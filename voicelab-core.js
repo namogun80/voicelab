@@ -1,5 +1,5 @@
 (function () {
-  var VER0 = 73;   /* = VER below */
+  var VER0 = 74;   /* = VER below */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -31,7 +31,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.28.2';
+  var VERSION = '2.28.3';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -46,6 +46,7 @@
   var LS = 'voiceLapCfg';
   var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 1, gapAhead: true, gapAheadLaps: 1, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
     teamOn: false, teams: [], teamOf: {}, ptsMode: 'fixed', ptsFixed: [10, 8, 6, 5, 4, 3, 2, 1], ptsCustom: [10, 8, 6, 5, 4, 3, 2, 1], bonusBest: false, bonusFin: false, teamAuto: true, teamSay: true, teamSayLive: false,
+    gAllPrac: true, gVoice: true, gVoiceBold: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1 };
   var koVoice = null, koVoices = [], femVoices = [];
@@ -467,6 +468,12 @@
     '<div class="lim">크게 다른 랩 제외 <select id="vl_avgo" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="10">보통 랩과 10% 넘게 차이</option><option value="15">15% 넘게 차이</option><option value="20">20% 넘게 차이</option><option value="30">30% 넘게 차이</option><option value="0">제외 안 함</option></select></div>' +
     '<details class="inf"><summary>ⓘ 설명</summary><div>피트 아웃·사고·컷처럼 보통 랩(중앙값)과 크게 다른 랩은 빼고 계산합니다. 시작 전 랩을 모르면 아는 랩 중 빠른 10랩(10랩 이하면 LiveRC 값)을 씁니다</div></details></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_gbf"><span>그래프에 시작 전 기록도 넣기 — 연습 세션은 LiveRC 연습 기록에서 이전 랩을 불러오고, 새로고침해도 같은 세션 기록을 이어서 그립니다</span></label></div>' +
+    '<div class="sub"><span>그래프 자동 선택</span></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_gallp"><span><b>Open Practice</b>에서는 코스에 나온 선수를 <b>모두</b> 그래프에 자동 선택</span></label>' +
+    '<div class="lim"><span style="color:#999">끄면 직접 체크한 선수만 · 레이스(예선·결승)는 원래 자동 선택 없음</span></div>' +
+    '<label style="margin-top:6px"><input type="checkbox" id="vl_gvoice"><span><b>🔊 보이스 알림 선수</b>는 그래프에 자동 선택 <small style="color:#999">(연습·레이스 모두)</small></span></label>' +
+    '<div class="lim"><span style="color:#999">코스에 나오면 자동으로 체크 · 안내를 끄면 자동으로 넣었던 체크도 빠짐 · 직접 체크를 끄면 그 세션 동안은 다시 넣지 않음</span></div>' +
+    '<label style="margin-top:6px"><input type="checkbox" id="vl_gvbold"><span>그래프에서 🔊 선수 선을 <b>굵게</b>, 맨 앞에</span></label></div>' +
     '</div></div>' +
     '<div class="sec grp" data-g="prac"><div class="gh"><span class="ar"></span><span class="sech">📊 연습</span><span class="gs" id="vl_gs_prac"></span></div><div class="gb">' +
     '<div class="sub" style="margin-top:12px"><span>세션 목록 — 표시 항목 · 순서</span></div>' +
@@ -594,11 +601,11 @@
   $('vl_rbb').addEventListener('change', function (e) {
     var n = e.target.getAttribute && e.target.getAttribute('data-g'); if (n === null || n === undefined) return;
     var i = cfg.graphSel.indexOf(n);
-    if (e.target.checked && i < 0) cfg.graphSel.push(n); else if (!e.target.checked && i >= 0) cfg.graphSel.splice(i, 1);
+    if (e.target.checked && i < 0) { cfg.graphSel.push(n); delete gNo[n]; } else if (!e.target.checked && i >= 0) { cfg.graphSel.splice(i, 1); gNo[n] = 1; if (cfg.graphAuto) delete cfg.graphAuto[n]; }   /* un-ticked by hand: not put back this session */
     save(); renderRaceBoard(true);
   });
   root.querySelectorAll('#vl_gbar .gch[data-g]').forEach(function (b) { b.onclick = function () { var k = b.getAttribute('data-g'); cfg.gShow = cfg.gShow || {}; cfg.gShow[k] = !cfg.gShow[k]; save(); renderGraphs(true); }; });
-  $('vl_gclr').onclick = function () { cfg.graphSel = []; save(); renderRaceBoard(true); };
+  $('vl_gclr').onclick = function () { (cfg.graphSel || []).forEach(function (n) { gNo[n] = 1; }); cfg.graphSel = []; cfg.graphAuto = {}; save(); renderRaceBoard(true); };
   /* name in the graph legend / lap list header: lap-time chart for that driver only (best / within / over colours); again = all */
   function gfClick(e) {
     var t = e.target.closest('[data-gf]'); if (!t) return;
@@ -680,6 +687,7 @@
   $('vl_tone').value = String(cfg.dingTone || 0); $('vl_tone').onchange = function () { cfg.dingTone = +this.value; save(); ding(); };
   bind('vl_pcol', 'paceColor', function () { renderRaceBoard(true); });
   bind('vl_gbf', 'gBackfill', function () { bf.next = 0; renderGraphs(true); });
+  bind('vl_gallp', 'gAllPrac', function () { gPresent = null; renderGraphs(true); }); bind('vl_gvoice', 'gVoice', function () { renderGraphs(true); }); bind('vl_gvbold', 'gVoiceBold', function () { renderGraphs(true); });
   function tsrcHint() { $('vl_tsrch').textContent = cfg.trendSrc === 'avg' ? 'Last Lap이 평균 랩보다 빠르면 초록, 느리면 빨강 · 괄호 안에 평균과의 차이 (예 21.200 (+0.140))' : cfg.trendSrc === 'best' ? 'Last Lap을 베스트 랩과의 차이로 — 베스트 보라 · 세션 랩타임 기준 초 이하 초록 · 그 이상 주황, 괄호 안에 차이 (기준·색은 🎨 랩타임 색)' : 'Pace가 빨라지면 초록, 느려지면 빨강 (Pace 칸에 표시)'; }
   $('vl_tsrc').value = cfg.trendSrc === 'avg' || cfg.trendSrc === 'best' ? cfg.trendSrc : 'pace'; tsrcHint(); $('vl_tsrc').onchange = function () { cfg.trendSrc = this.value; save(); tsrcHint(); renderRaceBoard(true); };
   bind('vl_bhdc', 'bhdColor', function () { renderRaceBoard(true); });
@@ -709,7 +717,7 @@
   });
   $('vl_freset').onclick = fuelReset;
   /* ---- Google Drive sync (through the user's own "VoiceLab sync" Apps Script web app) ---- */
-  var SYNC_LOCAL = ['syncUrl', 'syncKey', 'tab', 'open', 'full', '_ts', 'graphSel', 'zoom', 'bigView', 'gOpen', 'syncOk', 'v228s'];   /* stay on this device */
+  var SYNC_LOCAL = ['syncUrl', 'syncKey', 'tab', 'open', 'full', '_ts', 'graphSel', 'zoom', 'bigView', 'gOpen', 'syncOk', 'v228s', 'graphAuto'];   /* stay on this device */
   var syncQK = 'vlSyncQ', syncTmr = null, syncBusy = false, syncLast = 0, syncErr = '', syncFolder = '', syncPushT = null;
   function vlSafe(h) { return String(h || '').toLowerCase().replace(/[^a-z0-9.-]/g, '').replace(/\.liverc\.com$/, '').slice(0, 60) || 'track'; }
   function vlStamp(d) { var p2 = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()); }
@@ -1763,12 +1771,12 @@
     }
     var nx = Math.min(5, x1 - x0 + 1);
     for (i = 0; i < nx; i++) { var xv = Math.round(x0 + (x1 - x0) * i / Math.max(1, nx - 1)); g += '<text x="' + X(xv) + '" y="' + (H - 6) + '" fill="#888" font-size="10" text-anchor="middle">' + xv + '</text>'; }
-    series.forEach(function (s) {
+    series.filter(function (s) { return !s.v; }).concat(series.filter(function (s) { return s.v; })).forEach(function (s) {   /* 🔊 drivers on top, thicker */
       if (!s.pts.length) return;
-      g += '<path d="' + s.pts.map(function (p, k) { return (k ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(' ') + '" fill="none" stroke="' + s.color + '" stroke-width="1.8"/>';
+      g += '<path d="' + s.pts.map(function (p, k) { return (k ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(' ') + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.v ? 3.4 : 1.8) + '"/>';
       s.pts.forEach(function (p) {
         var out = p.y > y1;   /* clipped slow lap: hollow marker at the edge */
-        g += '<circle cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="2.6" fill="' + (out ? '#0f0f12' : s.color) + '" stroke="' + s.color + '"><title>' +
+        g += '<circle cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="' + (s.v ? 3.4 : 2.6) + '" fill="' + (out ? '#0f0f12' : s.color) + '" stroke="' + s.color + '"><title>' +
           esc(s.name + ' · ' + p.x + '랩 · ' + (kind === 'pos' ? p.y + '위' : fmtS(p.y))) + '</title></circle>';
       });
     });
@@ -1776,26 +1784,38 @@
   }
   /* Open Practice: a driver who comes on track is ticked for the graphs by itself, one who leaves is taken off */
   var gPresent = null, gFocus = null, gFocusSel = '';
-  function autoGraph(sc, present) {
-    if (!sc || !isPractice(sc)) { gPresent = null; return; }
-    var sel = cfg.graphSel || (cfg.graphSel = []), ch = false;
-    Object.keys(present).forEach(function (n) { if ((!gPresent || !gPresent[n]) && sel.indexOf(n) < 0) { sel.push(n); ch = true; } });
-    for (var i = sel.length - 1; i >= 0; i--) if (!present[sel[i]]) { sel.splice(i, 1); ch = true; }
-    gPresent = Object.assign({}, present);
+  /* graph ticks chosen for the user: everyone on track in Open Practice (setting), and the 🔊 voice drivers (setting).
+     cfg.graphAuto = names ticked by the voice rule (taken off again when their voice goes off); gNo = names the user un-ticked this session */
+  var gNo = {}, gNoSid = '';
+  function autoGraph(sc, present, presentD) {
+    var sel = cfg.graphSel || (cfg.graphSel = []), ch = false, sid = sc ? sessId(sc) : '';
+    if (sid !== gNoSid) { gNo = {}; gNoSid = sid; }
+    if (sc && isPractice(sc) && cfg.gAllPrac !== false) {
+      Object.keys(present).forEach(function (n) { if ((!gPresent || !gPresent[n]) && sel.indexOf(n) < 0 && !gNo[n]) { sel.push(n); ch = true; } });
+      for (var i = sel.length - 1; i >= 0; i--) if (!present[sel[i]]) { sel.splice(i, 1); ch = true; }
+      gPresent = Object.assign({}, present);
+    } else gPresent = null;
+    var ga = cfg.graphAuto || (cfg.graphAuto = {});
+    Object.keys(presentD || {}).forEach(function (n) {
+      var v = cfg.gVoice !== false && !!match(presentD[n]);
+      if (v && !gNo[n] && sel.indexOf(n) < 0) { sel.push(n); ga[n] = 1; ch = true; }
+      else if (!v && ga[n]) { var j = sel.indexOf(n); if (j >= 0) { sel.splice(j, 1); ch = true; } delete ga[n]; ch = true; }
+    });
     if (ch) save();
   }
   function renderGraphs(force) {
     var show = cfg.gShow || {};
     var sc = SC(), present = {};
-    if (sc && sc.driverData) list(sc.driverData).forEach(function (d) { if (nameOf(d)) present[nameOf(d)] = keyOf(d); });
-    autoGraph(sc, present);
+    var presentD = {}, vmap = {};
+    if (sc && sc.driverData) list(sc.driverData).forEach(function (d) { if (nameOf(d)) { present[nameOf(d)] = keyOf(d); presentD[nameOf(d)] = d; if (match(d)) vmap[nameOf(d)] = 1; } });
+    autoGraph(sc, present, presentD);
     var sel = cfg.graphSel || [];
     /* only drivers still on the timing screen get a column / a line (colour stays with the tick order) */
-    var ser = sel.map(function (n, i) { var k = present[n]; return { name: n, color: PCOL[i % PCOL.length], k: k, h: (k && lapHist[k]) || [] }; }).filter(function (s) { return s.k; });
+    var ser = sel.map(function (n, i) { var k = present[n]; return { name: n, color: PCOL[i % PCOL.length], k: k, h: (k && lapHist[k]) || [], v: cfg.gVoiceBold !== false && !!vmap[n] }; }).filter(function (s) { return s.k; });
     if (sel.join('\n') !== gFocusSel) { gFocusSel = sel.join('\n'); gFocus = null; }   /* ticking someone else = back to all */
     if (gFocus && !ser.some(function (s) { return s.name === gFocus; })) gFocus = null;
     if (show.list === undefined) show.list = true;
-    var gsig = JSON.stringify([gFocus, show, cfg.avgMode, cfg.avgOut, cfg.lapDev, cfg.lapNear, cfg.lapFar, cfg.lapBest, ser.map(function (s) { return [s.name, s.h.length, s.h.length ? s.h[0] : 0, s.h.length ? s.h[s.h.length - 1] : 0]; })]);
+    var gsig = JSON.stringify([gFocus, show, ser.map(function (s) { return s.v ? 1 : 0; }), cfg.avgMode, cfg.avgOut, cfg.lapDev, cfg.lapNear, cfg.lapFar, cfg.lapBest, ser.map(function (s) { return [s.name, s.h.length, s.h.length ? s.h[0] : 0, s.h.length ? s.h[s.h.length - 1] : 0]; })]);
     if (gsig === lastGSig && !force) return;
     lastGSig = gsig;
     root.querySelectorAll('#vl_gbar .gch[data-g]').forEach(function (b) { b.classList.toggle('on', !!show[b.getAttribute('data-g')]); });
@@ -1821,7 +1841,7 @@
     fitWidths();
     var kinds = [['pos', '순위 변화', function (e) { return e.p; }], ['lap', '랩타임 변화', function (e) { return e.t; }], ['avg', '평균 랩 변화', null]];
     $('vl_graphs').innerHTML = !sel.length ? '' : kinds.filter(function (k) { return show[k[0]]; }).map(function (k) {
-      var series = ser.map(function (s) { return { name: s.name, color: s.color, pts: s.h.map(function (e, i) { return { x: e.l, y: k[2] ? k[2](e) : ruleAvg(s.h.slice(0, i + 1), e.l, e.a) }; }).filter(function (p) { return p.y > 0; }) }; });
+      var series = ser.map(function (s) { return { name: s.name, color: s.color, v: s.v, pts: s.h.map(function (e, i) { return { x: e.l, y: k[2] ? k[2](e) : ruleAvg(s.h.slice(0, i + 1), e.l, e.a) }; }).filter(function (p) { return p.y > 0; }) }; });
       /* one driver: the lap-time chart looks like the session one (best / within / over colours, dashed best + seconds) */
       var one = k[0] === 'lap' && (ser.length === 1 || gFocus) ? (ser.filter(function (s) { return s.name === gFocus; })[0] || ser[0]) : null;
       var body = one ? lapSvg(siteBest(one, one.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t }; })), 300, 170) : lapChart(series, k[0]);
