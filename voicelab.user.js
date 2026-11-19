@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      2.29.1
+// @version      2.29.2
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,7 +20,7 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 76;   /* = VER below */
+  var VER0 = 77;   /* = VER below */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -53,7 +53,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.29.1';
+  var VERSION = '2.29.2';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -244,6 +244,7 @@ window.__vlAuto = true;
     '#vl_rb tbody tr.vl-new td{background:#1d4a2a}#vl_rb tbody tr.vl-new td:first-child{background-image:linear-gradient(to right,#3ddc84 0,#3ddc84 3px,transparent 3px)}' +
     '#vl_rb .pb{color:#4fc3f7;font-weight:700}#vl_rb .rf{color:#d27cff;font-weight:700}' +
     '#vl_rb .empty{padding:22px 10px;text-align:center;color:#888;font-size:13px;background:#0b0b0d}' +
+    '#vl_rb td.empty{white-space:normal !important;max-width:0;line-height:1.6}' +
     '#vl_rb.vl-cbon td.c-nm,#vl_panel #vl_rb.vl-cbon td.c-nm{padding-left:20px}#vl_rb td.c-p{position:relative;overflow:visible}' +
     '#vl_rb .vl-cbl{position:absolute;right:-13px;bottom:calc(50% + 4px);width:3px;height:calc(100% - 16px);border-radius:2px;background:#fff;box-shadow:0 0 3px var(--cc),0 0 7px var(--cc),0 0 12px var(--cc);pointer-events:none;animation:vlcbp 1.2s ease-in-out infinite alternate}' +
     '#vl_rb .vl-cbl:before{content:"";position:absolute;left:50%;top:-8px;transform:translateX(-50%);border:6px solid transparent;border-top:0;border-bottom:8px solid #fff;filter:drop-shadow(0 0 3px var(--cc)) drop-shadow(0 0 6px var(--cc))}' +
@@ -2238,7 +2239,7 @@ window.__vlAuto = true;
       var on = (cfg.sortK || 'p') === c.k;
       return '<th class="c-' + c.k + (on ? ' sorted' : '') + '" data-k="' + c.k + '" title="눌러서 정렬"><span class="lg">' + c.lg + '</span><span class="sm">' + c.sm + '</span>' + (on ? '<span class="ar">' + ((cfg.sortD || 1) > 0 ? '▲' : '▼') + '</span>' : '') + '</th>';
     }).join('') + '</tr>';
-    if (!rowsData.length) { $('vl_rbb').innerHTML = '<tr><td class="empty" colspan="' + cols.length + '">코스에 나온 선수가 없습니다. 주행이 시작되면 자동으로 표시됩니다.</td></tr>'; renderQual(); return; }
+    if (!rowsData.length) { $('vl_rbb').innerHTML = '<tr><td class="empty" colspan="' + cols.length + '">코스에 나온 선수가 없습니다.<br>주행이 시작되면 자동으로 표시됩니다.</td></tr>'; renderQual(); fitWidths(); return; }
     $('vl_rbb').innerHTML = rowsData.map(function (r, ri) {
       var cs = '';   /* close battles: no row colour any more (it clashed with the lap-update colours) → neon arrow in the P cell */
       var prv = rowsData[ri - 1], chase = r.closeTo && prv && +prv.p === +r.p - 1;
