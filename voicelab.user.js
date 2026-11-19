@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      2.26.1
+// @version      2.27.0
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -50,8 +50,8 @@ window.__vlAuto = true;
   main();
   function main() {
   if (!document.body) return;
-  var VER = 69;   /* bump when the panel changes */
-  var VERSION = '2.26.1';
+  var VER = 70;   /* bump when the panel changes */
+  var VERSION = '2.27.0';
   var warnOld = false;
   var others = document.querySelectorAll('#vl_root');
   for (var oi = 0; oi < others.length; oi++) {
@@ -61,18 +61,21 @@ window.__vlAuto = true;
     if (!ov) warnOld = true;   /* copies before v1.9 keep running in the background and can't be stopped from here */
   }
   var LS = 'voiceLapCfg';
-  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: true, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 1, gapAhead: true, gapAheadLaps: 1, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
+  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 1, gapAhead: true, gapAheadLaps: 1, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
     nameMulti: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
-    remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false };
+    remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1 };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
   cfg.closeV2 = 0;   /* stays 0 only for settings saved before v2.24 (see below) */
+  cfg.v227 = 0;
   try { Object.assign(cfg, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   try { if (DESK && DESK.cfgGet) { var dc = DESK.cfgGet(); if (dc) Object.assign(cfg, JSON.parse(dc)); } } catch (e) {}
   /* Google Drive sync address travels to another track's site in the address (#…&vl-sync=url%0Akey) */
   try { var hsy = location.hash.match(/vl-sync=([^&]*)/); if (hsy) { var spy = decodeURIComponent(hsy[1]).split('\n'); if (/^https:\/\/script\.google(usercontent)?\.com\//.test(spy[0])) { cfg.syncUrl = spy[0]; cfg.syncKey = spy[1] || ''; } } } catch (e) {}
   /* v2.24: close battles are a neon arrow, not a row colour → the old default red becomes neon pink */
+  /* v2.27: the name / position / “초” boxes are gone — names follow the 2-or-more rule, position only when it changes, lap times without “초” */
+  if (!cfg.v227) { cfg.sayName = true; cfg.sayPos = false; cfg.unit = false; cfg.v227 = 1; }
   if (!cfg.closeV2) { if (!cfg.closeColor || String(cfg.closeColor).toLowerCase() === '#ff5252') cfg.closeColor = '#ff2bd6'; cfg.closeV2 = 1; }
   var syncTs0 = +cfg._ts || 0, syncReady = false, syncSig = null;
   var running = false;
@@ -82,6 +85,7 @@ window.__vlAuto = true;
     if (syncReady && cfg.syncUrl) { var sg = syncSigOf(); if (sg !== syncSig) { syncSig = sg; cfg._ts = Date.now(); syncPushSoon(); } }
     try { localStorage.setItem(LS, JSON.stringify(cfg)); } catch (e) {}
     try { if (DESK && DESK.cfgSet) DESK.cfgSet(JSON.stringify(cfg)); } catch (e) {}
+    try { autoRun(); } catch (e) {}   /* a driver picked or unpicked: start / stop the voice right away (not up to 250 ms later, so no lap slips through) */
   };
 
   /* ---------- styles ---------- */
@@ -106,7 +110,7 @@ window.__vlAuto = true;
     '#vl_tab_set details.inf{margin-top:4px}#vl_tab_set details.inf summary{color:#8aa;font-size:12px;cursor:pointer;list-style:none}#vl_tab_set details.inf summary::-webkit-details-marker{display:none}#vl_tab_set details.inf>div{color:#999;font-size:12px;margin-top:3px;line-height:1.5}' +
     '#vl_tab_set .sec{border:1px solid #2a2a30;border-radius:10px;padding:10px 10px 6px;margin-bottom:12px}#vl_tab_set .sech{font-size:15px;font-weight:800;color:#e8b400;margin:0 0 8px}' +
     '#vl_head{display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid #2a2a30;flex:none}' +
-    '#vl_head .tab{background:none;border:0;border-bottom:3px solid transparent;color:#999;padding:11px 10px 8px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}' +
+    '#vl_head .tab{position:relative;background:none;border:0;border-bottom:3px solid transparent;color:#999;padding:11px 10px 8px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}' +
     '#vl_head .tab.on{color:#fff;border-bottom-color:#e8b400}' +
     '#vl_zm{margin-left:auto;margin-right:6px;display:inline-flex;align-items:center;gap:2px;background:#1e1e24;border:1px solid #3a3a42;border-radius:16px;padding:2px 4px;font-size:13px;color:#ddd;position:relative;flex:none}' +
     '#vl_zm i{font-style:normal;opacity:.7;margin:0 2px}#vl_zm button{background:#2a2a32;color:#eee;border:0;border-radius:50%;width:22px;height:22px;font-weight:800;cursor:pointer;padding:0;line-height:22px}' +
@@ -155,7 +159,7 @@ window.__vlAuto = true;
     '#vl_glaps .glrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}#vl_glaps .glc{flex:0 0 auto;min-width:0;max-width:none;background:#0f0f12;border:1px solid #24242b;border-radius:8px;padding:6px}' +
     '#vl_glaps .glc h5{margin:0 0 4px 2px;font-size:12px;color:#ddd;display:flex;align-items:center;gap:6px}#vl_glaps .glc h5 i{width:10px;height:10px;border-radius:2px;display:inline-block}#vl_glaps .glc h5 small{margin-left:auto;color:#777;font-weight:400}' +
     '#vl_glaps .ll{max-height:none;overflow:visible}#vl_glaps .ll td{height:22px !important;box-sizing:border-box}#vl_glaps .glc h5{cursor:pointer}#vl_glaps table{width:auto;font-size:12px}#vl_glaps td,#vl_glaps th{padding:2px 6px !important;font-size:13px !important;height:auto !important;text-align:right;border-bottom:1px solid #1d1d22}#vl_glaps th{color:#888;font-size:11px;position:sticky;top:0;background:#0f0f12}' +
-    '#vl_glaps .glk{margin:2px 0 8px}#vl_glaps .lk,#vl_graphs .lk{font-size:11px;color:#888}' +
+    '#vl_glaps .glk{margin:2px 0 8px}#vl_glaps .glc{width:fit-content}#vl_glaps .vl-ls{width:0;min-width:100%}#vl_glaps .lk,#vl_graphs .lk{font-size:11px;color:#888}' +
     '#vl_graphs .gc h5{margin:0 0 2px 2px;font-size:12px;color:#e8b400;font-weight:700;display:flex;justify-content:space-between}#vl_graphs .gc h5 small{color:#777;font-weight:400}' +
     '#vl_graphs svg{width:100%;height:auto;display:block}' +
     '#vl_cols .cr{display:flex;align-items:center;gap:8px;background:#1f1f24;border-radius:7px;padding:5px 8px;font-size:14px}' +
@@ -187,13 +191,23 @@ window.__vlAuto = true;
     '#vl_qual tr.vl-ql td{background:#12301f !important}#vl_qual tr.vl-ql .vl-qn{color:#3ddc84;font-weight:700}#vl_qual tr.vl-qv td{background:#2a1838 !important}#vl_qual tr.vl-qv .vl-qn{color:#d27cff;font-weight:800}' +
     '#vl_qual .vl-qd{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 6px #3ddc84}#vl_qual .vl-qtq{color:#e8b400 !important;margin-left:2px !important;font-size:11px !important}#vl_qual .vl-qtie{color:#ffb74d !important}' +
     '#vl_bigb{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.35);border-radius:6px;color:inherit;font-size:13px;font-weight:700;padding:2px 7px;cursor:pointer;opacity:.75;align-self:center;white-space:nowrap}#vl_bigb.on{opacity:1;background:rgba(0,0,0,.5)}' +
-    '#vl_big{display:none}#vl_rb.vl-bigon #vl_big{display:flex;flex-wrap:wrap;gap:10px;padding:10px 0}#vl_rb.vl-bigon .tw,#vl_rb.vl-bigon .lgd,#vl_rb.vl-bigon #vl_gbar,#vl_rb.vl-bigon #vl_gsel,#vl_rb.vl-bigon #vl_glg,#vl_rb.vl-bigon #vl_glaps,#vl_rb.vl-bigon #vl_graphs,#vl_rb.vl-bigon #vl_ghint{display:none!important}' +
+    '#vl_big{display:none}#vl_rb.vl-bigon #vl_big{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,600px));gap:12px;padding:10px 0;align-items:start}#vl_big .bcol{display:flex;flex-direction:column;gap:8px;min-width:0}#vl_big .bcol>.vl-bc{flex:none;max-width:none;width:100%;box-sizing:border-box}#vl_rb.vl-bigon .tw,#vl_rb.vl-bigon .lgd,#vl_rb.vl-bigon #vl_gbar,#vl_rb.vl-bigon #vl_gsel,#vl_rb.vl-bigon #vl_glg,#vl_rb.vl-bigon #vl_glaps,#vl_rb.vl-bigon #vl_graphs,#vl_rb.vl-bigon #vl_ghint{display:none!important}' +
     '#vl_big .vl-bc{flex:1 1 320px;max-width:560px;background:#141418;border:1px solid #2c2c34;border-radius:14px;padding:12px 14px;box-sizing:border-box}#vl_big .vl-bc.mine{border-color:#6a5a1a}' +
     '#vl_big .bc-top{display:flex;align-items:baseline;gap:10px;min-width:0}#vl_big .bc-p{font-size:44px;font-weight:900;color:#ffd54a;line-height:1}#vl_big .bc-p small{font-size:20px;color:#bbb;margin-right:2px}' +
     '#vl_big .bc-nm{font-size:22px;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#vl_big .bc-l{font-size:22px;font-weight:800;color:#ddd;white-space:nowrap}' +
     '#vl_big .bc-k{font-size:12px;color:#999;font-weight:700;letter-spacing:.5px}#vl_big .bc-main{margin:8px 0 6px}#vl_big .bc-last{font-size:64px;font-weight:900;line-height:1.05;font-variant-numeric:tabular-nums}#vl_big .bc-d{font-size:22px;font-weight:800}' +
     '#vl_big .bc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid #2a2a30;padding-top:8px}#vl_big .bc-v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}#vl_big .bc-v.cl{color:var(--cc)}' +
     '#vl_big .bc-none{color:#999;font-size:14px;padding:6px 2px}@media (max-width:430px){#vl_big .bc-last{font-size:56px}#vl_big .bc-v{font-size:20px}#vl_big .bc-p{font-size:38px}}' +
+    '#vl_big .vl-bc.rv{border:2px solid var(--cc);box-shadow:0 0 10px var(--cc);padding:8px 12px;background:#18121a}#vl_big .rv .rv-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#fff;min-width:0}#vl_big .rv .rv-h>span:first-child{text-shadow:0 0 6px var(--cc);white-space:nowrap}' +
+    '#vl_big .rv .rv-m{display:flex;align-items:baseline;gap:10px;margin-top:4px}#vl_big .rv .rv-p{font-size:20px;font-weight:900;color:#ddd}#vl_big .rv .rv-n{font-size:16px;color:#eee;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '#vl_big .rv .rv-t{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}#vl_big .rv .rv-g{font-size:20px;font-weight:900;color:var(--cc)}' +
+    '#vl_big .bc-q{margin:6px 0 2px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;background:#221d0c;border:1px solid #5a4a12;border-radius:10px;padding:6px 10px}#vl_big .bc-q b{font-size:26px;color:#ffd54a}#vl_big .bc-q span{font-size:15px;color:#ddd;font-weight:700}#vl_big .bc-q .up{color:#3ddc84}#vl_big .bc-q .dn{color:#ff7a7a}' +
+    '@media (max-width:700px){#vl_big.two .bc-last{font-size:40px}#vl_big.two .bc-p{font-size:30px}#vl_big.two .bc-nm,#vl_big.two .bc-l{font-size:16px}#vl_big.two .bc-row{grid-template-columns:1fr 1fr}#vl_big.two .bc-v{font-size:18px}#vl_big.two .rv .rv-t{font-size:22px}#vl_big.two .rv .rv-g{font-size:15px}#vl_big.two .bc-q b{font-size:20px}#vl_big.two .bc-q span{font-size:12px}#vl_big.two .bc-d{font-size:16px}}' +
+    '@media (max-width:430px){#vl_big.two .bc-last{font-size:30px}#vl_big.two .vl-bc{padding:8px}#vl_big.two .bc-v{font-size:15px}#vl_big.two .rv .rv-h{flex-wrap:wrap;gap:2px 6px}#vl_big.two .rv .rv-t{font-size:18px}}' +
+    '#vl_upddot{display:none;position:absolute;top:6px;right:2px;width:9px;height:9px;border-radius:50%;background:#ff5252;box-shadow:0 0 0 2px #111}#vl_upddot.on{display:block}' +
+    '#vl_unl{display:none;background:#3a2a06;border-bottom:1px solid #6a5212;color:#ffd54a;font-weight:800;font-size:14px;padding:8px 12px;text-align:center;cursor:pointer}#vl_unl.on{display:block}' +
+    '#vl_go .vl-ps{display:none}@media (max-width:430px){#vl_go .vl-pl{display:none}#vl_go .vl-ps{display:inline}#vl_go.vl-st{padding:5px 8px !important}}@media (max-width:350px){#vl_go.vl-st{padding:4px 5px !important;font-size:12px !important}}#vl_go.vl-st{border-radius:999px;padding:5px 10px;font-size:13px;font-weight:800;border:1px solid transparent}#vl_go.vl-st.on{background:#123a22 !important;color:#3ddc84 !important;border-color:#2f6b3d}#vl_go.vl-st.mu{background:#3a1a1a !important;color:#ff9a9a !important;border-color:#6b2f2f}#vl_go.vl-st.no{background:#2a2a30 !important;color:#999 !important;border-color:#444}' +
+    '#vl_upd .ub{padding:6px 12px;border-radius:8px;border:1px solid #555;background:#2a2a32;color:#fff;font-size:14px;font-weight:700;cursor:pointer}#vl_upd .ub.go{background:#3ddc84;color:#06240f;border:0;font-weight:800}#vl_updi .nw{margin-top:8px;background:#16261a;border:1px solid #2f6b3d;border-radius:10px;padding:8px 10px;line-height:1.6}#vl_updi ul{margin:4px 0 6px 18px;padding:0;color:#ddd;font-size:13px}' +
     '#vl_qual .vl-qmore{display:none}#vl_panel.wide #vl_qual .vl-qbox.vl-qo{max-width:none}#vl_panel.wide #vl_qual .vl-qo .vl-qt{width:100%}' +
     '#vl_panel.wide #vl_qual .vl-qsc{max-height:var(--qh,none);overflow:auto;overscroll-behavior:contain}#vl_panel.wide #vl_qual .vl-qsc .vl-qt tr:first-child th{position:sticky;top:0;z-index:2}' +
     '#vl_panel.wide #vl_qual .vl-qsc tr.vl-qv td{position:sticky;bottom:0;z-index:1;box-shadow:inset 0 -2px 0 #b04ad8}' +
@@ -307,9 +321,10 @@ window.__vlAuto = true;
   root.setAttribute('data-vl-ver', String(VER));
   root.innerHTML =
     '<div id="vl_panel">' +
-    '<div id="vl_head"><button class="tab" data-tab="board">🏁 레이스<span class="vl-tl"> 보드</span></button><button class="tab" data-tab="prac">📊 연습<span class="vl-tl"> 기록</span></button><button class="tab" data-tab="set">⚙ 설정</button>' +
+    '<div id="vl_head"><button class="tab" data-tab="board">🏁 레이스<span class="vl-tl"> 보드</span></button><button class="tab" data-tab="prac">📊 연습<span class="vl-tl"> 기록</span></button><button class="tab" data-tab="set">⚙ 설정<i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
     '<span id="vl_zm" title="화면 확대/축소"><i>🔍</i><button data-zs="-1" title="작게">−</button><button id="vl_zv" title="눌러서 퍼센트 고르기">100%</button><button data-zs="1" title="크게">+</button><span id="vl_zl"></span></span>' +
     '<button id="vl_go"></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span></div>' +
+    '<div id="vl_unl">🔊 화면을 한 번 누르면 음성이 켜져요</div>' +
     '<div id="vl_warn" style="display:none;background:#5a1414;color:#ffd2d2;font-size:12px;line-height:1.45;padding:8px 12px;border-bottom:1px solid #7a2020"></div>' +
     '<div id="vl_body">' +
     '<div id="vl_trk"></div>' +
@@ -340,13 +355,10 @@ window.__vlAuto = true;
     '<div class="sub"><span>읽어 줄 내용</span></div>' +
     '<div class="grid">' +
     '<label class="ck"><input type="checkbox" id="vl_all">전체 선수</label>' +
-    '<label class="ck" title="선수 목록에서 체크한 선수는 각 선수 줄의 설정을 따릅니다"><input type="checkbox" id="vl_name">이름 <small style="color:#999">(전체·직접 추가)</small></label>' +
     '<label class="ck"><input type="checkbox" id="vl_lap">랩 수</label>' +
     '<label class="ck"><input type="checkbox" id="vl_time">랩타임</label>' +
-    '<label class="ck"><input type="checkbox" id="vl_pos">순위</label>' +
     '<label class="ck"><input type="checkbox" id="vl_best">베스트 알림</label>' +
     '<label class="ck" title="랩타임 뒤에 베스트와의 차이 · 베스트를 새로 내면 얼마나 줄었는지"><input type="checkbox" id="vl_delta">베스트와 차이 <small style="color:#999">(+0.4)</small></label>' +
-    '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_unit">랩타임에 “초” 붙이기 (29.8초 / 29.8)</label>' +
     '</div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_nmulti">이름은 <b>안내 선수가 2명 이상</b> 함께 달릴 때만 부르기</label>' +
     '<div class="lim"><span style="color:#999">1명이면 이름 없이 “23.4” · 2명 이상이면 “남호, 23.4” · 선수 줄의 ‘이름’ 체크를 끈 선수는 항상 안 부름</span></div></div>' +
@@ -392,7 +404,7 @@ window.__vlAuto = true;
     '<div class="sub"><span>앞차 통과 알림음</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_ding"><span>안내 중인 선수의 <b>앞차</b>가 라인을 통과하면 알림음</span></label>' +
     '<div class="lim">소리 <select id="vl_tone" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="0">부드러운 띵</option><option value="1">낮은 퐁</option><option value="2">짧은 톡</option><option value="3">나무 똑</option><option value="4">맑은 핑</option></select>' +
-    '<button id="vl_dingt" style="background:#333;color:#fff;border:0;border-radius:6px;padding:5px 10px;cursor:pointer">🔔 소리 테스트</button><span style="color:#999">▶ 시작 중에만 울립니다</span></div></div>' +
+    '<button id="vl_dingt" style="background:#333;color:#fff;border:0;border-radius:6px;padding:5px 10px;cursor:pointer">🔔 소리 테스트</button><span style="color:#999">안내 중에만 울립니다</span></div></div>' +
     '<div class="sub" style="margin-top:12px"><span>주유 타이머 · 피트 타임</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_fon">주유 타이머 사용 <small style="color:#999">(레이스 보드 ⛽ 버튼으로도 켜고 끔)</small></label>' +
     '<div class="lim" style="flex-wrap:wrap">주유 시간 <input type="number" id="vl_fmin" min="0" max="60" style="width:56px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">분 <input type="number" id="vl_fsec" min="0" max="59" style="width:56px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">초</div>' +
@@ -439,6 +451,8 @@ window.__vlAuto = true;
     '<div style="color:#999;font-size:12px;margin-top:4px">레이스 보드 랩타임 표 · 세션 랩타임 · PC 앱 저장된 기록에 공통</div></div>' +
     '</div></div>' +
     '<div class="sec grp" data-g="gen"><div class="gh"><span class="ar"></span><span class="sech">⚙ 일반</span><span class="gs" id="vl_gs_gen"></span></div><div class="gb">' +
+    '<div class="gap" id="vl_upd"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:15px">🔄 업데이트</b><span style="color:#bbb" id="vl_updv"></span><button class="ub" id="vl_updb" style="margin-left:auto">업데이트 확인</button></div><div id="vl_updi"></div>' +
+    '<div style="margin-top:6px;color:#999;font-size:12px">하루 한 번 자동으로 확인하고, 새 버전이 있으면 ⚙ 설정 탭에 빨간 점 · Tampermonkey 자동 업데이트도 그대로</div></div>' +
     '<div class="grid"><label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_wake">화면 꺼짐 방지 (휴대폰)</label>' +
     '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_trkshow">트랙 이동 줄 표시 (레이스 보드 · 연습 기록 위)</label>' +
     '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_afit"><span>넓은 화면에서 표를 화면 폭에 맞춰 크게 <small style="color:#999">(PC·아이패드, 최대 1.5배)</small></span></label></div>' +
@@ -565,9 +579,8 @@ window.__vlAuto = true;
   var bind = function (id, key, fn) { var el = $(id); el.checked = !!cfg[key]; el.onchange = function () { cfg[key] = el.checked; save(); if (fn) fn(); }; };
   $('vl_t').value = cfg.targets;
   $('vl_t').oninput = function () { cfg.targets = this.value; save(); parseTargets(); };
-  bind('vl_all', 'all'); bind('vl_name', 'sayName'); bind('vl_lap', 'sayLap'); bind('vl_time', 'sayTime'); bind('vl_pos', 'sayPos'); bind('vl_best', 'sayBest');
+  bind('vl_all', 'all'); bind('vl_lap', 'sayLap'); bind('vl_time', 'sayTime'); bind('vl_best', 'sayBest');
   $('vl_dec').value = String(cfg.dec); $('vl_dec').onchange = function () { cfg.dec = +this.value; save(); };
-  bind('vl_unit', 'unit');
   $('vl_pad').value = String(cfg.pad); $('vl_pad').onchange = function () { cfg.pad = +this.value; save(); };
   bind('vl_gl', 'gapLead'); bind('vl_ga', 'gapAhead');
   [['vl_gln', 'gapLeadLaps'], ['vl_gan', 'gapAheadLaps']].forEach(function (x) { var el = $(x[0]); el.value = String(cfg[x[1]]); el.onchange = function () { cfg[x[1]] = +el.value; save(); }; });
@@ -769,7 +782,7 @@ window.__vlAuto = true;
       var on = Object.keys(cfg.sel || {}).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; }), lab = function (k) { return (cfg.sel[k] && cfg.sel[k].alias) || k; };
       var mm = function (m, s2) { return (+m || 0) + ':' + ('0' + (+s2 || 0)).slice(-2); };
       var v = [on.length ? lab(on[0]) + (on.length > 1 ? ' 외 ' + (on.length - 1) + '명' : '') : (cfg.all ? '전체 선수' : '선수 없음')];
-      var r = [cfg.sayName && '이름', cfg.sayLap && '랩 수', cfg.sayTime && '랩타임', cfg.sayPos && '순위', cfg.sayBest && '베스트'].filter(Boolean);
+      var r = [cfg.sayLap && '랩 수', cfg.sayTime && '랩타임', cfg.sayBest && '베스트', cfg.sayDelta && '베스트 차이'].filter(Boolean);
       if (r.length) v.push(r.join('·'));
       if (cfg.runOn) v.push((cfg.runWord || '주행 완료') + ' ' + mm(cfg.runMin, cfg.runSec));
       v.push({ def: '기본 음성', f1: '여성 1', f2: '여성 2', f3: '여성 3' }[cfg.voice || 'def'] || '기본 음성');
@@ -902,16 +915,86 @@ window.__vlAuto = true;
   });
   $('vl_trk').addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id === 'vl_tin' && !e.isComposing) trkGo(e.target.value); });
   renderTrk();
+  /* no start/stop button: voice runs whenever at least one driver is picked for announcements (checked, typed in, or "all"),
+     the status pill mutes / unmutes for a while without touching the picks */
+  var muted = false;
+  /* browsers (iPhone Safari above all) only let a page speak after the person has touched it once */
+  var unlocked = NB || !hasSpeech || !!DESK || !!(navigator.userActivation && navigator.userActivation.hasBeenActive && !IOS);   /* PC app: speech allowed without a touch (if not, the not-allowed error brings the banner back) */
+  function voiceCount() { return cfg.all ? -1 : Object.keys(cfg.sel).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; }).length + (targets ? targets.length : 0); }
   var paint = function () {
-    var b = $('vl_go'); b.textContent = running ? '■ 중지' : '▶ 시작';
-    b.style.background = running ? '#c0392b' : '#e8b400'; b.style.color = running ? '#fff' : '#000';
+    var b = $('vl_go'), n = voiceCount();
+    b.className = 'vl-st ' + (!n ? 'no' : muted ? 'mu' : 'on');
+    var L = function (lg, sh) { return '<span class="vl-pl">' + lg + '</span><span class="vl-ps">' + sh + '</span>'; }, cnt = n < 0 ? '전체' : n + '명';   /* long label / short label for phones */
+    b.innerHTML = !n ? L('🔇 안내 없음', '🔇 없음') : muted ? L('🔇 음소거', '🔇 음소거') : L('🔊 안내 ' + cnt, '🔊 ' + cnt);
+    b.title = !n ? '안내할 선수가 없어요 — 눌러서 선수 고르기' : muted ? '눌러서 다시 켜기' : '눌러서 잠시 음소거';
     $('vl_fab').classList.toggle('on', running);
+    $('vl_unl').classList.toggle('on', running && !unlocked);
   };
+  function autoRun() {
+    var want = voiceCount() !== 0 && !muted;
+    if (want !== running) {
+      running = want;
+      if (running) { seed(); spk.q = 0; if (cfg.wake) wakeOn(); }
+      else { if (NB) native({ type: 'stop' }); else if (hasSpeech) spCancel(); wakeOff(); audioOff(); }
+    }
+    paint();
+  }
   $('vl_go').onclick = function () {
-    running = !running; paint();
-    if (running) { seed(); spk.q = 0; speak('보이스랩 시작'); if (cfg.wake) wakeOn(); setTab('board'); }
-    else { if (NB) native({ type: 'stop' }); else if (hasSpeech) spCancel(); wakeOff(); audioOff(); }
+    if (!voiceCount()) { setTab('set'); try { var g = root.querySelector('.grp[data-g="voice"]'); if (g && !g.classList.contains('open')) g.querySelector('.gh').click(); g.scrollIntoView({ block: 'start' }); } catch (e) {} return; }
+    muted = !muted; autoRun();
   };
+  function unlock() {
+    if (unlocked) return; unlocked = true;
+    try { if (hasSpeech && !NB) { var u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'ko-KR'; speechSynthesis.speak(u); } } catch (e) {}
+    if (!IOS) audioOn(); if (running && cfg.wake) wakeOn(); paint();
+  }
+  document.addEventListener('click', unlock, true); document.addEventListener('touchend', unlock, true); document.addEventListener('keydown', unlock, true);
+  $('vl_unl').onclick = function () { unlock(); };
+
+  /* ---------- 🔄 update check (GitHub namogun80/voicelab · version.json) ---------- */
+  var GH = 'namogun80/voicelab', UPD_JSON = 'https://raw.githubusercontent.com/' + GH + '/main/version.json';
+  var UPD_US = 'https://raw.githubusercontent.com/' + GH + '/main/voicelab.user.js';
+  var upd = { busy: false, err: '', msg: '' };
+  /* how this copy was started: PC app, userscript (Tampermonkey / Userscripts) or a bookmark */
+  var KIND = DESK ? 'pc' : NB ? 'app' : window.__vlAuto ? 'us' : 'bm';
+  var KIND_TXT = { pc: 'PC 앱', app: '아이폰 앱', us: '유저스크립트', bm: '북마크' }[KIND];
+  function updGet() { try { return JSON.parse(localStorage.getItem('vlUpd') || '{}') || {}; } catch (e) { return {}; } }
+  function updNewer(u) { return +u.ver > VER; }
+  function updPaint() {
+    var u = updGet(), nw = updNewer(u);
+    $('vl_upddot').classList.toggle('on', nw);
+    var v = $('vl_updv'); if (!v) return;
+    v.innerHTML = '지금 <b style="color:#fff">v' + VERSION + '</b> · ' + KIND_TXT;
+    $('vl_updb').textContent = upd.busy ? '확인 중…' : '업데이트 확인';
+    var h = '';
+    if (upd.err) h = '<div style="margin-top:6px;color:#ff9a9a">확인하지 못했어요 (' + esc(upd.err) + ') — 인터넷 연결을 확인하세요</div>';
+    else if (nw) {
+      var how = { us: 'Tampermonkey 설치 창이 열려요 · “업데이트”를 누른 뒤 이 페이지를 새로고침', bm: '이 자리에서 바로 새 버전으로 바뀌어요 · 북마크를 “🔄 자동 업데이트 북마크”로 바꾸면 늘 최신', pc: '새 코어를 받아 이 화면을 다시 불러와요', app: '아이폰 앱은 새 앱 파일이 필요해요' }[KIND];
+      h = '<div class="nw"><div><b style="color:#3ddc84">새 버전 v' + esc(u.version) + '</b> <small style="color:#9a9">' + esc(u.date || '') + '</small></div>' +
+        (u.notes && u.notes.length ? '<ul>' + u.notes.slice(0, 6).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '') +
+        (KIND !== 'app' ? '<button class="ub go" id="vl_updgo">지금 업데이트</button> ' : '') + '<small style="color:#aaa">' + how + '</small>' + (upd.msg ? '<div style="margin-top:4px;color:#ffd54a">' + esc(upd.msg) + '</div>' : '') + '</div>';
+    } else if (u.t) h = '<div style="margin-top:6px;color:#3ddc84">최신 버전이에요 <small style="color:#888">(' + new Date(u.t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 확인)</small></div>';
+    $('vl_updi').innerHTML = h;
+    var g = $('vl_updgo'); if (g) g.onclick = updGo;
+  }
+  function updCheck() {
+    if (upd.busy) return; upd.busy = true; upd.err = ''; updPaint();
+    fetch(UPD_JSON + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      var o = { t: Date.now(), ver: +j.ver || 0, version: String(j.version || ''), date: String(j.date || ''), notes: Array.isArray(j.notes) ? j.notes.map(String) : [] };
+      try { localStorage.setItem('vlUpd', JSON.stringify(o)); } catch (e) {}
+    }).catch(function (e) { upd.err = String(e && e.message || e).slice(0, 60); }).then(function () { upd.busy = false; updPaint(); });
+  }
+  function updGo() {
+    if (KIND === 'us') { window.open(UPD_US, '_blank'); upd.msg = '설치 창에서 업데이트한 뒤 이 페이지를 새로고침하세요'; updPaint(); return; }
+    if (KIND === 'pc') { upd.msg = '새 코어를 받는 중…'; updPaint(); var p = DESK.coreUpdate ? DESK.coreUpdate() : Promise.resolve(); Promise.resolve(p).then(function () { location.reload(); }, function () { upd.msg = '받지 못했어요 — 앱을 다시 열어 보세요'; updPaint(); }); return; }
+    /* bookmark: load the newest core of the latest commit right here; the newer copy takes over this panel */
+    upd.msg = '새 버전을 불러오는 중…'; updPaint();
+    var go = function (v) { var sc2 = document.createElement('script'); sc2.src = 'https://cdn.jsdelivr.net/gh/' + GH + '@' + v + '/voicelab-core.js'; sc2.onerror = function () { if (v !== 'main') go('main'); else { upd.msg = '불러오지 못했어요'; updPaint(); } }; document.head.appendChild(sc2); };
+    fetch('https://api.github.com/repos/' + GH + '/commits/main').then(function (r) { return r.json(); }).then(function (j) { go(j && j.sha ? j.sha : 'main'); }, function () { go('main'); });
+  }
+  if ($('vl_updb')) $('vl_updb').onclick = updCheck;
+  updPaint();
+  if (Date.now() - (+updGet().t || 0) > 864e5) setTimeout(updCheck, 4000);   /* once a day, a few seconds after start */
   $('vl_test').onclick = function () { speak('남호, 28랩, 23.69초, 베스트 랩'); };
   paint();
   var hint = function (s) { $('vl_hint').textContent = s; };
@@ -1045,7 +1128,7 @@ window.__vlAuto = true;
       if (tryN < 2) setTimeout(function () { speak(text, tryN + 1); }, 250);   /* same words with the next fallback voice */
     };
     u.onstart = function () { started = true; spk.ok++; spk.q = 0; spk.err = ''; spkInfo(); };
-    u.onerror = function (e) { var er = (e && e.error) || 'error'; if (er === 'interrupted' || er === 'canceled') return; fail(er); };
+    u.onerror = function (e) { var er = (e && e.error) || 'error'; if (er === 'interrupted' || er === 'canceled') return; if (er === 'not-allowed') { unlocked = false; spk.q = 0; try { paint(); } catch (x) {} return; } fail(er); };
     /* WebKit sometimes "ends" an utterance at once without saying anything when the voice is unusable */
     u.onend = function () { if (!started) fail('소리 없이 끝남'); };
     if (!tryN) spk.n++;
@@ -1436,7 +1519,7 @@ window.__vlAuto = true;
       var lst = siteBest(s, s.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p }; }));
       return '<div class="glc"><h5 data-gf="' + esc(s.name) + '" title="눌러서 랩타임 변화를 이 선수만 보기"><i style="background:' + s.color + '"></i>' + esc(s.name) + '<small>' + (lst.length ? lst.length + '랩' : '') + '</small></h5>' + lapSum(lst) + '<div class="ll">' +
         (lst.length ? lapTbl(lst, !isPractice(sc)) : '<div style="color:#777;font-size:12px;padding:12px">아직 기록이 없습니다</div>') + '</div></div>';
-    }).join('') + '</div><div class="glk">' + lapKey() + '</div>';
+    }).join('') + '</div><div class="glk">' + lapKey(null, true) + '</div>';
     fitWidths();
     var kinds = [['pos', '순위 변화', function (e) { return e.p; }], ['lap', '랩타임 변화', function (e) { return e.t; }], ['avg', '평균 랩 변화', null]];
     $('vl_graphs').innerHTML = !sel.length ? '' : kinds.filter(function (k) { return show[k[0]]; }).map(function (k) {
@@ -1444,7 +1527,7 @@ window.__vlAuto = true;
       /* one driver: the lap-time chart looks like the session one (best / within / over colours, dashed best + seconds) */
       var one = k[0] === 'lap' && (ser.length === 1 || gFocus) ? (ser.filter(function (s) { return s.name === gFocus; })[0] || ser[0]) : null;
       var body = one ? lapSvg(siteBest(one, one.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t }; })), 300, 170) : lapChart(series, k[0]);
-      return '<div class="gc"><h5><span>' + k[1] + (one && ser.length > 1 ? ' · <b style="color:' + one.color + '">' + esc(one.name) + '</b>' : '') + '</span><small>X = 랩 · 위쪽이 ' + (k[0] === 'pos' ? '앞 순위' : '빠름') + '</small></h5>' + body + '</div>';
+      return '<div class="gc"><h5><span>' + k[1] + (one && ser.length > 1 ? ' · <b style="color:' + one.color + '">' + esc(one.name) + '</b>' : '') + '</span><small>X = 랩 · 위쪽이 ' + (k[0] === 'pos' ? '앞 순위' : '빠름') + (one ? ' · 점선 = 베스트 + ' + lapCols().dev + '초' : '') + '</small></h5>' + body + '</div>';
     }).join('');
   }
   function paceVal(p) { var m = String(p || '').match(/^(\d+)\/(.+)$/); if (!m) return NaN; var t = secs(m[2]); return t >= 0 ? +m[1] * 1e6 - t : NaN; }
@@ -1578,23 +1661,37 @@ window.__vlAuto = true;
     var on = !!cfg.bigView, mine = rows.filter(function (r) { return r.mine; }), box = $('vl_big');
     $('vl_bigb').classList.toggle('on', on);
     $('vl_rb').classList.toggle('vl-bigon', on && mine.length > 0);
-    if (!on) { if (box.innerHTML) box.innerHTML = ''; return; }
-    if (!mine.length) { box.innerHTML = ''; $('vl_rb').classList.remove('vl-bigon'); return; }
-    var C = lapCols(), ron = cfg.raceOn !== false;
+    if (!on || !mine.length) { if (box.innerHTML) box.innerHTML = ''; return; }
+    var C = lapCols(), wide = panel.classList.contains('wide'), n = Math.min(mine.length, wide ? 3 : 2);
+    box.style.setProperty('--n', n); box.classList.toggle('two', mine.length > 1);
+    var pred = (qd && qd.pred) || {}, tq = qd && qd.tq;
+    var col = function (r) { return r.ls > 0 && r.bn > 0 ? lapCol(r.ls, r.bn, C) : '#fff'; };
+    /* the car ahead / behind gets its own card only while it is a close battle with this driver */
+    var rival = function (r, cls, lab, gap) {
+      return '<div class="vl-bc rv ' + cls + '" style="--cc:' + closeCol + '"><div class="rv-h"><span>' + lab + '</span><span class="rv-p">P' + esc(r.p || '-') + '</span><span class="rv-n">' + (r.fin ? '🏁 ' : '') + esc(r.nm) + '</span></div>' +
+        '<div class="rv-m"><span class="rv-t" style="color:' + col(r) + '">' + esc(r.last) + '</span><span class="rv-g">' + esc(gap) + '</span></div></div>';
+    };
     box.innerHTML = mine.map(function (r) {
-      var i = rows.indexOf(r), back = rows[i + 1], lc = r.ls > 0 && r.bn > 0 ? lapCol(r.ls, r.bn, C) : '#fff', dl = r.ls > 0 && r.bn > 0 ? r.ls - r.bn : NaN;
+      var i = rows.indexOf(r), ahead = rows[i - 1], back = rows[i + 1], lc = col(r), dl = r.ls > 0 && r.bn > 0 ? r.ls - r.bn : NaN;
       var dTxt = dl === dl ? (dl < -0.0005 ? '제외' : dl < 0.0005 ? '베스트' : '+' + dl.toFixed(3)) : '';
       var gapA = r.p == 1 ? '선두' : r.bhd, gapB = back ? back.bhd : '-';
       var cell = function (k, v, cls, st) { return '<div><div class="bc-k">' + k + '</div><div class="bc-v' + (cls ? ' ' + cls : '') + '"' + (st || '') + '>' + v + '</div></div>'; };
-      return '<div class="vl-bc mine">' +
-        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.fin ? '🏁 ' : '') + esc(r.alias || r.nm) + '</span><span class="bc-l">' + (+r.l || 0) + '랩</span></div>' +
+      var q = pred[nmKey(r.nm)], qTxt = '';
+      if (q) qTxt = '<div class="bc-q">🏆 <span>예선 예상</span><b>' + (q.rank ? q.rank + '위' : '대기') + '</b>' + (q.chg ? '<span class="' + (q.chg > 0 ? 'up' : 'dn') + '">' + (q.chg > 0 ? '▲' : '▼') + Math.abs(q.chg) + '</span>' : '') +
+        (q.rank === 1 ? '<span class="up">TQ</span>' : tq ? '<span>· TQ 예상 ' + esc(tq) + '</span>' : '') + '</div>';
+      return '<div class="bcol">' +
+        (r.closeTo && ahead ? rival(ahead, 'ah', '▲ 앞차', r.bhd + '초 앞') : '') +
+        '<div class="vl-bc mine">' +
+        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.fin ? '🏁 ' : '') + esc(r.alias || r.nm) + '</span><span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
         '<div class="bc-row">' +
           cell('진행 중', '-', 'lt', ' data-lt="' + esc(r.key) + '"') +
           cell('베스트', esc(r.fast)) +
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
           cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
-        '</div></div>';
+        '</div></div>' +
+        (back && back.closeTo ? rival(back, 'bh', '▼ 뒤차', back.bhd + '초 뒤') : '') +
+        '</div>';
     }).join('');
   }
   function renderRaceBoard(force) {
@@ -1722,7 +1819,7 @@ window.__vlAuto = true;
     if (h) { h.style.width = w ? w + 'px' : ''; h.style.boxSizing = w ? 'border-box' : ''; h.style.flexWrap = w ? 'wrap' : ''; }
     if (l) l.style.maxWidth = w ? w + 'px' : '';
     var r = root.querySelector('#vl_glaps .glrow'), k = root.querySelector('#vl_glaps .glk');
-    if (k) k.style.maxWidth = wide && r && r.scrollWidth ? r.scrollWidth + 'px' : '';
+    if (k) { var cw = 0; if (r) [].forEach.call(r.querySelectorAll('.glc'), function (c, i) { cw += c.offsetWidth + (i ? 8 : 0); }); k.style.maxWidth = cw ? cw + 'px' : ''; }   /* colour key as wide as the lap cards */
     var qb = root.querySelector('#vl_qual .vl-qbox');
     if (qb) qb.style.width = w && qb.classList.contains('vl-qo') ? w + 'px' : '';
     [].forEach.call(root.querySelectorAll('#vl_qual .vl-qsc'), function (sc) {
@@ -1862,14 +1959,17 @@ window.__vlAuto = true;
   function renderQual() {
     var box = $('vl_qual'); if (!box) return;
     var sc = SC(), R = qualRound(sc), cls = ((sc || {}).raceData || {}).className || pageText('#class .value') || '';
-    if (!cfg.qualOn || cfg.raceOn === false || !R || !cls) { if (box.innerHTML) box.innerHTML = ''; qd.html = ''; return; }
+    if (!cfg.qualOn || cfg.raceOn === false || !R || !cls) { if (box.innerHTML) box.innerHTML = ''; qd.html = ''; qd.pred = {}; qd.tq = ''; return; }
     var key = location.host + '|' + nmKey(cls) + '|' + R;
     if (qd.key !== key) { qd = { key: key, at: 0, busy: false, ok: false, err: '', rounds: {}, html: '' }; }
     if (!qd.busy && Date.now() - qd.at > 60000) qualFetch(cls, R, key);
-    if (!qd.ok) { if (box.innerHTML) box.innerHTML = ''; qd.html = ''; return; }
+    if (!qd.ok) { if (box.innerHTML) box.innerHTML = ''; qd.html = ''; qd.pred = {}; qd.tq = ''; return; }
     var mode = cfg.qualMode === 'points' ? 'points' : 'best';
     var now = qualRank(qualEntries(sc, R, true), R, mode), before = qualRank(qualEntries(sc, R, false), R, mode), pos0 = {};
     before.forEach(function (e, i) { pos0[nmKey(e.name)] = i + 1; });
+    /* for the 👤 big cards: predicted standing (and change) per driver, predicted TQ */
+    qd.pred = {}; qd.tq = now[0] && now[0].best ? now[0].name : '';
+    now.forEach(function (e, i) { var p0 = pos0[nmKey(e.name)]; qd.pred[nmKey(e.name)] = { rank: e.best ? i + 1 : 0, chg: e.best && p0 ? p0 - (i + 1) : 0 }; });
     var rowCls = function (e) { return e.voice ? ' class="vl-qv"' : e.live ? ' class="vl-ql"' : ''; };
     var nmCell = function (e, tq) { return '<td class="vl-qn">' + (e.live ? '<i class="vl-qd"></i>' : '') + (e.voice ? '🔊 ' : '') + (tq ? '🏁 ' : '') + esc(e.name) + (tq ? ' <small class="vl-qtq">TQ</small>' : '') + '</td>'; };
     var chg = function (e, i) { var p0 = pos0[nmKey(e.name)]; if (!p0 || p0 === i + 1) return '<td class="vl-qc">–</td>'; return p0 > i + 1 ? '<td class="vl-qc vl-qup">▲' + (p0 - i - 1) + '</td>' : '<td class="vl-qc vl-qdn">▼' + (i + 1 - p0) + '</td>'; };
@@ -2235,9 +2335,9 @@ window.__vlAuto = true;
     var tot = nb + nn + nf; if (!tot) return '';
     var pc = function (n) { return Math.round(n / tot * 100); }, sw = function (c) { return '<i style="background:' + c + '"></i>'; };
     return '<div class="vl-ls"><div class="lsc">' +
-      '<span>' + sw(C.B) + '베스트 <b>' + fmtS(best) + '</b> <small>(' + (nb ? bn + '랩' + (nb > 1 ? ' 외 ' + (nb - 1) : '') : 'LiveRC Fast' + (bn > 0 ? ' · ' + bn + '랩' : '') + ', 표에 없음') + ')</small></span>' +
-      '<span>' + sw(C.N) + C.dev + '초 이내 <b>' + nn + '랩</b> <small>' + pc(nn) + '%</small></span>' +
-      '<span>' + sw(C.F) + '그 이상 <b>' + nf + '랩</b> <small>' + pc(nf) + '%</small></span>' +
+      '<span title="베스트 (LiveRC Fast)">' + sw(C.B) + '<b>' + fmtS(best) + '</b> <small>(' + (nb ? bn + '랩' + (nb > 1 ? ' 외 ' + (nb - 1) : '') : 'LiveRC Fast' + (bn > 0 ? ' · ' + bn + '랩' : '') + ', 표에 없음') + ')</small></span>' +
+      '<span title="베스트 + ' + C.dev + '초 이내">' + sw(C.N) + '<b>' + nn + '랩</b> <small>' + pc(nn) + '%</small></span>' +
+      '<span title="그보다 느린 랩">' + sw(C.F) + '<b>' + nf + '랩</b> <small>' + pc(nf) + '%</small></span>' +
       (nx ? '<span class="lx">무효 ' + nx + '랩</span>' : '') + (ns ? '<span class="lx" title="LiveRC Fast Lap보다 짧은 랩 (출발 직후 등)">제외 ' + ns + '랩</span>' : '') + '</div>' +
       '<div class="lsb"><i style="width:' + (nb / tot * 100) + '%;background:' + C.B + '"></i><i style="width:' + (nn / tot * 100) + '%;background:' + C.N + '"></i><i style="width:' + (nf / tot * 100) + '%;background:' + C.F + '"></i></div></div>';
   }
@@ -2264,9 +2364,9 @@ window.__vlAuto = true;
     });
     return '<svg viewBox="0 0 ' + W2 + ' ' + H + '">' + g + '</svg>';
   }
-  function lapKey(link) {
+  function lapKey(link, noDash) {
     var C = lapCols();
-    return '<div class="lk"><b style="color:' + C.B + '">■</b> 베스트 · <b style="color:' + C.N + '">■</b> ' + C.dev + '초 이하 · <b style="color:' + C.F + '">■</b> 그 이상 · 점선 = 베스트 + ' + C.dev + '초' +
+    return '<div class="lk"><b style="color:' + C.B + '">■</b> 베스트 · <b style="color:' + C.N + '">■</b> ' + C.dev + '초 이하 · <b style="color:' + C.F + '">■</b> 그 이상' + (noDash ? '' : ' · 점선 = 베스트 + ' + C.dev + '초') +
       (link ? ' · <a href="' + link + '" target="_blank" rel="noopener">LiveRC 원본 ↗</a>' : '') + '</div>';
   }
   /* one session's laps, top to bottom, with the chart beside them. laps: signed numbers (negative = invalid on LiveRC) */
@@ -2669,6 +2769,7 @@ window.__vlAuto = true;
     var all = list(dd);
     all.forEach(record);
     var aheadKeys = {}, dingNow = false;
+    autoRun();
     var sid = sessId(sc), prcNow = isPractice(sc), remNow = remSecs();
     if (sid !== rs.id) rs = { id: sid, fin: {}, pos: {}, rem: NaN, remMax: 0, remAnn: {} };
     if (remNow > 0) rs.remMax = Math.max(rs.remMax, remNow);
@@ -2761,7 +2862,7 @@ window.__vlAuto = true;
     syncStart();
   });
   if (warnOld) showWarn();
-  hint(SC() ? '선수를 체크하고 ▶ 시작을 누르세요. 탭은 열어두세요.' : pracOnly ? '' : '⚠ 아직 스코어링 데이터를 찾지 못했습니다. LiveRC 트랙의 라이브 스코어링 화면(…liverc.com/live/scoring/)을 열어주세요.');
+  hint(SC() ? '선수를 체크하면 바로 안내가 시작돼요. 탭은 열어두세요.' : pracOnly ? '' : '⚠ 아직 스코어링 데이터를 찾지 못했습니다. LiveRC 트랙의 라이브 스코어링 화면(…liverc.com/live/scoring/)을 열어주세요.');
   if (window.__vlSyncNote) { hint(window.__vlSyncNote); delete window.__vlSyncNote; }
   }
 })();
