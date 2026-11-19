@@ -1,5 +1,5 @@
 (function () {
-  var VER0 = 74;   /* = VER below */
+  var VER0 = 75;   /* = VER below */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -22,7 +22,8 @@
   function SC() { var w = SCW(); return w ? w.scoring : null; }
   var auto = !!window.__vlAuto;
   var onPractice = /^\/practice/.test(location.pathname);
-  if (auto && !SC() && !onPractice) {
+  var onTracks = /^live\.liverc\.com$/i.test(location.hostname);   /* LiveRC's track list: VoiceLab opens as the track picker */
+  if (auto && !SC() && !onPractice && !onTracks) {
     var tries = 0;
     var w = setInterval(function () { if (SC() || ++tries > 1800) { clearInterval(w); if (SC() && !(window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0))) main(); } }, 1000);
     return;
@@ -31,7 +32,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.28.3';
+  var VERSION = '2.29.0';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -46,7 +47,7 @@
   var LS = 'voiceLapCfg';
   var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 1, gapAhead: true, gapAheadLaps: 1, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
     teamOn: false, teams: [], teamOf: {}, ptsMode: 'fixed', ptsFixed: [10, 8, 6, 5, 4, 3, 2, 1], ptsCustom: [10, 8, 6, 5, 4, 3, 2, 1], bonusBest: false, bonusFin: false, teamAuto: true, teamSay: true, teamSayLive: false,
-    gAllPrac: true, gVoice: true, gVoiceBold: true,
+    gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1 };
   var koVoice = null, koVoices = [], femVoices = [];
@@ -100,6 +101,7 @@
     '#vl_head{display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid #2a2a30;flex:none}' +
     '#vl_head .tab{position:relative;background:none;border:0;border-bottom:3px solid transparent;color:#999;padding:11px 10px 8px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}' +
     '#vl_head .tab.on{color:#fff;border-bottom-color:#e8b400}' +
+    '@media (max-width:430px){#vl_head .tab:not(.on) .vl-tn{display:none}#vl_head .tab{padding-left:6px !important;padding-right:6px !important}}' +
     '#vl_zm{margin-left:auto;margin-right:6px;display:inline-flex;align-items:center;gap:2px;background:#1e1e24;border:1px solid #3a3a42;border-radius:16px;padding:2px 4px;font-size:13px;color:#ddd;position:relative;flex:none}' +
     '#vl_zm i{font-style:normal;opacity:.7;margin:0 2px}#vl_zm button{background:#2a2a32;color:#eee;border:0;border-radius:50%;width:22px;height:22px;font-weight:800;cursor:pointer;padding:0;line-height:22px}' +
     '#vl_zm #vl_zv{width:auto;min-width:44px;border-radius:10px;background:none;font-weight:700;font-size:13px}' +
@@ -304,6 +306,28 @@
     '#vl_upd .vl-dlb{display:inline-block;text-decoration:none;background:#ffc72c;color:#111;font-weight:800;border-radius:10px;padding:10px 14px;font-size:16px;margin:6px 0}' +
     '#vl_upd .vl-dlb2{display:inline-block;text-decoration:none;background:#333;color:#ffc72c;border:0;border-radius:8px;padding:8px 12px;font-size:15px;margin-top:8px;cursor:pointer}' +
     '#vl_upd .vl-dlg{background:#1d1d24;border:1px solid #444;border-radius:10px;padding:9px 11px;margin-top:8px;font-size:15px;line-height:1.6;color:#eee}#vl_upd .vl-dls{margin:6px 0 4px;padding-left:22px}' +
+    '#vl_mstrip{display:none;background:#17171b;border:1px solid #333;border-radius:10px;padding:7px 10px;margin:6px 0;font-size:15px;color:#eee;cursor:pointer}#vl_mstrip .mlink{color:#aaa;font-size:14px;white-space:nowrap}' +
+    '#vl_rb tr.vl-bline td{border-bottom:2px solid #3ddc84 !important}#vl_rb .vl-bmp{color:#3ddc84;font-weight:800;margin-right:4px}' +
+    '#vl_main{padding:4px 2px;font-size:16px;color:#eee}#vl_main .mchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}#vl_main .mchip{border:1px solid #555;background:#1b1b20;border-radius:14px;padding:4px 11px;font-size:14px;color:#ddd;cursor:pointer}#vl_main .mchip.on{background:#4dabf7;color:#111;border-color:#4dabf7;font-weight:700}' +
+    '#vl_main .mnote{color:#aaa;font-size:14px;line-height:1.55;margin:4px 0}#vl_main .mnote b{color:#ddd}#vl_main .mnote a{color:#8ec5ff}' +
+    '#vl_main .mcard{background:#17171b;border:1px solid #333;border-radius:10px;padding:8px 10px;margin:8px 0}#vl_main .mcard.live{border-color:#3ddc84}' +
+    '#vl_main .mt{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-weight:800;font-size:17px}#vl_main .mt small{color:#aaa;font-weight:400;font-size:14px}' +
+    '#vl_main table.mt2{border-collapse:collapse;width:100%;background:none}#vl_main .mt2 td,#vl_main .mt2 th{padding:5px 6px;border:0;border-top:1px solid #26262c;font-size:15px;white-space:nowrap;color:#eee;background:none;text-align:left}' +
+    '#vl_main .mt2 th{color:#aaa;font-weight:400;font-size:14px;border-top:0}#vl_main .mt2 .r{text-align:right}#vl_main .mt2 .g{color:#888;width:24px}#vl_main .mt2 tr.me td{background:#2a2033}' +
+    '#vl_main .mt2 tr.emp td{color:#ff8de8;font-style:italic}#vl_main .mt2 tr.bl td{border-top:2px solid #3ddc84}#vl_main .bu{color:#3ddc84;font-weight:700}#vl_main .og{color:#ffa94d}#vl_main .ok{color:#3ddc84}#vl_main .pk{color:#ff8de8}' +
+    '#vl_main .mt2 td.x{text-decoration:line-through;color:#777}#vl_main .mt2 td.big{font-size:19px;font-weight:800}' +
+    '#vl_main .mgoal{background:#16261a;border:1px solid #2f6b3d;border-radius:10px;padding:8px 10px;margin-top:8px;font-size:15px;line-height:1.6}#vl_main .mgoal small{color:#aaa}' +
+    '#vl_tk{padding:4px 2px;font-size:16px;color:#eee}#vl_tk .tktop{background:#141418;border:1px solid #2a2a30;border-radius:10px;padding:8px 10px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}' +
+    '#vl_tk .tktop .pb2{margin-left:auto}#vl_tk .tkfrom{width:100%;color:#999;font-size:14px}' +
+    '#vl_tk #vl_tkq{width:100%;box-sizing:border-box;background:#111;border:1px solid #555;border-radius:10px;padding:9px 12px;font-size:17px;color:#fff}' +
+    '#vl_tk .tkf{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}#vl_tk .tkc{border:1px solid #555;background:#1b1b20;border-radius:14px;padding:4px 11px;font-size:14px;color:#ddd;cursor:pointer}#vl_tk .tkc.on{background:#4dabf7;color:#111;border-color:#4dabf7;font-weight:700}' +
+    '#vl_tk .tkgh{color:#ffc72c;font-size:15px;margin:10px 0 4px}#vl_tk .tkgh small{color:#999;font-size:13px}' +
+    '#vl_tk .tkr{display:flex;gap:10px;align-items:center;padding:8px 6px;border-top:1px solid #26262c;cursor:pointer}#vl_tk .tkr:hover{background:#1b1b22}#vl_tk .tkr.cur{background:#1d2a1f}' +
+    '#vl_tk .tki{width:30px;text-align:center;font-size:18px;flex:none}#vl_tk .tki small{display:block;font-size:11px}#vl_tk .tkn{flex:1;min-width:0}#vl_tk .tks{color:#888;font-size:13px}' +
+    '#vl_tk .tke{color:#bbb;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vl_tk .tkt{color:#999;font-size:13px;text-align:right;white-space:nowrap}' +
+    '#vl_tk .tkst{background:none;border:0;color:#666;font-size:22px;line-height:1;cursor:pointer;padding:0}#vl_tk .tkst.on{color:#ffc72c}#vl_tk .tkhl{background:#5a4a00;color:#fff;border-radius:3px}' +
+    '#vl_tk .tknote{color:#999;font-size:14px;margin-top:10px;line-height:1.6}#vl_tk .tkman{white-space:nowrap}#vl_tk #vl_tkman{width:130px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px 8px;font-size:15px}' +
+    '#vl_panel.tmode #vl_head .tab:not([data-tab=trk]),#vl_panel.tmode #vl_go,#vl_panel.tmode #vl_zm{display:none!important}' +
     '#vl_vlog{display:none;background:#16161a;border:1px solid #333;border-radius:8px;padding:8px 10px;font-size:15px;line-height:1.6;margin-top:8px;color:#ddd}' +
     '#vl_drv .vl-auto{color:#ff8de8;font-size:13px;white-space:nowrap}' +
     '#vl_drv .vl-rm{margin:6px 0 0 26px;font-size:14px;color:#aaa;display:flex;flex-wrap:wrap;gap:6px;align-items:center}' +
@@ -339,7 +363,7 @@
   root.setAttribute('data-vl-ver', String(VER));
   root.innerHTML =
     '<div id="vl_panel">' +
-    '<div id="vl_head"><button class="tab" data-tab="board">🏁 레이스<span class="vl-tl"> 보드</span></button><button class="tab" data-tab="prac">📊 연습<span class="vl-tl"> 기록</span></button><button class="tab" data-tab="set">⚙ 설정<i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
+    '<div id="vl_head"><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span></button><button class="tab" data-tab="trk" title="다른 트랙으로 — LiveRC 트랙 목록에서 검색">📍<span class="vl-tn"> 트랙</span></button><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
     '<span id="vl_zm" title="화면 확대/축소"><i>🔍</i><button data-zs="-1" title="작게">−</button><button id="vl_zv" title="눌러서 퍼센트 고르기">100%</button><button data-zs="1" title="크게">+</button><span id="vl_zl"></span></span>' +
     '<button id="vl_go"></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span></div>' +
     '<div id="vl_unl">🔊 화면을 한 번 누르면 음성이 켜져요</div>' +
@@ -351,7 +375,7 @@
     '<div style="white-space:nowrap"><span class="sub2 vl-hl vl-hl-rem">남은 시간</span><span class="clk" id="vl_rem">0:00</span></div>' +
     '<div id="vl_fuel"><button id="vl_fbtn" title="주유 타이머 켜기/끄기">⛽</button><span id="vl_fbox"></span><button id="vl_freset" title="수동 리셋 — 지금 주유 (다음 라인 통과 때 피트 타임 계산)">↺</button></div><button id="vl_bigb" title="내 선수 크게 보기 ↔ 표 보기">👤 크게</button></div><div class="sub2" id="vl_rnd"></div></div>' +
     '<div style="text-align:right" id="vl_elab"><div class="sub2 vl-hl vl-hl-ela">경과 시간</div><div class="clk" id="vl_clk"></div></div></div>' +
-    '<div id="vl_big"></div><div class="tw"><table><thead id="vl_rbh"></thead><tbody id="vl_rbb"></tbody></table></div>' +
+    '<div id="vl_mstrip"></div><div id="vl_big"></div><div class="tw"><table><thead id="vl_rbh"></thead><tbody id="vl_rbb"></tbody></table></div>' +
     '<div id="vl_qual"></div>' +
     '<div class="lgd"><span id="vl_lgfin" style="display:none">🏁 완주 (남은 시간 0 뒤 통과)</span><span><i style="background:#2b250f;outline:1px solid #ffd54a"></i>안내 중인 선수</span><span><i style="background:#17351f"></i>방금 통과</span><span><b class="pb">하늘색</b> 개인 베스트</span><span><b class="rf">보라</b> 레이스 최고</span><span><b style="color:#ffb74d">+1L</b> Behind 랩 차이</span><span id="vl_lgcl"><i id="vl_lgclc" class="vl-cbk">↑</i>접전 (뒤 선수 → 앞 선수, 설정한 초 이내)</span><span id="vl_lgpc"></span><span id="vl_lgbd">Behind <b class="pu">줄어듦</b>/<b class="pd">늘어남</b> (변한 초)</span></div>' +
     '<div id="vl_team"></div>' +
@@ -360,6 +384,8 @@
     '<div id="vl_gsel"><button class="gch" id="vl_gall">전체 선택</button><button class="gch" id="vl_gclr">선택 해제</button></div>' +
     '<div id="vl_glg"></div><div id="vl_glaps"></div><div id="vl_graphs"></div>' +
     '</div></div>' +
+    '<div id="vl_tab_main" style="display:none"><div id="vl_main"></div></div>' +
+    '<div id="vl_tab_trk" style="display:none"><div id="vl_tk"></div></div>' +
     '<div id="vl_tab_set">' +
     '<div class="vlver"><span><b>VoiceLab</b> v' + VERSION + '</span><span>Made by <b>NAMO</b></span></div>' +
     '<div class="gtools"><button class="pb2" id="vl_gopen">모두 펼치기</button><button class="pb2" id="vl_gclose">모두 접기</button></div>' +
@@ -422,6 +448,9 @@
     '<div class="lim"><label><input type="checkbox" id="vl_finsay">안내 선수가 끝나면 음성 알림</label></div>' +
     '<div class="lim">알림 문구 <input type="text" id="vl_finw" style="width:140px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px"> <label><input type="checkbox" id="vl_finpos">최종 순위도 함께 <small style="color:#999">(“레이스 종료, 3등”)</small></label></div>' +
     '<details class="inf"><summary>ⓘ 설명</summary><div>남은 시간이 0 아래(마이너스)로 내려간 뒤 처음 라인을 통과하면 그 선수는 끝 · 마지막 랩 안내 뒤에 이어서 말하고 그 뒤 랩은 안내하지 않음 · 끝난 선수끼리는 접전 화살표 없음 · Open Practice에서는 표시·알림 없음</div></details></div>' +
+    '<div class="sub"><span>🏆 메인전</span></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_msay">메인전 음성 — 범프권 진입·밖, “A메인 진출 · N번 그리드”, 전동 “종합 N위”</label>' +
+    '<div class="lim"><span style="color:#999">오늘 대회에 메인 출전표(Main Events)가 있으면 🏆 메인 탭이 생겨요</span></div></div>' +
     '<div class="sub"><span>🔫 레이스 출발</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_sgun">레이스가 출발하면 <b>출발 총성</b> 한 번</label>' +
     '<div class="lim"><span style="color:#999">남은 시간이 처음 줄기 시작할 때 · 안내 선수가 달리는 경기에서만 · Open Practice 제외</span> <button class="pb2" id="vl_sgunt">▶ 듣기</button></div></div>' +
@@ -527,8 +556,10 @@
   document.body.appendChild(root);
   var $ = function (id) { return root.querySelector('#' + id); };
   var panel = $('vl_panel');
+  var trkOnly = !SC() && onTracks;
   var pracOnly = !SC() && onPractice;
   if (pracOnly) panel.classList.add('pmode');
+  if (trkOnly) panel.classList.add('tmode');
   var showPanel = function (v) { cfg.open = v; save(); panel.style.display = v ? '' : 'none'; fit(); };
   /* ---- full screen ----
      iPhone Safari cannot make a page element full screen, so on phones the open panel covers exactly the visible
@@ -578,13 +609,20 @@
   }
   function setTab(t) {
     if (pracOnly && t === 'board') { if (curTrk) location.href = 'https://' + curTrk + '.liverc.com/live/scoring/#vl-trk=' + (cfg.trkRecent || []).join(',') + syncHash(); return; }   /* this page has no live data: go to the track's live scoring */
-    if (pracOnly && t !== 'set') t = 'prac';
-    cfg.tab = t === 'board' || t === 'prac' ? t : 'set'; if (!pracOnly) save();
+    if (t === 'trk' && !trkOnly) { trkPick(); return; }   /* the picker lives on LiveRC's own track list page */
+    if (trkOnly) t = 'trk';
+    else if (pracOnly && t !== 'set') t = 'prac';
+    if (t === 'main' && !(md.ok && md.classes.length)) t = 'board';
+    cfg.tab = t === 'board' || t === 'prac' || t === 'main' || t === 'trk' ? t : 'set'; if (!pracOnly && !trkOnly) save();
     $('vl_tab_board').style.display = cfg.tab === 'board' ? '' : 'none';
     $('vl_tab_set').style.display = cfg.tab === 'set' ? '' : 'none';
     $('vl_tab_prac').style.display = cfg.tab === 'prac' ? '' : 'none';
+    $('vl_tab_main').style.display = cfg.tab === 'main' ? '' : 'none';
+    $('vl_tab_trk').style.display = cfg.tab === 'trk' ? '' : 'none';
+    if (cfg.tab === 'main') try { renderMain(true); } catch (e) {}
+    if (cfg.tab === 'trk') try { tkOpen(); } catch (e) {}
     try { fitWidths(); fitPrac(); } catch (e) {}
-    $('vl_trk').style.display = cfg.tab === 'set' ? 'none' : '';
+    $('vl_trk').style.display = cfg.tab === 'set' || cfg.tab === 'trk' || cfg.tab === 'main' ? 'none' : '';
     if (typeof curTrk === 'string') renderTrk();
     root.querySelectorAll('#vl_head .tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === cfg.tab); });
     setWide();
@@ -665,7 +703,7 @@
   bind('vl_ding', 'dingAhead');
   $('vl_bigb').onclick = function () { cfg.bigView = !cfg.bigView; save(); renderRaceBoard(true); };
   bind('vl_nmulti', 'nameMulti'); bind('vl_selkeep', 'selKeep', function () { Object.keys(rows).forEach(rowSync); }); bind('vl_toneauto', 'toneAuto');
-  bind('vl_vmerge', 'voiceMerge'); bind('vl_vlatest', 'voiceLatest'); bind('vl_sgun', 'startGun');
+  bind('vl_vmerge', 'voiceMerge'); bind('vl_msay', 'mainSay'); bind('vl_vlatest', 'voiceLatest'); bind('vl_sgun', 'startGun');
   $('vl_sgunt').onclick = function () { playTone(9); };
   (function () {
     var r = $('vl_tvol'), v = $('vl_tvv'); r.value = Math.round(toneVol() * 100); v.textContent = r.value + '%';
@@ -984,6 +1022,8 @@
     if (el.value === '') delete r.adj; else r.adj = +el.value || 0;
     tcSave(o); renderTeam(true);
   });
+  $('vl_main').addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-mc]'); if (b) { md.sel = b.getAttribute('data-mc'); renderMain(true); } });
+  $('vl_mstrip').addEventListener('click', function () { if (md.ok) setTab('main'); });
   $('vl_raceOn').checked = cfg.raceOn !== false;
   $('vl_raceOn').onchange = function () { cfg.raceOn = this.checked; save(); grpSet(); updFuel(list(((SC() || {}).driverData) || {})); };
   var save0 = save; save = function () { save0(); gsum(); };
@@ -1055,42 +1095,133 @@
   };
   /* ---- track bar (race board / practice): go to another LiveRC track, last 5 tracks as buttons, can be hidden ---- */
   var curTrk = (location.host.match(/^([a-z0-9-]+)\.liverc\.com$/i) || [])[1];
+  var tkFrom = '', tkPg = '';
   curTrk = curTrk ? curTrk.toLowerCase() : '';
   /* each track is its own site (own storage), so the recent list travels in the address when moving: #vl-trk=a,b,c */
   var hm = location.hash.match(/vl-trk=([a-z0-9,-]*)/i);
   if (hm) {
     var carried = hm[1].toLowerCase().split(',').filter(Boolean);
     cfg.trkRecent = (cfg.trkRecent || []).concat(carried);
-    if (/^#vl-trk=[a-z0-9,-]*(&vl-sync=[^&]*)?$/i.test(location.hash)) try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    var hf = location.hash.match(/vl-fav=([a-z0-9,-]*)/i);
+    if (hf) cfg.trkFav = hf[1].toLowerCase().split(',').filter(Boolean);   /* favourites travel with the address too (every track site keeps its own storage) */
+    var hfr = location.hash.match(/vl-from=([a-z0-9-]*)/i), hpg = location.hash.match(/vl-pg=([a-z]*)/i);
+    tkFrom = hfr ? hfr[1].toLowerCase() : ''; tkPg = hpg ? hpg[1] : '';
+    if (/^#vl-trk=[a-z0-9,-]*(&vl-(fav|from|pg)=[a-z0-9,-]*)*(&vl-sync=[^&]*)?$/i.test(location.hash)) try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   }
-  if (curTrk && curTrk !== 'www') {
+  if (curTrk && curTrk !== 'www' && curTrk !== 'live') {
     var seenT = {};
     cfg.trkRecent = (hm ? hm[1].toLowerCase().split(',').filter(Boolean) : []).length ? [curTrk].concat(hm[1].toLowerCase().split(',')) : [curTrk].concat(cfg.trkRecent || []);
     cfg.trkRecent = cfg.trkRecent.filter(function (t) { if (!t || seenT[t]) return false; seenT[t] = 1; return true; }).slice(0, 5); save();
   }
-  function trkGo(t) {
+  function trkHash(list) {
+    return '#vl-trk=' + list.join(',') + ((cfg.trkFav || []).length ? '&vl-fav=' + cfg.trkFav.join(',') : '');
+  }
+  function trkGo(t, pg) {
     t = String(t || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\.liverc\.com.*$/, '').replace(/[^a-z0-9-]/g, '');
     if (!t) return;
-    var page = (pracOnly || cfg.tab === 'prac') ? '/practice/' : '/live/scoring/';
-    var keep = [t].concat(cfg.trkRecent || []).filter(function (x, i, a) { return a.indexOf(x) === i; }).slice(0, 5);
-    location.href = 'https://' + t + '.liverc.com' + page + '#vl-trk=' + keep.join(',') + syncHash();
+    var prac = pg ? pg === 'prac' : (pracOnly || cfg.tab === 'prac');
+    var keep = [t].concat(cfg.trkRecent || []).filter(function (x, i, a) { return x !== 'live' && a.indexOf(x) === i; }).slice(0, 5);
+    location.href = 'https://' + t + '.liverc.com' + (prac ? '/practice/' : '/live/scoring/') + trkHash(keep) + syncHash();
+  }
+  /* 📍 트랙 tab on a track's page: open LiveRC's track list, where VoiceLab becomes the picker */
+  function trkPick() {
+    var pg = (pracOnly || cfg.tab === 'prac') ? 'prac' : 'board';
+    location.href = 'https://live.liverc.com/' + trkHash((cfg.trkRecent || []).filter(function (x) { return x !== 'live'; }).slice(0, 5)) + (curTrk && curTrk !== 'live' ? '&vl-from=' + curTrk : '') + '&vl-pg=' + pg + syncHash();
   }
   function renderTrk() {
-    var r = (cfg.trkRecent || []).slice(0, 5), page = (pracOnly || cfg.tab === 'prac') ? '연습 기록' : '라이브 스코어링';
+    if (trkOnly) { $('vl_trk').innerHTML = ''; return; }
+    var r = (cfg.trkRecent || []).slice(0, 5);
     $('vl_trk').innerHTML = cfg.trkHide
-      ? '<div class="tb1">트랙 <b>' + esc(curTrk || '-') + '</b><button class="tog" id="vl_ttog">▼ 트랙 이동</button></div>'
-      : '<div class="tb1">트랙 <input id="vl_tin" value="' + esc(curTrk) + '" spellcheck="false" autocomplete="off" placeholder="트랙 이름"><span>.liverc.com</span>' +
-        '<button class="go" id="vl_tgo" title="이 트랙의 ' + page + '로 이동">이동</button><button class="tog" id="vl_ttog">▲ 숨기기</button></div>' +
-        (r.length ? '<div class="tb2">최근 ' + r.map(function (t) { return '<button data-trk="' + esc(t) + '"' + (t === curTrk ? ' class="cur"' : '') + '>' + esc(t) + '</button>'; }).join('') + '</div>' : '');
+      ? '<div class="tb1">📍 <b>' + esc(curTrk || '-') + '</b><button class="tog" id="vl_ttog">▼ 트랙</button></div>'
+      : '<div class="tb1">📍 <b>' + esc(curTrk || '-') + '</b><span style="color:#888;font-size:13px">.liverc.com</span>' +
+        '<button class="go" id="vl_tpick" title="LiveRC 트랙 목록에서 검색해서 고르기">🔍 트랙 바꾸기</button><button class="tog" id="vl_ttog">▲ 숨기기</button></div>' +
+        (r.length > 1 ? '<div class="tb2">최근 ' + r.map(function (t) { return '<button data-trk="' + esc(t) + '"' + (t === curTrk ? ' class="cur"' : '') + '>' + ((cfg.trkFav || []).indexOf(t) >= 0 ? '★ ' : '') + esc(t) + '</button>'; }).join('') + '</div>' : '');
   }
   $('vl_trk').addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('button'); if (!b) return;
     if (b.id === 'vl_ttog') { cfg.trkHide = !cfg.trkHide; save(); renderTrk(); try { $('vl_trkshow').checked = !cfg.trkHide; } catch (e) {} return; }
-    if (b.id === 'vl_tgo') { trkGo($('vl_tin').value); return; }
+    if (b.id === 'vl_tpick') { trkPick(); return; }
     var t = b.getAttribute('data-trk'); if (t && t !== curTrk) trkGo(t);
   });
-  $('vl_trk').addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id === 'vl_tin' && !e.isComposing) trkGo(e.target.value); });
   renderTrk();
+  /* ---------- 📍 track picker (on live.liverc.com) ----------
+     LiveRC's track list page holds every track (1,200+) in one table: row data-href "//sub.liverc.com/live/",
+     icons status_2 = racing, status_1 = open practice, status_video_1 = live video, status_featured; "1 minute ago"; name; current event */
+  var tk = { list: null, busy: false, q: '', f: 'all', err: '' };
+  function tkParse(doc) {
+    var out = [];
+    [].forEach.call(doc.querySelectorAll('table.track_list tbody tr'), function (tr, i) {
+      var a = tr.querySelector('a[href*=".liverc.com"]'), href = tr.getAttribute('data-href') || (a && a.getAttribute('href')) || '';
+      var m = href.match(/\/\/([a-z0-9-]+)\.liverc\.com/i); if (!m) return;
+      var st = tr.querySelector('.status_2') ? 2 : tr.querySelector('.status_1') ? 1 : 0;
+      var nm = tr.querySelector('strong'), ev = tr.querySelector('.indent'), ago = tr.querySelector('small small') || tr.querySelector('td small');
+      out.push({ s: m[1].toLowerCase(), n: nm ? nm.textContent.trim() : m[1], e: ev ? ev.textContent.replace(/\s+/g, ' ').trim() : '', st: st, v: !!tr.querySelector('.status_video_1'), ft: !!tr.querySelector('.status_featured'), t: ago ? ago.textContent.trim() : '', i: i });
+    });
+    return out;
+  }
+  function tkAgo(t) {
+    var m = String(t || '').match(/(\d+)\s*(second|minute|hour|day|week|month|year)/i); if (!m) return t || '';
+    return m[1] + ({ second: '초', minute: '분', hour: '시간', day: '일', week: '주', month: '달', year: '년' }[m[2].toLowerCase()]) + ' 전';
+  }
+  function tkOpen() {
+    tkRender();
+    if (tk.list || tk.busy) return;
+    tk.busy = true;
+    var fromDom = function () { return tkParse(document); };
+    fetch('/', { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) {
+      var l = tkParse(new DOMParser().parseFromString(h, 'text/html')); tk.list = l.length ? l : fromDom();
+    }, function () { tk.list = fromDom(); }).then(function () { tk.busy = false; if (!tk.list.length) tk.err = '트랙 목록을 읽지 못했어요'; tkRender(); });
+  }
+  function tkGoPick(s2) { trkGo(s2, tkPg === 'prac' ? 'prac' : 'board'); }
+  function tkRender() {
+    var box = $('vl_tk'); if (!box) return;
+    var L = tk.list || [], fav = cfg.trkFav || [], rec = (cfg.trkRecent || []).filter(function (x) { return x !== 'live'; });
+    var by = {}; L.forEach(function (x) { by[x.s] = x; });
+    var nKr = function (x) { return /[가-힣]/.test(x.n + x.e); };
+    var pass = function (x) {
+      if (tk.f === 'race' && x.st !== 2) return false; if (tk.f === 'prac' && x.st !== 1) return false; if (tk.f === 'kr' && !nKr(x)) return false;
+      return !tk.q || kmatch(x.n, tk.q) || kmatch(x.s, tk.q) || kmatch(x.e, tk.q);
+    };
+    var hl = function (txt) {
+      txt = String(txt || ''); var q = tk.q.trim(); if (!q) return esc(txt);
+      var i = txt.toLowerCase().indexOf(q.toLowerCase()); if (i < 0) return esc(txt);
+      return esc(txt.slice(0, i)) + '<span class="tkhl">' + esc(txt.slice(i, i + q.length)) + '</span>' + esc(txt.slice(i + q.length));
+    };
+    var row = function (x) {
+      var on = fav.indexOf(x.s) >= 0, cur = x.s === tkFrom;
+      return '<div class="tkr' + (cur ? ' cur' : '') + '" data-s="' + esc(x.s) + '"><span class="tki">' + (x.st === 2 ? '🏁' : x.st === 1 ? '🟢' : '·') + (x.v ? '<small>📹</small>' : '') + '</span>' +
+        '<div class="tkn"><b>' + hl(x.n) + '</b> <span class="tks">' + hl(x.s) + '</span>' + (x.e ? '<div class="tke">' + hl(x.e) + '</div>' : '') + '</div>' +
+        '<div class="tkt"><button class="tkst' + (on ? ' on' : '') + '" data-fav="' + esc(x.s) + '" title="즐겨찾기">' + (on ? '★' : '☆') + '</button><br>' + esc(tkAgo(x.t)) + '</div></div>';
+    };
+    var h = '<div class="tktop">🌐 <b>live.liverc.com</b> ' + (tk.busy ? '<span style="color:#aaa">목록 읽는 중…</span>' : tk.err ? '<span style="color:#ff9a9a">⚠ ' + esc(tk.err) + '</span>' : '<span style="color:#3ddc84">● 실시간 목록 ' + L.length.toLocaleString() + '곳</span>') +
+      (tkFrom ? '<button class="pb2" id="vl_tkback">↩ ' + esc((by[tkFrom] || {}).n || tkFrom) + '(으)로</button>' : '') +
+      '<div class="tkfrom">' + (tkFrom ? '지금 있던 트랙: ' + esc((by[tkFrom] || {}).n || tkFrom) + ' (' + esc(tkFrom) + ') · ' : '') + '고르면 그 트랙 ' + (tkPg === 'prac' ? '연습 기록' : '라이브 스코어링') + '으로</div></div>';
+    h += '<input type="search" id="vl_tkq" placeholder="트랙 이름 · 주소 · 대회 이름 · 초성" value="' + esc(tk.q) + '" autocomplete="off">';
+    h += '<div class="tkf">' + [['all', '전체'], ['race', '🏁 레이스 중'], ['prac', '🟢 연습 중'], ['kr', '🇰🇷 한글 트랙']].map(function (f) { return '<button class="tkc' + (tk.f === f[0] ? ' on' : '') + '" data-f="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '</div>';
+    h += '<div id="vl_tkl"></div>';
+    h += '<div class="tknote">누르면 이동 · ☆ = 즐겨찾기 · 상태와 대회 이름은 이 페이지에서 바로 읽어 실시간<br><span class="tkman">주소 직접 입력 <input id="vl_tkman" placeholder="예: thetrackkr" autocomplete="off"><button class="pb2" id="vl_tkgo">이동</button></span></div>';
+    if (!box.querySelector('#vl_tkq')) box.innerHTML = h;
+    else { box.querySelector('.tktop').outerHTML = h.match(/^<div class="tktop">[\s\S]*?<\/div><\/div>/)[0]; box.querySelectorAll('.tkc').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-f') === tk.f); }); }
+    var top = fav.concat(rec).filter(function (x, i, a) { return a.indexOf(x) === i; }).map(function (x2) { return by[x2] || { s: x2, n: x2, e: '', st: 0, t: '', i: 1e9 }; }).filter(pass);
+    var topS = {}; top.forEach(function (x) { topS[x.s] = 1; });
+    var rest = L.filter(function (x) { return !topS[x.s] && pass(x); });
+    var lh = (top.length ? '<div class="tkgh">★ 즐겨찾기 · 최근</div>' + top.map(row).join('') : '') +
+      '<div class="tkgh">' + (tk.q || tk.f !== 'all' ? '찾은 트랙 ' + rest.length : '모든 트랙 ' + rest.length) + ' <small>(최근 활동순)</small></div>' +
+      rest.slice(0, 150).map(row).join('') + (rest.length > 150 ? '<div class="tknote">… ' + (rest.length - 150) + '곳 더 — 검색으로 좁혀 보세요</div>' : '') +
+      (!tk.busy && L.length && !rest.length && !top.length ? '<div class="tknote">찾는 트랙이 없어요</div>' : '');
+    $('vl_tkl').innerHTML = lh;
+  }
+  $('vl_tk').addEventListener('input', function (e) { if (e.target.id === 'vl_tkq') { tk.q = e.target.value.trim(); tkRender(); } });
+  $('vl_tk').addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id === 'vl_tkman' && !e.isComposing) tkGoPick(e.target.value); });
+  $('vl_tk').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('button,.tkr'); if (!b) return;
+    if (b.id === 'vl_tkback') { tkGoPick(tkFrom); return; }
+    if (b.id === 'vl_tkgo') { tkGoPick($('vl_tkman').value); return; }
+    var f = b.getAttribute('data-f'); if (f) { tk.f = f; tkRender(); return; }
+    var fv = b.getAttribute('data-fav');
+    if (fv) { var a = (cfg.trkFav || []).slice(), i = a.indexOf(fv); if (i >= 0) a.splice(i, 1); else a.unshift(fv); cfg.trkFav = a.slice(0, 20); save(); tkRender(); return; }
+    var s2 = b.getAttribute('data-s'); if (s2) tkGoPick(s2);
+  });
   /* no start/stop button: voice runs whenever at least one driver is picked for announcements (checked, typed in, or "all"),
      the status pill mutes / unmutes for a while without touching the picks */
   var muted = false;
@@ -2054,6 +2185,8 @@
     /* a close gap colours both cars: the chaser and the car right ahead */
     rowsData.forEach(function (r, i) { if (r.closeTo && r.fin && rowsData[i - 1] && rowsData[i - 1].fin) r.closeTo = false; });   /* both finished: no battle any more */
     rowsData.forEach(function (r, i) { if (r.closeTo) { r.close = true; if (rowsData[i - 1]) rowsData[i - 1].close = true; } });
+    var bE = 0; try { bE = mainBumpE(); } catch (e) {}
+    rowsData.forEach(function (r, i) { r.bmp = bE > 0 && i < bE; r.bline = bE > 0 && i === bE - 1; });   /* 🏆 lower main: places that move up */
     var closeCol = /^#[0-9a-f]{6}$/i.test(cfg.closeColor) ? cfg.closeColor : '#ff2bd6';
     var hdr = { cls: pageText('#class .value') || (sc && sc.raceData && sc.raceData.className) || 'LIVE',
       rnd: [pageText('#round .value') && 'Round ' + pageText('#round .value'), pageText('#race .value') && 'Race ' + pageText('#race .value')].filter(Boolean).join(' · '),
@@ -2084,14 +2217,14 @@
     $('vl_rbb').innerHTML = rowsData.map(function (r, ri) {
       var cs = '';   /* close battles: no row colour any more (it clashed with the lap-update colours) → neon arrow in the P cell */
       var prv = rowsData[ri - 1], chase = r.closeTo && prv && +prv.p === +r.p - 1;
-      return '<tr class="' + (r.mine ? 'vl-mine ' : '') + (r.isNew ? 'vl-new ' : '') + (r.close ? 'vl-close' : '') + '" data-n="' + esc(r.nm) + '">' + cols.map(function (c) {
+      return '<tr class="' + (r.mine ? 'vl-mine ' : '') + (r.isNew ? 'vl-new ' : '') + (r.close ? 'vl-close ' : '') + (r.bline ? 'vl-bline' : '') + '" data-n="' + esc(r.nm) + '">' + cols.map(function (c) {
         if (c.k === 'sel') { var gi = cfg.graphSel.indexOf(r.nm); return '<td class="c-sel"' + cs + '><input type="checkbox" data-g="' + esc(r.nm) + '"' + (gi >= 0 ? ' checked' : '') + ' title="그래프에 표시">' + (gi >= 0 ? '<i style="background:' + PCOL[gi % PCOL.length] + '"></i>' : '') + '</td>'; }
         if (c.k === 'p') return '<td class="c-p">' + esc(r.p) + (chase ? '<span class="vl-cbl" style="--cc:' + closeCol + '" title="접전: 앞 선수와 ' + esc(r.bhd) + '초"></span>' : '') + '</td>';
         if (c.k === 'pace') return '<td class="c-pace ' + r.paceCls + '"' + cs + '>' + esc(r.pace) + '</td>';
         if (c.k === 'avg') return '<td class="c-avg ' + r.avgCls + '"' + cs + '>' + esc(r.avg) + '</td>';
         var dtx = r.bhdD === r.bhdD ? '<small class="' + r.bhdCls + '">(' + (r.bhdD > 0 ? '+' : '−') + Math.abs(r.bhdD).toFixed(3) + ')</small>' : '';
         if (c.k === 'bhd' && r.closeTo) return '<td class="c-bhd"' + cs + '><b style="color:' + closeCol + '">' + esc(r.bhd) + '</b>' + dtx + '</td>';
-        if (c.k === 'nm') return '<td class="c-nm" title="눌러서 음성 안내 켜기/끄기"' + cs + '>' + (r.tc ? '<i class="tmd tmdb" style="background:' + esc(r.tc) + '" title="팀 — 눌러서 바꾸기"></i>' : '') + (r.fin ? '<span class="vl-fin" title="완주 — 남은 시간이 끝난 뒤 라인 통과 (' + r.fin + '등)">🏁</span>' : '') + (r.mine ? '<span class="vo">🔊</span>' : '') + esc(r.nm) + (r.car ? '<small>#' + esc(r.car) + '</small>' : '') + '</td>';
+        if (c.k === 'nm') return '<td class="c-nm" title="눌러서 음성 안내 켜기/끄기"' + cs + '>' + (r.tc ? '<i class="tmd tmdb" style="background:' + esc(r.tc) + '" title="팀 — 눌러서 바꾸기"></i>' : '') + (r.bmp ? '<span class="vl-bmp" title="위 메인으로 범프 업">⬆</span>' : '') + (r.fin ? '<span class="vl-fin" title="완주 — 남은 시간이 끝난 뒤 라인 통과 (' + r.fin + '등)">🏁</span>' : '') + (r.mine ? '<span class="vo">🔊</span>' : '') + esc(r.nm) + (r.car ? '<small>#' + esc(r.car) + '</small>' : '') + '</td>';
         if (c.k === 'last' && r.lastBC) return '<td class="c-last"' + cs + '><b style="color:' + r.lastBC + '">' + esc(r.last) + '</b><small style="color:' + r.lastBC + '">(' + (r.lastBD < 0.0005 ? '베스트' : '+' + r.lastBD.toFixed(3)) + ')</small>' +
           (r.lastD === r.lastD ? '<small class="' + (r.lastD < 0 ? 'pu' : (r.lastD > 0 ? 'pd' : '')) + '">(평균 ' + (r.lastD > 0 ? '+' : (r.lastD < 0 ? '−' : '±')) + Math.abs(r.lastD).toFixed(3) + ')</small>' : '') + '</td>';
         if (c.k === 'last') return '<td class="c-last ' + r.lastCls + '"' + cs + '>' + esc(r.last) + (r.lastD === r.lastD ? '<small class="' + (r.lastD < 0 ? 'pu' : (r.lastD > 0 ? 'pd' : '')) + '">(' + (r.lastD > 0 ? '+' : (r.lastD < 0 ? '−' : '±')) + Math.abs(r.lastD).toFixed(3) + ')</small>' : '') + '</td>';
@@ -2516,6 +2649,280 @@
     L.push(['선수', '팀', '합계'].concat(R.map(function (r, i) { return '레이스' + (i + 1); })).join(sep));
     tb.drivers.forEach(function (d) { L.push([d.n, d.t.name, d.tot].concat(R.map(function (r, i) { return d.races[i] !== undefined ? d.races[i] : ''; })).join(sep)); });
     return L.join('\n');
+  }
+  /* ---------- 🏆 main events ----------
+     Results site of today's event: "Main Events" heat sheet (every main of every class in table.heat_sheet; rows filled by a lower main
+     show Seed Result "Bump-Up"), and "… Triple A-Main Results" (table.multi_main: leg cells "1st (1pts) : 20/8:02.016").
+     Nitro-style classes (A/B/C-Main): the free places of an upper main are taken by the top finishers of the main below, at the back of the grid.
+     Electric-style classes (A1/A2/A3-Main): points per leg (the event's own table, read from the results once a leg is done), best legs count. */
+  function mainParseSheet(doc) {
+    var out = [], cur = null;
+    [].forEach.call(doc.querySelectorAll('table.heat_sheet tr'), function (tr) {
+      var h = tr.querySelector('.class_header');
+      if (h) {
+        var full = h.textContent.replace(/\s+/g, ' ').trim(), mm = full.match(/^(.*?)\s+([A-Z])(\d*)-Main\s*$/i);
+        if (!mm) { cur = null; return; }
+        var st = tr.querySelector('.race_status'), a = st && st.querySelector('a'), ln = tr.querySelector('.race_length');
+        cur = { full: full, cls: mm[1].trim(), letter: mm[2].toUpperCase(), leg: +mm[3] || 0, code: mm[2].toUpperCase() + (mm[3] || ''), num: +((tr.querySelector('.race_num') || {}).textContent || 0),
+          len: ln ? ln.textContent.replace(/Length:\s*/i, '').trim() : '', done: !!(st && /complete/i.test(st.textContent)), res: a ? a.getAttribute('href') : '', rows: [] };
+        out.push(cur); return;
+      }
+      var td = tr.querySelectorAll('td'); if (!cur || td.length < 3) return;
+      var nc = td[1].cloneNode(true); [].forEach.call(nc.querySelectorAll('.car_num'), function (x) { x.remove(); });
+      var name = nc.textContent.replace(/\s+/g, ' ').trim(), seedRes = td[td.length - 1].textContent.replace(/\s+/g, ' ').trim(), seed = td[td.length - 2].textContent.trim();
+      cur.rows.push({ pos: +td[0].textContent.trim() || cur.rows.length + 1, name: name, seed: seed, bump: /bump/i.test(seedRes), empty: !name });
+    });
+    return out;
+  }
+  function mainParseMulti(doc) {
+    var t = doc.querySelector('table.multi_main'); if (!t) return null;
+    var head = (doc.body.textContent.match(/Completed:\s*(\d+)\s*of\s*(\d+)/i) || []), rows = [];
+    [].forEach.call(t.querySelectorAll('tbody tr'), function (tr) {
+      var td = [].map.call(tr.querySelectorAll('td'), function (x) { return x.textContent.replace(/\s+/g, ' ').trim(); }); if (td.length < 5) return;
+      var nc = tr.querySelectorAll('td')[2].cloneNode(true); [].forEach.call(nc.querySelectorAll('.car_num,.hidden'), function (x) { x.remove(); });
+      rows.push({ pos: +td[0] || 0, name: nc.textContent.replace(/\s+/g, ' ').trim(), points: +td[3] || 0, legs: td.slice(4).map(function (c) {
+        var m = c.match(/(\d+)\w*\s*\(\s*(-?[\d.]+)\s*pts?\s*\)\s*:\s*(\d+)\/([\d:.]+)/i);
+        return m ? { pos: +m[1], pts: +m[2], L: +m[3], T: secs(m[4]) } : null;
+      }) });
+    });
+    return { done: +head[1] || 0, of: +head[2] || 0, rows: rows };
+  }
+  var md = { ok: false, classes: [], at: 0, busy: false, err: '', ev: '', sel: '', said: {} };
+  function mainFetch() {
+    if (md.busy) return; md.busy = true;
+    getDoc('/results/').then(function (doc) {
+      var today = false;
+      [].forEach.call(doc.querySelectorAll('h1,h2,h3,h4,h5,h6'), function (x) { var t = Date.parse(x.textContent.trim()); if (t > 0 && Math.abs(Date.now() - t) < 2 * 86400e3) today = true; });
+      var sheet = [].filter.call(doc.querySelectorAll('a[href*="view_heat_sheet"]'), function (a) { return /main\s*events/i.test(a.textContent); })[0];
+      var multis = [].filter.call(doc.querySelectorAll('a[href*="view_multi_main_result"]'), function (a) { return true; });
+      md.ev = ((doc.querySelector('h3,h2') || {}).textContent || '').trim();
+      if (!today || !sheet) { md.ok = false; md.classes = []; return; }
+      var mains = [], mult = {};
+      var jobs = [fetch(sheet.getAttribute('href'), { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) { mains = mainParseSheet(new DOMParser().parseFromString(h, 'text/html')); })];
+      multis.forEach(function (a) {
+        var cls = a.textContent.replace(/\s+/g, ' ').replace(/\s*(Double|Triple|Quad\w*|Multi)?\s*A-Main\s*Results\s*$/i, '').trim();
+        jobs.push(fetch(a.getAttribute('href'), { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (h) { mult[nmKey(cls)] = mainParseMulti(new DOMParser().parseFromString(h, 'text/html')); }, function () {}));
+      });
+      return Promise.all(jobs).then(function () {
+        var by = {};
+        mains.forEach(function (m) { var k = nmKey(m.cls); (by[k] = by[k] || { name: m.cls, key: k, mains: [] }).mains.push(m); });
+        md.classes = Object.keys(by).map(function (k) {
+          var c = by[k]; c.kind = c.mains.some(function (m) { return m.leg > 0; }) ? 'pts' : 'bump';
+          c.mains.sort(function (a, b) { return a.letter === b.letter ? a.leg - b.leg : a.letter < b.letter ? -1 : 1; });
+          c.multi = mult[k] || null; return c;
+        });
+        md.ok = md.classes.length > 0;
+      });
+    }).then(function () { md.busy = false; md.at = Date.now(); md.err = ''; mainTabShow(); renderMain(true); },
+      function () { md.busy = false; md.at = Date.now(); md.err = 'LiveRC 결과 페이지를 읽지 못했습니다'; renderMain(true); });
+  }
+  function mainTabShow() { var b = $('vl_tmain'); if (b) b.style.display = md.ok && !trkOnly && !pracOnly ? '' : 'none'; if (!md.ok && cfg.tab === 'main') setTab('board'); }
+  /* which main is on track now: the one whose line-up holds most of the drivers on the timing screen (legs A1/A2/A3 share a line-up: the first one not done) */
+  function mainNow(sc) {
+    if (!md.ok || !sc || !sc.driverData || isPractice(sc)) return null;
+    var live = list(sc.driverData).map(function (d) { return nmKey(nameOf(d)); }).filter(Boolean); if (!live.length) return null;
+    var txt = nmKey([pageText('#class .value'), (sc.raceData || {}).className, (sc.raceData || {}).parsedHeat, (sc.raceData || {}).heatName].join(' '));
+    var best = null, bs = 0;
+    md.classes.forEach(function (c) {
+      c.mains.forEach(function (m) {
+        var names = {}; m.rows.forEach(function (r) { if (r.name) names[nmKey(r.name)] = 1; });
+        var hit = live.filter(function (n) { return names[n]; }).length / live.length;
+        if (txt.indexOf(nmKey(m.code + '-main')) >= 0) hit += 0.3;
+        if (m.leg && m.done) hit -= 0.2;
+        if (hit > bs) { bs = hit; best = { c: c, m: m }; }
+      });
+    });
+    return bs >= 0.5 ? best : null;
+  }
+  /* free places of the main above m (bump spots) */
+  function mainUpper(c, m) { return c.mains.filter(function (x) { return !x.leg && x.letter === String.fromCharCode(m.letter.charCodeAt(0) - 1); })[0] || null; }
+  function mainSlots(up) { return up ? up.rows.filter(function (r) { return r.bump || r.empty; }).length : 0; }
+  var mainLive = null;   /* { c, m, E } for this tick */
+  function mainBumpE() { return mainLive && mainLive.c.kind === 'bump' ? mainLive.E : 0; }
+  /* ---- electric: points ---- */
+  function mainRule(c) {
+    var map = {}, maxP = 0;
+    if (c.multi) c.multi.rows.forEach(function (r) { r.legs.forEach(function (l) { if (l && l.pos > 0) { map[l.pos] = l.pts; maxP = Math.max(maxP, l.pos); } }); });
+    var ks = Object.keys(map).map(Number).sort(function (a, b) { return a - b; });
+    var src = ks.length > 1 ? 'ev' : 'def';
+    var at = function (pos) {
+      if (src === 'def') return pos;
+      if (map[pos] !== undefined) return map[pos];
+      var a = ks[ks.length - 2], b = ks[ks.length - 1], step = (map[b] - map[a]) / (b - a);
+      return pos > b ? map[b] + step * (pos - b) : map[ks[0]];
+    };
+    var low = src === 'def' || at(1) <= at(Math.max(2, maxP));
+    return { at: at, low: low, src: src };
+  }
+  function mainBestK(c) {
+    var n = c.mains.filter(function (m) { return m.leg > 0; }).length || (c.multi ? c.multi.of : 0) || 3;
+    return n >= 3 ? n - 1 : n;
+  }
+  /* standings: finished legs from the results + the leg on track (live order) */
+  function mainStand(c, liveLeg, override) {
+    var R = mainRule(c), K = mainBestK(c), by = {}, nLegs = Math.max(c.mains.filter(function (m) { return m.leg > 0; }).length, c.multi ? c.multi.of : 0);
+    var get = function (nm) { var k = nmKey(nm); return by[k] || (by[k] = { name: nm, legs: [], L: 0, T: 0, est: {} }); };
+    var doneN = c.multi ? c.multi.done : 0;
+    if (c.multi) c.multi.rows.forEach(function (r) { var e = get(r.name); e.off = r.pos; for (var i = 0; i < doneN; i++) if (r.legs[i]) { e.legs[i] = r.legs[i].pts; e.L += r.legs[i].L; e.T += r.legs[i].T; } });
+    var li = -1;
+    if (liveLeg && liveLeg.length) {
+      li = doneN;
+      var order = override || liveLeg;
+      order.forEach(function (x, i) { var e = get(x.name); e.legs[li] = R.at(i + 1); e.est[li] = true; e.L += x.L || 0; e.T += x.T || 0; e.live = true; e.lpos = i + 1; e.voice = x.voice; });
+    }
+    var arr = Object.keys(by).map(function (k) {
+      var e = by[k], got = e.legs.map(function (v, i) { return { v: v, i: i }; }).filter(function (x) { return x.v !== undefined; });
+      got.sort(function (a, b) { return R.low ? a.v - b.v : b.v - a.v; });
+      var use = got.slice(0, Math.min(K, got.length)); e.use = {}; use.forEach(function (x) { e.use[x.i] = 1; });
+      e.tot = use.reduce(function (s, x) { return s + x.v; }, 0); e.n = got.length; return e;
+    });
+    var allDone = doneN && doneN >= nLegs && li < 0;
+    arr.sort(function (a, b) {
+      if (allDone && a.off && b.off) return a.off - b.off;   /* final: the event's own order (its tie-breaker) */
+      if (b.n !== a.n) return b.n - a.n;
+      if (a.tot !== b.tot) return R.low ? a.tot - b.tot : b.tot - a.tot;
+      return b.L !== a.L ? b.L - a.L : a.T - b.T;
+    });
+    return { list: arr, rule: R, K: K, nLegs: nLegs, done: doneN, li: li };
+  }
+  function mainLiveLeg(sc) {
+    return list(sc.driverData).filter(function (d) { return nameOf(d); }).sort(function (a, b) { return (+a.position || 99) - (+b.position || 99); })
+      .map(function (d) { return { name: nameOf(d), L: +d.laps || 0, T: secs(d.elapsedTime) || 0, voice: !!match(d) }; });
+  }
+  /* what a voice driver needs in the leg on track for overall 1st / 2nd / 3rd (others keep their current order) */
+  function mainGoals(c, live, who) {
+    var others = live.filter(function (x) { return nmKey(x.name) !== nmKey(who); }), me = live.filter(function (x) { return nmKey(x.name) === nmKey(who); })[0]; if (!me) return null;
+    var rankAt = function (p) {
+      var o = others.slice(0, p - 1).concat([me]).concat(others.slice(p - 1));
+      var st = mainStand(c, live, o).list; for (var i = 0; i < st.length; i++) if (nmKey(st[i].name) === nmKey(who)) return i + 1; return 99;
+    };
+    var ranks = []; for (var p = 1; p <= live.length; p++) ranks[p] = rankAt(p);
+    return [1, 2, 3].map(function (k) {
+      var worst = 0; for (var p2 = 1; p2 <= live.length; p2++) if (ranks[p2] <= k) worst = p2;
+      return { k: k, p: worst, all: worst === live.length, none: !worst };
+    });
+  }
+  function gapTxt(a, b) {   /* a ahead of b */
+    if (!a || !b) return '';
+    var la = +a.laps || 0, lb = +b.laps || 0;
+    if (la > lb) return '+' + (la - lb) + 'L';
+    var d = (secs(b.elapsedTime) || 0) - (secs(a.elapsedTime) || 0); return d >= 0 ? d.toFixed(1) + '초' : '';
+  }
+  /* every tick: which main is on track; voice for bump spots / overall standing */
+  function mainTick(sc, all, fin) {
+    mainLive = null;
+    if (!md.ok) return;
+    var w = mainNow(sc); if (!w) return;
+    var up = w.c.kind === 'bump' ? mainUpper(w.c, w.m) : null;
+    mainLive = { c: w.c, m: w.m, up: up, E: mainSlots(up) };
+    if (!running || cfg.voiceOn === false || cfg.mainSay === false) return;
+    var ord = all.slice().sort(function (a, b) { return (+a.position || 99) - (+b.position || 99); });
+    if (w.c.kind === 'bump' && mainLive.E > 0) {
+      ord.forEach(function (d, i) {
+        if (!match(d) || !(+d.laps > 0)) return;
+        var k = keyOf(d), inZ = i < mainLive.E, prev = md.said['z' + k];
+        if (fin && fin[k]) {
+          if (!md.said['f' + k]) { md.said['f' + k] = 1; say('main' + k, inZ ? up.code + '메인 진출, ' + (up.rows.filter(function (r) { return !r.bump && !r.empty; }).length + i + 1) + '번 그리드' : w.m.code + '메인 ' + (i + 1) + '등', -1); }
+          return;
+        }
+        if (prev !== undefined && prev !== inZ) say('main' + k, inZ ? '범프권' : '범프권 밖', -1);
+        md.said['z' + k] = inZ;
+      });
+    }
+    if (w.c.kind === 'pts') {
+      var live = mainLiveLeg(sc), st = mainStand(w.c, live).list;
+      st.forEach(function (e, i) {
+        if (!e.voice || !e.live) return;
+        var d = ord.filter(function (x) { return nmKey(nameOf(x)) === nmKey(e.name); })[0]; if (!d || !(+d.laps > 0)) return;
+        var k = keyOf(d), prev = md.said['o' + k];
+        if (fin && fin[k]) { if (!md.said['of' + k]) { md.said['of' + k] = 1; say('main' + k, '종합 ' + (i + 1) + '위', -1); } return; }
+        if (prev !== undefined && prev !== i + 1) say('main' + k, '종합 ' + (i + 1) + '위', -1);
+        md.said['o' + k] = i + 1;
+      });
+    }
+  }
+  /* race tab: one line above the board */
+  function mainStrip() {
+    var el = $('vl_mstrip'); if (!el) return;
+    if (!mainLive) { el.style.display = 'none'; return; }
+    var c = mainLive.c, m = mainLive.m, h;
+    if (c.kind === 'bump') h = '🏆 <b>' + esc(m.code) + '메인</b>' + (mainLive.E ? ' · 상위 ' + mainLive.E + '명 ' + esc(mainLive.up.code) + '메인 범프 업' : '') + ' <span class="mlink">메인 탭에서 자세히 ▸</span>';
+    else {
+      var st = mainStand(c, mainLiveLeg(SC())).list, v = st.filter(function (e) { return e.voice; }).map(function (e) { return '🔊 ' + esc(e.name) + ' 종합 <b>' + (st.indexOf(e) + 1) + '위</b>'; });
+      h = '🏆 <b>' + esc(m.code) + '</b> · ' + esc(c.name) + (v.length ? ' · ' + v.join(' · ') : '') + ' <span class="mlink">메인 탭에서 자세히 ▸</span>';
+    }
+    el.innerHTML = h; el.style.display = 'block';
+  }
+  var mainSig = '';
+  function renderMain(force) {
+    var box = $('vl_main'); if (!box) return;
+    if (!md.ok) { box.innerHTML = '<div class="mnote">' + (md.busy ? '메인 정보를 읽는 중…' : md.err ? '⚠ ' + esc(md.err) : '오늘 대회의 메인 출전표(Main Events)가 아직 없어요') + '</div>'; return; }
+    var sc = SC(), voiceNames = {};
+    if (sc && sc.driverData) list(sc.driverData).forEach(function (d) { if (match(d)) voiceNames[nmKey(nameOf(d))] = 1; });
+    Object.keys(cfg.sel || {}).forEach(function (n) { if (cfg.sel[n].on) voiceNames[nmKey(n)] = 1; });
+    if (mainLive && mainLive.c.key !== md.liveKey) { md.liveKey = mainLive.c.key; md.sel = mainLive.c.key; }   /* a new main on track: show its class */
+    if (!md.sel || !md.classes.some(function (c) { return c.key === md.sel; })) {
+      var pick = md.classes.filter(function (c) { return c.mains.some(function (m) { return m.rows.some(function (r) { return voiceNames[nmKey(r.name)]; }); }); })[0];
+      md.sel = (mainLive && mainLive.c.key) || (pick || md.classes[0]).key;
+    }
+    var c = md.classes.filter(function (x) { return x.key === md.sel; })[0];
+    var liveD = {}; if (sc && sc.driverData) list(sc.driverData).forEach(function (d) { liveD[nmKey(nameOf(d))] = d; });
+    var h = '<div class="mchips">' + md.classes.map(function (x) {
+      var hasV = x.mains.some(function (m) { return m.rows.some(function (r) { return voiceNames[nmKey(r.name)]; }); });
+      return '<button class="mchip' + (x.key === md.sel ? ' on' : '') + '" data-mc="' + esc(x.key) + '">' + esc(x.name.replace(/^1\/\d+\s*/, '')) + (hasV ? ' 🔊' : '') + '</button>';
+    }).join('') + '</div>';
+    var vn = function (n) { return voiceNames[nmKey(n)] ? '🔊 ' : ''; };
+    if (c.kind === 'bump') {
+      h += '<div class="mnote">' + esc(md.ev) + ' · 🔧 범프업 방식 (위 메인의 빈 자리 = 아래 메인에서 올라오는 수, 맨 뒤 그리드에 아래 메인 순위대로)</div>';
+      c.mains.forEach(function (m) {
+        var isLive = mainLive && mainLive.m === m, up = mainUpper(c, m), E = mainSlots(up), lower = c.mains.filter(function (x) { return x.letter === String.fromCharCode(m.letter.charCodeAt(0) + 1); })[0];
+        var fixed = m.rows.filter(function (r) { return !r.bump && !r.empty; }), slots = m.rows.filter(function (r) { return r.bump || r.empty; });
+        h += '<div class="mcard' + (isLive ? ' live' : '') + '"><div class="mt">' + esc(m.code) + '메인 <small>' + esc(m.len) + ' · ' + (isLive ? '<span class="ok">● 진행 중</span>' : m.done ? '✓ 끝남' : '대기') +
+          (slots.length ? ' · ' + fixed.length + '명 + <span class="pk">' + (slots.some(function (r) { return r.bump && r.name; }) ? '범프업 ' : '빈 자리 ') + slots.length + '</span>' : '') + (E ? ' · 상위 ' + E + '명 범프 업' : '') + '</small></div>';
+        var rowsH = '';
+        if (isLive) {
+          var ord = Object.keys(liveD).map(function (k) { return liveD[k]; }).sort(function (a, b) { return (+a.position || 99) - (+b.position || 99); });
+          ord.forEach(function (d, i) {
+            rowsH += '<tr class="' + (match(d) ? 'me' : '') + (E && i === E ? ' bl' : '') + '"><td class="g">' + (i + 1) + '</td><td>' + vn(nameOf(d)) + esc(nameOf(d)) + '</td><td class="r">' +
+              (E && i < E ? '<span class="bu">⬆' + (match(d) ? ' 범프권' : '') + '</span>' : E && i === E ? '<span class="og">범프까지 ' + esc(gapTxt(ord[E - 1], d)) + '</span>' : '') + '</td></tr>';
+          });
+          var me = ord.map(function (d, i) { return { d: d, i: i }; }).filter(function (x) { return match(x.d) && E && x.i < E; });
+          if (me.length && up) rowsH += '<tr><td colspan="3" class="mnote">' + me.map(function (x) { return '지금 순위면 🔊 ' + esc(nameOf(x.d)) + ' → ' + esc(up.code) + '메인 <b>' + (up.rows.filter(function (r) { return !r.bump && !r.empty; }).length + x.i + 1) + '번 그리드</b>'; }).join('<br>') + '</td></tr>';
+        } else if (m.done && !slots.length && !isLive && m.letter !== 'A') {
+          rowsH = '<tr><td colspan="3" class="mnote">' + (m.res ? '<a href="' + esc(m.res) + '" target="_blank" rel="noopener">결과 보기 ▸</a>' : '') + '</td></tr>';
+        } else {
+          var lowerLive = lower && mainLive && mainLive.m === lower, lowOrd = lowerLive ? Object.keys(liveD).map(function (k) { return liveD[k]; }).sort(function (a, b) { return (+a.position || 99) - (+b.position || 99); }) : null;
+          m.rows.forEach(function (r) {
+            if (!r.bump && !r.empty) { rowsH += '<tr class="' + (voiceNames[nmKey(r.name)] ? 'me' : '') + '"><td class="g">' + r.pos + '</td><td>' + vn(r.name) + esc(r.name) + '</td><td class="r">' + (r.seed === '1' ? 'TQ' : '') + '</td></tr>'; return; }
+            var j = slots.indexOf(r), guess = r.name || (lowOrd && lowOrd[j] ? nameOf(lowOrd[j]) : '');
+            rowsH += '<tr class="emp' + (guess && voiceNames[nmKey(guess)] ? ' me' : '') + '"><td class="g">' + r.pos + '</td><td>⬆ ' + esc(lower ? lower.code : '') + '메인 ' + (j + 1) + '등' + (r.name ? ' — ' + vn(r.name) + esc(r.name) : guess ? ' 자리 — 예상: ' + vn(guess) + esc(guess) : ' 자리') + '</td><td></td></tr>';
+          });
+        }
+        h += '<table class="mt2">' + rowsH + '</table></div>';
+      });
+    } else {
+      var live = mainLive && mainLive.c === c && sc ? mainLiveLeg(sc) : null, S = mainStand(c, live), legs = [];
+      for (var i = 0; i < Math.max(S.nLegs, S.done + (live ? 1 : 0)); i++) legs.push(i);
+      h += '<div class="mnote">' + esc(md.ev) + ' · ⚡ 포인트 방식 · ' + (S.rule.src === 'ev' ? '<b>대회 규칙: 결과에서 읽음</b> (' + [1, 2, 3].map(function (p) { return p + '등 ' + S.rule.at(p) + '점'; }).join(' · ') + ' …, ' + (S.rule.low ? '적은' : '많은') + ' 순)' : '기본 규칙 1등 1점 · 2등 2점 … 적은 순 <span class="og">— A1이 끝나면 대회 규칙으로 바꿈</span>') +
+        ' · ' + (S.nLegs >= 3 ? '좋은 ' + S.K + '레그 합산' : '레그 ' + S.nLegs + '번 모두 합산') + ' · 같으면 레그 전체 랩/시간</div>';
+      h += '<div class="mcard' + (live ? ' live' : '') + '"><div class="mt">메인 종합 <small>' + (live ? 'A' + (S.li + 1) + ' <span class="ok">● 진행 중 — 지금 순위로 예상</span>' : S.done ? '레그 ' + S.done + '/' + S.nLegs + ' 끝남' : '아직 시작 전') + '</small></div>';
+      h += '<table class="mt2"><tr><th class="g">#</th><th>선수</th>' + legs.map(function (i) { return '<th class="r' + (i === S.li ? ' ok' : '') + '">A' + (i + 1) + '</th>'; }).join('') + '<th class="r">합</th></tr>' +
+        S.list.map(function (e, k) {
+          return '<tr class="' + (voiceNames[nmKey(e.name)] ? 'me' : '') + '"><td class="g">' + (k + 1) + '</td><td>' + vn(e.name) + esc(e.name) + '</td>' +
+            legs.map(function (i) { var v = e.legs[i]; return '<td class="r' + (e.est[i] ? ' ok' : '') + (v !== undefined && !e.use[i] ? ' x' : '') + '">' + (v === undefined ? '-' : v) + '</td>'; }).join('') +
+            '<td class="r big">' + e.tot + '</td></tr>';
+        }).join('') + '</table><div class="mnote">줄 그은 칸 = 버리는 레그</div>';
+      if (live) live.filter(function (x) { return x.voice; }).forEach(function (x) {
+        var G = mainGoals(c, live, x.name); if (!G) return;
+        var cur = live.indexOf(x) + 1;
+        h += '<div class="mgoal"><b>🔊 ' + esc(x.name) + ' 목표</b> <small>(다른 선수가 지금 순위로 끝난다고 보면 · 지금 ' + cur + '등)</small>' + G.map(function (g) {
+          return '<div>' + ['🏆', '🥈', '🥉'][g.k - 1] + ' 종합 ' + g.k + '위: ' + (g.none ? '<span style="color:#ff9a9a">어려움</span>' : g.all ? '이미 <b class="ok">확정</b>' : g.p === 1 ? '이번 레그 <b>1등</b> 해야 함' : '<b>' + g.p + '등 안</b>이면 됨') + '</div>';
+        }).join('') + '</div>';
+      });
+      h += '</div>';
+    }
+    if (h === mainSig && !force) return; mainSig = h;
+    box.innerHTML = h;
   }
   function renderQual() {
     var box = $('vl_qual'); if (!box) return;
@@ -3413,6 +3820,8 @@
     if (dingNow) ding();
     if (remMsg) say('rem', remMsg, -1);
     try { teamTick(all, sc, sid, prcNow, over); } catch (e) {}
+    if (!prcNow && Date.now() - md.at > 60000 && !md.busy) mainFetch();
+    try { mainTick(sc, all, rs.fin); mainStrip(); if (cfg.tab === 'main') renderMain(); } catch (e) {}
     trackBhd(all);
     updFuel(all);
     backfill(); lhSave();
@@ -3420,7 +3829,7 @@
   }
   seed();
   renderColList();
-  setTab(pracOnly ? 'prac' : cfg.tab);
+  setTab(trkOnly ? 'trk' : pracOnly ? 'prac' : cfg.tab === 'trk' ? 'board' : cfg.tab);
   var timer = setInterval(tick, 250), timerL = setInterval(updLive, 200);
   function stopAll() {
     clearInterval(timer); clearInterval(timer2); clearInterval(timerL); try { vq = []; clearTimeout(vqT); vqGen++; } catch (e) {}
