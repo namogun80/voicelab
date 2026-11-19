@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      2.28.0
+// @version      2.28.1
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,7 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  if (window.__voiceLap) { window.__voiceLap.toggle(); return; }
+  var VER0 = 72;   /* = VER below */
+  if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
   var DESK = W.voicelabDesktop || window.voicelabDesktop || null;   /* VoiceLab Windows app bridge (preload) */
@@ -44,14 +45,14 @@ window.__vlAuto = true;
   var onPractice = /^\/practice/.test(location.pathname);
   if (auto && !SC() && !onPractice) {
     var tries = 0;
-    var w = setInterval(function () { if (SC() || ++tries > 1800) { clearInterval(w); if (SC() && !window.__voiceLap) main(); } }, 1000);
+    var w = setInterval(function () { if (SC() || ++tries > 1800) { clearInterval(w); if (SC() && !(window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0))) main(); } }, 1000);
     return;
   }
   main();
   function main() {
   if (!document.body) return;
-  var VER = 71;   /* bump when the panel changes */
-  var VERSION = '2.28.0';
+  var VER = VER0;   /* bump when the panel changes */
+  var VERSION = '2.28.1';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -317,6 +318,9 @@ window.__vlAuto = true;
     '#vl_teamset .tmchip{border:1px solid #555;background:#222;color:#ddd;border-radius:14px;padding:3px 10px;font-size:15px;white-space:nowrap;cursor:pointer}#vl_teamset .tmchip.on{color:#111;font-weight:700}#vl_teamset .tmchip.on.none{background:#888}' +
     '#vl_teamset .tmpts{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:6px 0}#vl_teamset .pt{display:inline-flex;align-items:center;gap:4px;background:#111;border:1px solid #444;border-radius:6px;padding:2px 7px;font-size:15px}' +
     '#vl_teamset .tmpt{width:44px;background:#000;color:#fff;border:1px solid #555;border-radius:4px;padding:1px 3px;font-size:15px}#vl_teamset select{max-width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px}' +
+    '#vl_upd .vl-dlb{display:inline-block;text-decoration:none;background:#ffc72c;color:#111;font-weight:800;border-radius:10px;padding:10px 14px;font-size:16px;margin:6px 0}' +
+    '#vl_upd .vl-dlb2{display:inline-block;text-decoration:none;background:#333;color:#ffc72c;border:0;border-radius:8px;padding:8px 12px;font-size:15px;margin-top:8px;cursor:pointer}' +
+    '#vl_upd .vl-dlg{background:#1d1d24;border:1px solid #444;border-radius:10px;padding:9px 11px;margin-top:8px;font-size:15px;line-height:1.6;color:#eee}#vl_upd .vl-dls{margin:6px 0 4px;padding-left:22px}' +
     '#vl_vlog{display:none;background:#16161a;border:1px solid #333;border-radius:8px;padding:8px 10px;font-size:15px;line-height:1.6;margin-top:8px;color:#ddd}' +
     '#vl_drv .vl-auto{color:#ff8de8;font-size:13px;white-space:nowrap}' +
     '#vl_drv .vl-rm{margin:6px 0 0 26px;font-size:14px;color:#aaa;display:flex;flex-wrap:wrap;gap:6px;align-items:center}' +
@@ -1132,10 +1136,22 @@ window.__vlAuto = true;
   /* ---------- 🔄 update check (GitHub namogun80/voicelab · version.json) ---------- */
   var GH = 'namogun80/voicelab', UPD_JSON = 'https://raw.githubusercontent.com/' + GH + '/main/version.json';
   var UPD_US = 'https://raw.githubusercontent.com/' + GH + '/main/voicelab.user.js';
+  var UPD_LD = 'https://raw.githubusercontent.com/' + GH + '/main/voicelab-auto.user.js';
+  /* iPhone (Userscripts app): opening a .user.js only shows its text → hand over a file to download instead (tapped as a real link, so Safari allows it) */
+  var dlUrl = {};
+  function dlPrep(key, url, cb) {
+    if (dlUrl[key]) { cb && cb(); return; }
+    fetch(url + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); }).then(function (t) {
+      dlUrl[key] = URL.createObjectURL(new Blob([t], { type: 'application/octet-stream' })); cb && cb();
+    }).catch(function (e) { upd.err = String(e && e.message || e).slice(0, 60); cb && cb(); });
+  }
+  var IOS_STEPS = '<ol class="vl-dls"><li><b>파일</b> 앱 › <b>다운로드</b> 폴더 열기</li><li><b>voicelab.user.js</b> 길게 누르기 › <b>이동</b></li><li><b>Userscripts</b> 폴더 고르기 › <b>이동</b> › <b>대치</b></li><li>이 페이지 새로 고침 → 위 버전 확인</li></ol>' +
+    '<div style="color:#aaa;font-size:14px">💡 설정 › Safari › 다운로드 위치를 <b>Userscripts</b> 폴더로 바꿔 두면 1~3번 없이 받기만 하면 돼요 (이름 뒤에 “-2”가 붙으면 예전 파일을 지우기)</div>';
   var upd = { busy: false, err: '', msg: '' };
   /* how this copy was started: PC app, userscript (Tampermonkey / Userscripts) or a bookmark */
-  var KIND = DESK ? 'pc' : NB ? 'app' : window.__vlAuto ? 'us' : 'bm';
-  var KIND_TXT = { pc: 'PC 앱', app: '아이폰 앱', us: '유저스크립트', bm: '북마크' }[KIND];
+  var KIND = DESK ? 'pc' : NB ? 'app' : window.__vlLoader ? 'ld' : window.__vlAuto ? 'us' : 'bm';
+  var KIND_TXT = { pc: 'PC 앱', app: '아이폰 앱', ld: '자동 업데이트 유저스크립트', us: '유저스크립트', bm: '북마크' }[KIND];
+  var IOSDL = KIND === 'us' && IOS;   /* iPhone + Userscripts app */
   function updGet() { try { return JSON.parse(localStorage.getItem('vlUpd') || '{}') || {}; } catch (e) { return {}; } }
   function updNewer(u) { return +u.ver > VER; }
   function updPaint() {
@@ -1147,13 +1163,25 @@ window.__vlAuto = true;
     var h = '';
     if (upd.err) h = '<div style="margin-top:6px;color:#ff9a9a">확인하지 못했어요 (' + esc(upd.err) + ') — 인터넷 연결을 확인하세요</div>';
     else if (nw) {
-      var how = { us: 'Tampermonkey 설치 창이 열려요 · “업데이트”를 누른 뒤 이 페이지를 새로고침', bm: '이 자리에서 바로 새 버전으로 바뀌어요 · 북마크를 “🔄 자동 업데이트 북마크”로 바꾸면 늘 최신', pc: '새 코어를 받아 이 화면을 다시 불러와요', app: '아이폰 앱은 새 앱 파일이 필요해요' }[KIND];
+      var how = { us: IOSDL ? '아이폰은 파일로 받아서 바꿔요 · 받은 뒤 아래 순서대로' : 'Tampermonkey 설치 창이 열려요 · “업데이트”를 누른 뒤 이 페이지를 새로고침', ld: '페이지를 새로 고치면 새 버전으로 바뀌어요 (열 때마다 자동)', bm: '이 자리에서 바로 새 버전으로 바뀌어요 · 북마크를 “🔄 자동 업데이트 북마크”로 바꾸면 늘 최신', pc: '새 코어를 받아 이 화면을 다시 불러와요', app: '아이폰 앱은 새 앱 파일이 필요해요' }[KIND];
       h = '<div class="nw"><div><b style="color:#3ddc84">새 버전 v' + esc(u.version) + '</b> <small style="color:#9a9">' + esc(u.date || '') + '</small></div>' +
         (u.notes && u.notes.length ? '<ul>' + u.notes.slice(0, 6).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '') +
-        (KIND !== 'app' ? '<button class="ub go" id="vl_updgo">지금 업데이트</button> ' : '') + '<small style="color:#aaa">' + how + '</small>' + (upd.msg ? '<div style="margin-top:4px;color:#ffd54a">' + esc(upd.msg) + '</div>' : '') + '</div>';
+        (IOSDL ? (dlUrl.us ? '<a class="ub go vl-dlb" id="vl_updgo" href="' + dlUrl.us + '" download="voicelab.user.js">⬇ 새 파일 받기 (voicelab.user.js)</a> ' : '<span class="ub go vl-dlb" style="opacity:.6">파일 준비 중…</span> ')
+          : KIND !== 'app' ? '<button class="ub go" id="vl_updgo">지금 업데이트</button> ' : '') + '<small style="color:#aaa">' + how + '</small>' + (upd.msg ? '<div style="margin-top:4px;color:#ffd54a">' + esc(upd.msg) + '</div>' : '') +
+        (IOSDL && upd.dl ? '<div class="vl-dlg"><b>✓ 받았어요 — 이렇게 바꾸세요</b>' + IOS_STEPS + '</div>' : '') + '</div>';
+      if (IOSDL && !dlUrl.us) dlPrep('us', UPD_US, updPaint);
     } else if (u.t) h = '<div style="margin-top:6px;color:#3ddc84">최신 버전이에요 <small style="color:#888">(' + new Date(u.t).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' 확인)</small></div>';
+    /* iPhone userscript: one-time switch to the self-updating userscript */
+    if (IOSDL) h += '<div class="vl-dlg" style="border-color:#6a4a80;background:#1a1726"><b style="color:#e6c8ff">💡 한 번만 바꾸면 끝</b><br><b>자동 업데이트 유저스크립트</b>로 한 번 바꿔 두면, 앞으로는 열 때마다 깃허브의 최신 보이스랩을 받아 실행해서 <b>파일을 다시 바꿀 일이 없어요</b>.<br><span style="color:#aaa;font-size:14px">인터넷이 안 되면 마지막에 받아 둔 버전으로 실행 · 설정·기록은 그대로 · 받는 파일 이름도 voicelab.user.js라 같은 방법으로 대치</span><br>' +
+      (dlUrl.ld ? '<a class="ub vl-dlb2" id="vl_updld" href="' + dlUrl.ld + '" download="voicelab.user.js">⬇ 자동 업데이트 유저스크립트 받기</a>' : '<button class="ub vl-dlb2" id="vl_updldp">⬇ 자동 업데이트 유저스크립트 받기</button>') +
+      (upd.dlLd ? '<div style="margin-top:6px"><b>✓ 받았어요 — 이렇게 바꾸세요</b>' + IOS_STEPS + '</div>' : '') + '</div>';
+    if (KIND === 'ld') h += '<div style="margin-top:6px;color:#aaa;font-size:14px">🔄 자동 업데이트 유저스크립트 — 페이지를 열 때마다 최신 버전을 받아 실행해요</div>';
     $('vl_updi').innerHTML = h;
-    var g = $('vl_updgo'); if (g) g.onclick = updGo;
+    var g = $('vl_updgo');
+    if (g && IOSDL) g.onclick = function () { setTimeout(function () { upd.dl = true; updPaint(); }, 300); };
+    else if (g) g.onclick = updGo;
+    var gl = $('vl_updld'); if (gl) gl.onclick = function () { setTimeout(function () { upd.dlLd = true; updPaint(); }, 300); };
+    var gp = $('vl_updldp'); if (gp) gp.onclick = function () { gp.textContent = '파일 준비 중…'; dlPrep('ld', UPD_LD, updPaint); };
   }
   function updCheck() {
     if (upd.busy) return; upd.busy = true; upd.err = ''; updPaint();
@@ -1163,6 +1191,7 @@ window.__vlAuto = true;
     }).catch(function (e) { upd.err = String(e && e.message || e).slice(0, 60); }).then(function () { upd.busy = false; updPaint(); });
   }
   function updGo() {
+    if (KIND === 'ld') { location.reload(); return; }
     if (KIND === 'us') { window.open(UPD_US, '_blank'); upd.msg = '설치 창에서 업데이트한 뒤 이 페이지를 새로고침하세요'; updPaint(); return; }
     if (KIND === 'pc') { upd.msg = '새 코어를 받는 중…'; updPaint(); var p = DESK.coreUpdate ? DESK.coreUpdate() : Promise.resolve(); Promise.resolve(p).then(function () { location.reload(); }, function () { upd.msg = '받지 못했어요 — 앱을 다시 열어 보세요'; updPaint(); }); return; }
     /* bookmark: load the newest core of the latest commit right here; the newer copy takes over this panel */
@@ -3359,6 +3388,7 @@ window.__vlAuto = true;
     if (window.__voiceLap === api) delete window.__voiceLap;
   }
   var api = {
+    ver: VER,
     toggle: function () { showPanel(panel.style.display === 'none'); },
     stop: function () { root.remove(); stopAll(); }
   };
