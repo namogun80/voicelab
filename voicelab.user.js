@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      2.28.1
+// @version      2.28.2
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,7 +20,7 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 72;   /* = VER below */
+  var VER0 = 73;   /* = VER below */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -52,7 +52,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.28.1';
+  var VERSION = '2.28.2';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -314,7 +314,10 @@ window.__vlAuto = true;
     '#vl_teamset .tmrow{display:flex;align-items:center;gap:8px;margin:6px 0}#vl_teamset .tmrow input[type=text]{background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:16px;width:130px}' +
     '#vl_teamset input[type=color]{width:34px;height:30px;border:0;background:none;padding:0;cursor:pointer}' +
     '#vl_teamset .tmdr{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#1f1f24;border-radius:8px;padding:6px 8px;margin:5px 0;flex-wrap:wrap}' +
-    '#vl_teamset .tmdn{display:flex;align-items:center;font-size:15px}#vl_teamset .tmchips{display:flex;gap:5px;flex-wrap:wrap}' +
+    '#vl_teamset #vl_tmq{flex:1;min-width:180px;background:#111;color:#fff;border:1px solid #444;border-radius:8px;padding:7px 10px;font-size:16px}' +
+    '#vl_teamset .tmst{color:#aaa;font-size:14px;margin-bottom:4px}#vl_teamset .tmun{font-size:15px;white-space:nowrap}#vl_teamset .tmgh{color:#ffc72c;font-size:15px;margin:10px 0 2px}#vl_teamset .tmgh small{color:#999;font-size:13px}' +
+    '#vl_teamset .tmcls{color:#999;margin-left:6px;font-size:13px}#vl_teamset .tmnow{color:#3ddc84;margin-left:6px;font-size:13px;white-space:nowrap}' +
+    '#vl_teamset .tmdn{display:flex;align-items:center;flex-wrap:wrap;font-size:15px}#vl_teamset .tmchips{display:flex;gap:5px;flex-wrap:wrap}' +
     '#vl_teamset .tmchip{border:1px solid #555;background:#222;color:#ddd;border-radius:14px;padding:3px 10px;font-size:15px;white-space:nowrap;cursor:pointer}#vl_teamset .tmchip.on{color:#111;font-weight:700}#vl_teamset .tmchip.on.none{background:#888}' +
     '#vl_teamset .tmpts{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:6px 0}#vl_teamset .pt{display:inline-flex;align-items:center;gap:4px;background:#111;border:1px solid #444;border-radius:6px;padding:2px 7px;font-size:15px}' +
     '#vl_teamset .tmpt{width:44px;background:#000;color:#fff;border:1px solid #555;border-radius:4px;padding:1px 3px;font-size:15px}#vl_teamset select{max-width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px}' +
@@ -940,6 +943,7 @@ window.__vlAuto = true;
       var n = b.getAttribute('data-n'), tid = b.getAttribute('data-t'); cfg.teamOf = Object.assign({}, cfg.teamOf || {});
       if (tid) cfg.teamOf[n] = tid; else delete cfg.teamOf[n]; teamChanged(); return;
     }
+    if (b.id === 'vl_tmrf') { tmRosterGet(true); return; }
     if (b.id === 'vl_ptadd' || b.id === 'vl_ptdel') {
       var a = (cfg.ptsCustom || []).slice(); if (b.id === 'vl_ptadd') a.push(Math.max(0, (+a[a.length - 1] || 1) - 1)); else if (a.length > 1) a.pop();
       cfg.ptsCustom = a; teamChanged(); return;
@@ -962,8 +966,11 @@ window.__vlAuto = true;
       o = tcLoad(); cup = tcCup(o, false); if (cup) { cup.races = []; tcSave(o); } teamChanged(); return;
     }
   });
+  $('vl_teamset').addEventListener('input', function (e) { if (e.target.id === 'vl_tmq') { tmQ = e.target.value.trim(); teamListRender(); } });
   $('vl_teamset').addEventListener('change', function (e) {
     var el = e.target, o, cup;
+    if (el.id === 'vl_tmun') { tmUn = el.checked; teamListRender(); return; }
+    if (el.id === 'vl_tmq') return;
     if (el.classList.contains('tmname')) { var t = teams()[+el.getAttribute('data-ti')]; if (t) { t.name = el.value.trim() || t.name; cfg.teams = teams().slice(); teamChanged(); } return; }
     if (el.classList.contains('tmc')) { var t2 = teams()[+el.getAttribute('data-ti')]; if (t2) { t2.color = el.value; cfg.teams = teams().slice(); teamChanged(); } return; }
     if (el.id === 'vl_ptsm') { cfg.ptsMode = el.value; teamChanged(); return; }
@@ -2426,14 +2433,8 @@ window.__vlAuto = true;
     });
     h += '<div class="tmrow"><button class="pb2" id="vl_tmadd">＋ 팀 추가</button></div>';
     h += '<div class="sub"><span>선수 배정</span><span style="color:#999">레이스 보드에서 팀 색 점을 눌러도 바뀌어요</span></div>';
-    var nl = Object.keys(names).sort();
-    if (!nl.length) h += '<div class="lim"><span style="color:#999">코스에 나온 선수가 여기에 보여요</span></div>';
-    nl.forEach(function (n) {
-      var cur = (cfg.teamOf || {})[n] || '';
-      h += '<div class="tmdr"><span class="tmdn">' + (cur && teamById(cur) ? '<i class="tmd" style="background:' + esc(teamById(cur).color) + '"></i>' : '<i class="tmd" style="background:#444"></i>') + esc(n) + '</span><span class="tmchips">' +
-        T.map(function (t) { return '<button class="tmchip' + (cur === t.id ? ' on' : '') + '" data-n="' + esc(n) + '" data-t="' + t.id + '"' + (cur === t.id ? ' style="background:' + esc(t.color) + ';border-color:' + esc(t.color) + '"' : '') + '>' + esc(t.name) + '</button>'; }).join('') +
-        '<button class="tmchip' + (cur && teamById(cur) ? '' : ' on none') + '" data-n="' + esc(n) + '" data-t="">없음</button></span></div>';
-    });
+    h += '<div class="lim" style="margin:0 0 6px;flex-wrap:wrap"><input type="search" id="vl_tmq" placeholder="선수 검색 — 이름·초성(ㄱㄴㅎ)" value="' + esc(tmQ) + '"><button class="pb2" id="vl_tmrf">↻ 다시 받기</button></div>' +
+      '<div id="vl_tmst" class="tmst"></div><div style="margin-bottom:4px"><label class="tmun"><input type="checkbox" id="vl_tmun"' + (tmUn ? ' checked' : '') + '> 배정 안 된 선수만</label></div><div id="vl_tmlist"></div>';
     var tb = cfg.ptsMode === 'custom' ? cfg.ptsCustom : cfg.ptsFixed;
     h += '<div class="sub"><span>포인트 규칙</span></div><div class="gap"><div class="lim" style="margin:0">방식 <select id="vl_ptsm"><option value="fixed">고정표 (기본)</option><option value="count">출전 수 기준 (N명 → 1등 N점)</option><option value="custom">직접 입력</option></select></div>';
     if (cfg.ptsMode === 'count') h += '<div class="lim"><span style="color:#999">출전한 선수가 N명이면 1등 N점, 2등 N−1점 … 꼴찌 1점</span></div>';
@@ -2451,11 +2452,52 @@ window.__vlAuto = true;
       '<label style="margin-top:6px"><input type="checkbox" id="vl_tsayl">레이스 중 팀 순위가 바뀌면 음성 <small style="color:#999">(“블루 팀 1위로”)</small></label>' +
       '<div class="lim" style="margin-top:8px;flex-wrap:wrap"><button class="pb2" id="vl_tcopy">📋 표 복사</button><button class="pb2" id="vl_tcsv">⬇ CSV</button><button class="pb2" id="vl_tclr">이 팀전 비우기</button><span id="vl_tmsg" style="color:#999"></span></div></div>';
     el.innerHTML = h;
+    teamListRender(); tmRosterGet(false);
     $('vl_ptsm').value = cfg.ptsMode === 'count' || cfg.ptsMode === 'custom' ? cfg.ptsMode : 'fixed';
     bind('vl_bbest', 'bonusBest', teamChanged); bind('vl_bfin', 'bonusFin', teamChanged);
     $('vl_tauto').checked = cfg.teamAuto !== false; $('vl_tauto').onchange = function () { cfg.teamAuto = this.checked; save(); };
     $('vl_tsay').checked = cfg.teamSay !== false; $('vl_tsay').onchange = function () { cfg.teamSay = this.checked; save(); };
     bind('vl_tsayl', 'teamSayLive');
+  }
+  /* today's practice list (/practice/?p=session_list&d=today) → everyone who ran today, for team picking */
+  var tmRoster = { t: 0, busy: false, names: {}, err: '' }, tmQ = '', tmUn = false;
+  function tmRosterGet(force) {
+    if (tmRoster.busy || (!force && Date.now() - tmRoster.t < 300000)) return;
+    tmRoster.busy = true; tmStatus();
+    getDoc('/practice/?p=session_list&d=' + todayS()).then(function (doc) {
+      var nm = {}; parseDay(doc).forEach(function (r) { if (r[1] && !nm[r[1]]) nm[r[1]] = r[2] || ''; });
+      tmRoster.names = nm; tmRoster.err = '';
+    }).catch(function () { tmRoster.err = '오늘 연습 기록을 읽지 못했어요'; }).then(function () { tmRoster.busy = false; tmRoster.t = Date.now(); teamListRender(); });
+  }
+  function tmStatus() {
+    var st = $('vl_tmst'); if (!st) return;
+    var nT = Object.keys(tmRoster.names).length, nA = Object.keys(cfg.teamOf || {}).filter(function (n) { return teamById(cfg.teamOf[n]); }).length;
+    var hh = tmRoster.t ? ('0' + new Date(tmRoster.t).getHours()).slice(-2) + ':' + ('0' + new Date(tmRoster.t).getMinutes()).slice(-2) : '';
+    st.innerHTML = tmRoster.busy ? '📋 오늘 연습 기록을 받는 중…' : tmRoster.err ? '<span style="color:#ff9a9a">⚠ ' + esc(tmRoster.err) + '</span> · 배정 ' + nA + '명'
+      : '📋 오늘 연습 기록에서 <b style="color:#fff">' + nT + '명</b> · 배정 ' + nA + '명' + (hh ? ' · ' + hh + ' 받음' : '');
+  }
+  function teamListRender() {
+    var box = $('vl_tmlist'); if (!box) return;
+    tmStatus();
+    var T = teams(), info = {}, now = {};
+    Object.keys(tmRoster.names).forEach(function (n) { info[n] = tmRoster.names[n]; });
+    try { var sc = SC(); if (sc && sc.driverData) list(sc.driverData).forEach(function (d) { var n = nameOf(d); if (n) { now[n] = 1; if (!(n in info)) info[n] = ''; } }); } catch (e) {}
+    Object.keys(rows || {}).forEach(function (n) { if (!(n in info)) info[n] = ''; });
+    Object.keys(cfg.teamOf || {}).forEach(function (n) { if (!(n in info)) info[n] = ''; });
+    var all = Object.keys(info).filter(function (n) { return !tmQ || kmatch(n, tmQ); });
+    var cmp = function (a, b) { return a.localeCompare(b, 'ko'); };
+    var asg = all.filter(function (n) { return teamById((cfg.teamOf || {})[n]); }).sort(cmp), un = all.filter(function (n) { return !teamById((cfg.teamOf || {})[n]); }).sort(cmp);
+    var line = function (n) {
+      var cur = (cfg.teamOf || {})[n] || '', ct = teamById(cur);
+      return '<div class="tmdr"><span class="tmdn"><i class="tmd" style="background:' + (ct ? esc(ct.color) : '#444') + '"></i>' + esc(n) +
+        (info[n] ? '<small class="tmcls">' + esc(info[n]) + '</small>' : '') + (now[n] ? '<small class="tmnow">● 코스</small>' : '') + '</span><span class="tmchips">' +
+        T.map(function (t) { return '<button class="tmchip' + (cur === t.id ? ' on' : '') + '" data-n="' + esc(n) + '" data-t="' + t.id + '"' + (cur === t.id ? ' style="background:' + esc(t.color) + ';border-color:' + esc(t.color) + '"' : '') + '>' + esc(t.name) + '</button>'; }).join('') +
+        '<button class="tmchip' + (ct ? '' : ' on none') + '" data-n="' + esc(n) + '" data-t="">없음</button></span></div>';
+    };
+    var h = '';
+    if (!tmUn && asg.length) h += '<div class="tmgh">배정된 선수 ' + asg.length + '</div>' + asg.map(line).join('');
+    h += '<div class="tmgh">배정 안 됨 ' + un.length + ' <small>(오늘 연습한 선수 · 가나다순)</small></div>' + (un.length ? un.map(line).join('') : '<div class="lim"><span style="color:#999">' + (tmQ ? '찾는 선수가 없어요' : '모두 배정했어요') + '</span></div>');
+    box.innerHTML = h;
   }
   function teamChanged() { save(); teamSetRender(); renderTeam(true); try { renderRaceBoard(true); } catch (e) {} gsumSafe(); }
   function gsumSafe() { try { gsum(); } catch (e) {} }
