@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 라이트 - thetrackkr 음성 랩타임
 // @namespace    voicelab-lite
-// @version      1.0.0
+// @version      1.1.0
 // @description  thetrackkr LiveRC 라이브 스코어링 — 선수 한 명의 랩타임을 음성으로 (자동 업데이트: 열 때마다 깃허브의 최신 라이트를 받아 실행)
 // @match        https://thetrackkr.liverc.com/*
 // @match        http://thetrackkr.liverc.com/*

@@ -2,8 +2,8 @@
    화면: 선수 등록 입력 칸 → 크게 보기 카드(프로와 같은 모양, 앞차·뒤차 없음) → 랩 타임표(프로와 같은 색).
    음성: 라인을 지날 때마다 랩타임만, 소수 1자리(버림), "초" 없이 — 23.640 → "23.6". 안드로이드·아이폰 사파리용. */
 (function () {
-  var VER0 = 1;   /* = LVER below; the loader compares it */
-  var LVERSION = '1.0.0';
+  var VER0 = 2;   /* = LVER below; the loader compares it */
+  var LVERSION = '1.1.0';
   var TRACK = 'thetrackkr', HOME = 'https://' + TRACK + '.liverc.com/live/scoring/';
   if (window.__vlLite && !((+window.__vlLite.ver || 0) < VER0)) return;   /* same or newer copy already running */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -100,7 +100,7 @@
     '#vll_root *{box-sizing:border-box;font-family:inherit}html.vll-lock,html.vll-lock body{overflow:hidden!important}' +
     '#vll_root .vll-in{max-width:720px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}' +
     '#vll_root .vll-hd{display:flex;align-items:center;gap:8px;padding:4px 2px 8px;border-bottom:1px solid #222}' +
-    '#vll_root .vll-lg{font-weight:900;font-size:15px;color:#ffd54a;white-space:nowrap}#vll_root .vll-lg small{color:#888;font-weight:700;font-size:11px;margin-left:3px}' +
+    '#vll_root .vll-lg{font-weight:900;font-size:15px;color:#ffd54a;white-space:nowrap}#vll_root .vll-lg small{color:#888;font-weight:700;font-size:11px;margin-left:3px}#vll_root .vll-lg em{display:block;font-style:normal;font-size:10px;font-weight:700;color:#8a7a3a;letter-spacing:.3px;margin-top:1px}' +
     '#vll_root .vll-trk{font-size:12px;color:#aaa;white-space:nowrap}#vll_root .vll-sp{flex:1;min-width:0}' +
     '#vll_root .vll-rem{font-size:12px;color:#999;white-space:nowrap}#vll_root .vll-rem b{color:#fff;font-size:15px;font-variant-numeric:tabular-nums}' +
     '#vll_root button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;margin:0;line-height:1.2}' +
@@ -140,7 +140,7 @@
   var st = document.createElement('style'); st.id = 'vll_css'; st.textContent = css; document.head.appendChild(st);
   var root = document.createElement('div'); root.id = 'vll_root'; root.setAttribute('data-vll-ver', LVER);
   root.innerHTML = '<div class="vll-in">' +
-    '<div class="vll-hd"><span class="vll-lg">VoiceLab<small>Lite</small></span><span class="vll-trk">📍 ' + TRACK + '</span><span class="vll-sp"></span><span class="vll-rem" id="vll_rem"></span><button id="vll_mu" title="음성 켜기/끄기">🔊</button></div>' +
+    '<div class="vll-hd"><span class="vll-lg">VoiceLab<small>Lite</small><em>Made by NAMO</em></span><span class="vll-trk">📍 ' + TRACK + '</span><span class="vll-sp"></span><span class="vll-rem" id="vll_rem"></span><button id="vll_mu" title="음성 켜기/끄기">🔊</button></div>' +
     '<div class="vll-cls" id="vll_cls"></div><div id="vll_warn"></div>' +
     '<button id="vll_unl">👆 여기를 눌러 음성 켜기</button>' +
     '<div class="vll-reg"><div class="vll-row"><input id="vll_q" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="선수 한 명 · 이름 또는 초성 (예: ㄴㅎ)"><button id="vll_add">등록</button></div>' +
@@ -282,7 +282,7 @@
   $('vll_chip').onclick = function (e) { if (e.target.id === 'vll_x') { cfg.name = ''; save(); vClear(); draw(true); suggest(); paint(); } };
 
   /* ---------- laps of the driver: one entry per line crossing, kept across a page reload within the same run ---------- */
-  var LK = 'vlLiteLaps', laps = { key: '', run: 0, h: [] }, seen = {}, lastCross = 0, fresh = true;
+  var LK = 'vlLiteLaps', laps = { key: '', run: 0, h: [] }, seen = {}, seenF = NaN, lastCross = 0, fresh = true;
   try { var lo = JSON.parse(localStorage.getItem(LK) || 'null'); if (lo && lo.h && Date.now() - (lo.ts || 0) < 4 * 3600e3) laps = lo; } catch (e) {}
   function lapSave() { try { laps.ts = Date.now(); localStorage.setItem(LK, JSON.stringify(laps)); } catch (e) {} }
   /* same run = started at the same wall-clock moment (now − elapsed), within 2 minutes */
@@ -378,12 +378,14 @@
     var sc = SC(); if (!sc || !sc.driverData) return;
     var d = findMine(list(sc.driverData));
     if (d) {
-      var key = keyOf(d), L = +d.laps || 0, prev = seen[key];
-      seen = {}; seen[key] = L;
+      var key = keyOf(d), L = +d.laps || 0, prev = seen[key], f = siteFast(d), pf = seenF;
+      seen = {}; seen[key] = L; seenF = f;
       recLap(d);
       if (prev !== undefined && L > prev) {
         lastCross = Date.now();
-        if (!cfg.muted && L >= 1) { var t = sayTime(d.lapTime); if (t) try { say(t); } catch (e) {} }
+        /* best lap = LiveRC's F: got faster on this lap and it is this lap's time (Pro's rule; the very first lap is not a "new" best) */
+        var ls = secs(d.lapTime), isBest = f > 0 && pf > 0 && f < pf - 0.0005 && ls > 0 && Math.abs(ls - f) < 0.0005;
+        if (!cfg.muted && L >= 1) { var t = sayTime(d.lapTime); if (t) try { say(t + (isBest ? ', 베스트 랩' : '')); } catch (e) {} }
       } else if (prev !== undefined && L < prev) lastCross = 0;   /* a new heat */
     }
     draw(false); proWarn(); paint();
