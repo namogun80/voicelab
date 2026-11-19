@@ -1,5 +1,5 @@
 (function () {
-  var VER0 = 75;   /* = VER below */
+  var VER0 = 76;   /* = VER below */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -32,7 +32,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.29.0';
+  var VERSION = '2.29.1';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -101,6 +101,16 @@
     '#vl_head{display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid #2a2a30;flex:none}' +
     '#vl_head .tab{position:relative;background:none;border:0;border-bottom:3px solid transparent;color:#999;padding:11px 10px 8px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}' +
     '#vl_head .tab.on{color:#fff;border-bottom-color:#e8b400}' +
+    '#vl_head .vl-tsep{flex:none;width:1px;height:24px;background:#444;margin:0 6px 0 8px}' +
+    '#vl_head .tab.vl-tkb{flex:none;border:1px solid #3a3a42 !important;border-radius:8px;padding:6px 8px !important;margin:0 2px}#vl_head .tab.vl-tkb.on{background:#e8b400;color:#000;border-color:#e8b400 !important}' +
+    '#vl_th{padding:4px 2px;font-size:16px;color:#eee}#vl_th .thc{background:#1b1b20;border:1px solid #2a2a30;border-radius:12px;padding:12px;margin-bottom:10px}' +
+    '#vl_th .ths{color:#999;font-size:14px}#vl_th .thn{font-size:21px;font-weight:800;color:#fff;margin:2px 0}' +
+    '#vl_th .thchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}#vl_th .thchips button{border:1px solid #3a3a42;border-radius:16px;padding:7px 13px;font-size:15px;color:#ddd;background:#232329;cursor:pointer}#vl_th .thchips button.cur{border-color:#e8b400;color:#e8b400;cursor:default}' +
+    '#vl_th .thpg{margin-top:10px;color:#aaa;font-size:15px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}#vl_th .thpg button{background:#232329;color:#bbb;border:1px solid #3a3a42;border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer}#vl_th .thpg button.on{background:#3a3220;color:#ffd75e;border-color:#e8b400;font-weight:700}' +
+    '#vl_th #vl_thall{display:block;width:100%;background:#e8b400;color:#000;font-weight:800;border:0;border-radius:10px;padding:13px;font-size:17px;cursor:pointer}#vl_th .thnote{text-align:center;color:#999;font-size:14px;margin-top:8px}' +
+    '#vl_panel.tmode #vl_head .vl-tsep{display:none}' +
+    '@media (max-width:430px){#vl_head .vl-tsep{margin:0 4px}#vl_head .tab.vl-tkb{padding:6px 6px !important;margin:0}}' +
+    '@media (max-width:350px){#vl_head .vl-tsep{display:none}#vl_head .tab.vl-tkb{padding:5px 4px !important;margin-left:4px}}' +
     '@media (max-width:430px){#vl_head .tab:not(.on) .vl-tn{display:none}#vl_head .tab{padding-left:6px !important;padding-right:6px !important}}' +
     '#vl_zm{margin-left:auto;margin-right:6px;display:inline-flex;align-items:center;gap:2px;background:#1e1e24;border:1px solid #3a3a42;border-radius:16px;padding:2px 4px;font-size:13px;color:#ddd;position:relative;flex:none}' +
     '#vl_zm i{font-style:normal;opacity:.7;margin:0 2px}#vl_zm button{background:#2a2a32;color:#eee;border:0;border-radius:50%;width:22px;height:22px;font-weight:800;cursor:pointer;padding:0;line-height:22px}' +
@@ -140,12 +150,6 @@
     '#vl_glg{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:12px;margin-bottom:4px}#vl_glg span[data-gf]{cursor:pointer;border-radius:10px;padding:1px 6px}#vl_glg span.on{background:#2a2a32;font-weight:700;color:#fff}#vl_glg span.off{opacity:.45}#vl_glg .gfh{color:#777;font-size:11px}#vl_glg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}' +
     '#vl_graphs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}' +
     '#vl_graphs .gc{flex:0 1 320px;min-width:220px;max-width:320px;background:#0f0f12;border:1px solid #24242b;border-radius:8px;padding:6px 6px 2px}' +
-    '#vl_trk{margin:0 0 10px;padding:7px 9px;background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;font-size:13px;color:#aaa}' +
-    '#vl_trk .tb1{display:flex;align-items:center;gap:6px;flex-wrap:wrap}#vl_trk .tb1 b{color:#e8b400}' +
-    '#vl_trk input{flex:1 1 120px;min-width:90px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:15px}' +
-    '#vl_trk button{background:#2c2c33;color:#ddd;border:1px solid #3a3a42;border-radius:6px;padding:4px 10px;font-size:13px;cursor:pointer;white-space:nowrap}' +
-    '#vl_trk button.go{background:#e8b400;color:#000;border-color:#e8b400;font-weight:700}#vl_trk .tog{margin-left:auto}' +
-    '#vl_trk .tb2{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center}#vl_trk .tb2 button{border-radius:14px;padding:2px 10px;font-size:12px}#vl_trk .tb2 button.cur{border-color:#e8b400;color:#e8b400}' +
     '#vl_glaps .glrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}#vl_glaps .glc{flex:0 0 auto;min-width:0;max-width:none;background:#0f0f12;border:1px solid #24242b;border-radius:8px;padding:6px}' +
     '#vl_glaps .glc h5{margin:0 0 4px 2px;font-size:12px;color:#ddd;display:flex;align-items:center;gap:6px}#vl_glaps .glc h5 i{width:10px;height:10px;border-radius:2px;display:inline-block}#vl_glaps .glc h5 small{margin-left:auto;color:#777;font-weight:400}' +
     '#vl_glaps .ll{max-height:none;overflow:visible}#vl_glaps .ll td{height:22px !important;box-sizing:border-box}#vl_glaps .glc h5{cursor:pointer}#vl_glaps table{width:auto;font-size:12px}#vl_glaps td,#vl_glaps th{padding:2px 6px !important;font-size:13px !important;height:auto !important;text-align:right;border-bottom:1px solid #1d1d22}#vl_glaps th{color:#888;font-size:11px;position:sticky;top:0;background:#0f0f12}' +
@@ -363,13 +367,13 @@
   root.setAttribute('data-vl-ver', String(VER));
   root.innerHTML =
     '<div id="vl_panel">' +
-    '<div id="vl_head"><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span></button><button class="tab" data-tab="trk" title="다른 트랙으로 — LiveRC 트랙 목록에서 검색">📍<span class="vl-tn"> 트랙</span></button><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
+    '<div id="vl_head"><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span></button><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
     '<span id="vl_zm" title="화면 확대/축소"><i>🔍</i><button data-zs="-1" title="작게">−</button><button id="vl_zv" title="눌러서 퍼센트 고르기">100%</button><button data-zs="1" title="크게">+</button><span id="vl_zl"></span></span>' +
-    '<button id="vl_go"></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span></div>' +
+    '<button id="vl_go"></button><span class="vl-tsep"></span><button class="tab vl-tkb" data-tab="trk" title="트랙 바꾸기 — 눌러도 바로 이동하지 않아요">📍<span class="vl-tn"> 트랙</span></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span></div>' +
     '<div id="vl_unl">🔊 화면을 한 번 누르면 음성이 켜져요</div>' +
     '<div id="vl_warn" style="display:none;background:#5a1414;color:#ffd2d2;font-size:12px;line-height:1.45;padding:8px 12px;border-bottom:1px solid #7a2020"></div>' +
     '<div id="vl_body">' +
-    '<div id="vl_trk"></div>' +
+    
     '<div id="vl_tab_board"><div id="vl_rb">' +
     '<div class="hdr" id="vl_hdr"><div style="min-width:0"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div class="cls" id="vl_cls">LIVE</div>' +
     '<div style="white-space:nowrap"><span class="sub2 vl-hl vl-hl-rem">남은 시간</span><span class="clk" id="vl_rem">0:00</span></div>' +
@@ -385,7 +389,7 @@
     '<div id="vl_glg"></div><div id="vl_glaps"></div><div id="vl_graphs"></div>' +
     '</div></div>' +
     '<div id="vl_tab_main" style="display:none"><div id="vl_main"></div></div>' +
-    '<div id="vl_tab_trk" style="display:none"><div id="vl_tk"></div></div>' +
+    '<div id="vl_tab_trk" style="display:none"><div id="vl_th"></div><div id="vl_tk"></div></div>' +
     '<div id="vl_tab_set">' +
     '<div class="vlver"><span><b>VoiceLab</b> v' + VERSION + '</span><span>Made by <b>NAMO</b></span></div>' +
     '<div class="gtools"><button class="pb2" id="vl_gopen">모두 펼치기</button><button class="pb2" id="vl_gclose">모두 접기</button></div>' +
@@ -527,7 +531,6 @@
     '<div class="gap" id="vl_upd"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:15px">🔄 업데이트</b><span style="color:#bbb" id="vl_updv"></span><button class="ub" id="vl_updb" style="margin-left:auto">업데이트 확인</button></div><div id="vl_updi"></div>' +
     '<div style="margin-top:6px;color:#999;font-size:12px">하루 한 번 자동으로 확인하고, 새 버전이 있으면 ⚙ 설정 탭에 빨간 점 · Tampermonkey 자동 업데이트도 그대로</div></div>' +
     '<div class="grid"><label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_wake">화면 꺼짐 방지 (휴대폰)</label>' +
-    '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_trkshow">트랙 이동 줄 표시 (레이스 보드 · 연습 기록 위)</label>' +
     '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_afit"><span>넓은 화면에서 표를 화면 폭에 맞춰 크게 <small style="color:#999">(PC·아이패드, 최대 1.5배)</small></span></label></div>' +
     '<div class="sub"><span>☁ 구글 드라이브 동기화</span><span id="vl_sdot"></span></div>' +
     '<div class="gap"><div class="lim" style="margin:0;flex-wrap:wrap">웹 앱 URL <input type="url" id="vl_surl" placeholder="https://script.google.com/macros/s/…/exec" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:5px 8px;font-size:14px;flex:1;min-width:200px"></div>' +
@@ -609,7 +612,7 @@
   }
   function setTab(t) {
     if (pracOnly && t === 'board') { if (curTrk) location.href = 'https://' + curTrk + '.liverc.com/live/scoring/#vl-trk=' + (cfg.trkRecent || []).join(',') + syncHash(); return; }   /* this page has no live data: go to the track's live scoring */
-    if (t === 'trk' && !trkOnly) { trkPick(); return; }   /* the picker lives on LiveRC's own track list page */
+    if (t === 'trk' && !trkOnly && cfg.tab !== 'trk') thPg = (pracOnly || cfg.tab === 'prac') ? 'prac' : 'board';   /* where a picked track opens */
     if (trkOnly) t = 'trk';
     else if (pracOnly && t !== 'set') t = 'prac';
     if (t === 'main' && !(md.ok && md.classes.length)) t = 'board';
@@ -620,10 +623,8 @@
     $('vl_tab_main').style.display = cfg.tab === 'main' ? '' : 'none';
     $('vl_tab_trk').style.display = cfg.tab === 'trk' ? '' : 'none';
     if (cfg.tab === 'main') try { renderMain(true); } catch (e) {}
-    if (cfg.tab === 'trk') try { tkOpen(); } catch (e) {}
+    if (cfg.tab === 'trk') try { if (trkOnly) tkOpen(); else renderTrk(); } catch (e) {}
     try { fitWidths(); fitPrac(); } catch (e) {}
-    $('vl_trk').style.display = cfg.tab === 'set' || cfg.tab === 'trk' || cfg.tab === 'main' ? 'none' : '';
-    if (typeof curTrk === 'string') renderTrk();
     root.querySelectorAll('#vl_head .tab').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === cfg.tab); });
     setWide();
     if (cfg.tab === 'board') renderRaceBoard(true);
@@ -907,8 +908,6 @@
   $('vl_rword').value = cfg.runWord || '주행 완료';
   $('vl_rword').onchange = function () { cfg.runWord = this.value.trim() || '주행 완료'; this.value = cfg.runWord; save(); };
   /* track bar show/hide (same flag as the ✕ on the bar) */
-  $('vl_trkshow').checked = !cfg.trkHide;
-  $('vl_trkshow').onchange = function () { cfg.trkHide = !this.checked; save(); renderTrk(); };
   /* settings groups: fold/unfold (remembered), one-line summary, master switches */
   function grpSet() {
     root.querySelectorAll('#vl_tab_set .grp').forEach(function (g) {
@@ -937,7 +936,7 @@
       $('vl_gs_color').innerHTML = sw(cfg.lapBest) + '베스트 · ' + sw(cfg.lapNear) + (+cfg.lapDev || 0.5) + '초 이내 · ' + sw(cfg.lapFar) + '그 이상';
       var tcp = null; try { tcp = tcCup(null, false); } catch (e) {}
       $('vl_gs_team').textContent = !cfg.teamOn ? '꺼짐' : ['팀 ' + teams().length, ({ count: '출전 수 기준', custom: '직접 입력' }[cfg.ptsMode] || '고정표'), tcp ? tcp.name + ' · 레이스 ' + tcp.races.length + '개' : ''].filter(Boolean).join(' · ');
-      $('vl_gs_gen').textContent = [cfg.wake && '화면 꺼짐 방지', !cfg.trkHide && '트랙 이동 줄', cfg.syncUrl ? '☁ 드라이브 동기화' : '설정 파일'].filter(Boolean).join(' · ');
+      $('vl_gs_gen').textContent = [cfg.wake && '화면 꺼짐 방지', cfg.syncUrl ? '☁ 드라이브 동기화' : '설정 파일'].filter(Boolean).join(' · ');
     } catch (e) {}
   }
   root.querySelectorAll('#vl_tab_set .grp > .gh').forEach(function (h) {
@@ -1124,26 +1123,31 @@
     location.href = 'https://' + t + '.liverc.com' + (prac ? '/practice/' : '/live/scoring/') + trkHash(keep) + syncHash();
   }
   /* 📍 트랙 tab on a track's page: open LiveRC's track list, where VoiceLab becomes the picker */
-  function trkPick() {
-    var pg = (pracOnly || cfg.tab === 'prac') ? 'prac' : 'board';
+  function trkPick(pg) {
+    pg = pg || ((pracOnly || cfg.tab === 'prac') ? 'prac' : 'board');
     location.href = 'https://live.liverc.com/' + trkHash((cfg.trkRecent || []).filter(function (x) { return x !== 'live'; }).slice(0, 5)) + (curTrk && curTrk !== 'live' ? '&vl-from=' + curTrk : '') + '&vl-pg=' + pg + syncHash();
   }
+  /* 📍 트랙 tab on a track's page: shows the current track, favourites/recents and the full-list button — nothing moves until one of those is pressed */
+  var thPg = 'board';
   function renderTrk() {
-    if (trkOnly) { $('vl_trk').innerHTML = ''; return; }
-    var r = (cfg.trkRecent || []).slice(0, 5);
-    $('vl_trk').innerHTML = cfg.trkHide
-      ? '<div class="tb1">📍 <b>' + esc(curTrk || '-') + '</b><button class="tog" id="vl_ttog">▼ 트랙</button></div>'
-      : '<div class="tb1">📍 <b>' + esc(curTrk || '-') + '</b><span style="color:#888;font-size:13px">.liverc.com</span>' +
-        '<button class="go" id="vl_tpick" title="LiveRC 트랙 목록에서 검색해서 고르기">🔍 트랙 바꾸기</button><button class="tog" id="vl_ttog">▲ 숨기기</button></div>' +
-        (r.length > 1 ? '<div class="tb2">최근 ' + r.map(function (t) { return '<button data-trk="' + esc(t) + '"' + (t === curTrk ? ' class="cur"' : '') + '>' + ((cfg.trkFav || []).indexOf(t) >= 0 ? '★ ' : '') + esc(t) + '</button>'; }).join('') + '</div>' : '');
+    var el = $('vl_th'); if (!el) return;
+    if (trkOnly) { el.innerHTML = ''; return; }
+    var fav = cfg.trkFav || [], seen = {};
+    var list = fav.concat(cfg.trkRecent || []).filter(function (t) { if (!t || t === 'live' || seen[t]) return false; seen[t] = 1; return true; }).slice(0, 10);
+    el.innerHTML =
+      '<div class="thc"><div class="ths">지금 트랙</div><div class="thn">📍 ' + esc(curTrk || '-') + '</div><div class="ths">' + esc(curTrk || '-') + '.liverc.com · ' + (pracOnly ? '연습 기록' : '라이브 스코어링') + ' 페이지</div></div>' +
+      '<div class="thc"><div class="ths">★ 즐겨찾기 · 최근 — 눌러서 이동</div>' +
+      (list.length ? '<div class="thchips">' + list.map(function (t) { return '<button data-trk="' + esc(t) + '"' + (t === curTrk ? ' class="cur" title="지금 트랙"' : '') + '>' + (fav.indexOf(t) >= 0 ? '★ ' : '') + esc(t) + '</button>'; }).join('') + '</div>' : '<div class="ths" style="margin-top:6px">아직 없어요 — 아래 전체 트랙에서 찾아 주세요 (★는 트랙 목록에서 표시)</div>') +
+      '<div class="thpg">가는 곳: <button data-pg="board"' + (thPg === 'board' ? ' class="on"' : '') + '>🏁 라이브 스코어링</button><button data-pg="prac"' + (thPg === 'prac' ? ' class="on"' : '') + '>📊 연습 기록</button></div></div>' +
+      '<button id="vl_thall">🔍 전체 트랙에서 찾기 (LiveRC 트랙 목록)</button>' +
+      '<div class="thnote">누르면 live.liverc.com 트랙 목록으로 이동해 검색 · 필터 · ★ 즐겨찾기</div>';
   }
-  $('vl_trk').addEventListener('click', function (e) {
+  $('vl_th').addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('button'); if (!b) return;
-    if (b.id === 'vl_ttog') { cfg.trkHide = !cfg.trkHide; save(); renderTrk(); try { $('vl_trkshow').checked = !cfg.trkHide; } catch (e) {} return; }
-    if (b.id === 'vl_tpick') { trkPick(); return; }
-    var t = b.getAttribute('data-trk'); if (t && t !== curTrk) trkGo(t);
+    if (b.id === 'vl_thall') { trkPick(thPg); return; }
+    var pg = b.getAttribute('data-pg'); if (pg) { thPg = pg; renderTrk(); return; }
+    var t = b.getAttribute('data-trk'); if (t && t !== curTrk) trkGo(t, thPg);
   });
-  renderTrk();
   /* ---------- 📍 track picker (on live.liverc.com) ----------
      LiveRC's track list page holds every track (1,200+) in one table: row data-href "//sub.liverc.com/live/",
      icons status_2 = racing, status_1 = open practice, status_video_1 = live video, status_featured; "1 minute ago"; name; current event */
