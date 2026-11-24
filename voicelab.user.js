@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      2.29.3
+// @version      2.29.4
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 78;   /* = VER below */
-  /* var VER = 78; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 79;   /* = VER below */
+  /* var VER = 79; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.29.3';
+  var VERSION = '2.29.4';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -67,16 +67,18 @@ window.__vlAuto = true;
     if (!ov) warnOld = true;   /* copies before v1.9 keep running in the background and can't be stopped from here */
   }
   var LS = 'voiceLapCfg';
-  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 1, gapAhead: true, gapAheadLaps: 1, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
+  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 0, gapAhead: true, gapAheadLaps: 0, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
     teamOn: false, teams: [], teamOf: {}, ptsMode: 'fixed', ptsFixed: [10, 8, 6, 5, 4, 3, 2, 1], ptsCustom: [10, 8, 6, 5, 4, 3, 2, 1], bonusBest: false, bonusFin: false, teamAuto: true, teamSay: true, teamSayLive: false,
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
-    remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1 };
+    remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1 };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
   cfg.closeV2 = 0;   /* stays 0 only for settings saved before v2.24 (see below) */
   cfg.v227 = 0;
+  cfg.v2294 = 0;
   try { Object.assign(cfg, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   try { if (DESK && DESK.cfgGet) { var dc = DESK.cfgGet(); if (dc) Object.assign(cfg, JSON.parse(dc)); } } catch (e) {}
   /* Google Drive sync address travels to another track's site in the address (#…&vl-sync=url%0Akey) */
@@ -88,6 +90,8 @@ window.__vlAuto = true;
   /* v2.28: a device that has synced with this Drive address before (devices set up before v2.28 count as synced) */
   if (cfg.syncUrl && cfg.syncOk === undefined && !cfg.v228s) cfg.syncOk = cfg.syncUrl;
   cfg.v228s = 1;
+  /* v2.29.4: gap calls default to “same lap only” — devices still on the old default (1 lap) move once */
+  if (!cfg.v2294) { if (+cfg.gapLeadLaps === 1) cfg.gapLeadLaps = 0; if (+cfg.gapAheadLaps === 1) cfg.gapAheadLaps = 0; cfg.v2294 = 1; }
   var syncTs0 = +cfg._ts || 0, syncReady = false, syncSig = null;
   var running = false;
   if (!cfg.colHide || typeof cfg.colHide !== 'object') cfg.colHide = { el: cfg.colEl === false, pace: cfg.colPace === false, t3: cfg.colTop3 === false };
@@ -214,7 +218,11 @@ window.__vlAuto = true;
     '#vl_big .bc-k{font-size:12px;color:#999;font-weight:700;letter-spacing:.5px}#vl_big .bc-main{margin:8px 0 6px}#vl_big .bc-last{font-size:64px;font-weight:900;line-height:1.05;font-variant-numeric:tabular-nums}#vl_big .bc-d{font-size:22px;font-weight:800}' +
     '#vl_big .bc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid #2a2a30;padding-top:8px}#vl_big .bc-v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}#vl_big .bc-v.cl{color:var(--cc)}' +
     '#vl_big .bc-none{color:#999;font-size:14px;padding:6px 2px}@media (max-width:430px){#vl_big .bc-last{font-size:56px}#vl_big .bc-v{font-size:20px}#vl_big .bc-p{font-size:38px}}' +
-    '#vl_big .vl-bc.rv{border:2px solid var(--cc);box-shadow:0 0 10px var(--cc);padding:8px 12px;background:#18121a}#vl_big .rv .rv-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#fff;min-width:0}#vl_big .rv .rv-h>span:first-child{text-shadow:0 0 6px var(--cc);white-space:nowrap}' +
+    '#vl_big .vl-bc.rv{border:1px solid #3a3a42;padding:8px 12px;background:#1b1b20}#vl_big .vl-bc.rv.cl{border:2px solid var(--cc);box-shadow:0 0 10px var(--cc);background:#18121a}#vl_big .rv:not(.cl) .rv-g{color:#ddd !important}#vl_big .rv.lead{padding:6px 12px}#vl_big .rv.lead .rv-h{color:#bbb}#vl_big .rv:not(.cl) .rv-h>span:first-child{text-shadow:none;color:#ccc}' +
+    '#vl_big .rv .rv-m{flex-wrap:wrap;row-gap:2px}#vl_big .rv-x{margin:0 0 0 auto;padding-left:14px;font-size:24px;font-weight:800;display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}#vl_big .rv-x small{font-size:14px;color:#aaa;font-weight:700}#vl_big .rv-x.wr{flex-direction:row;align-items:baseline;gap:10px;margin-left:0;padding-left:0;font-size:17px}#vl_big .rv-x.good{color:#3ddc84}#vl_big .rv-x.bad{color:#ffa94d}#vl_big .rv-x.warn{color:#ff6b6b}' +
+    '#vl_big .bc-q .ok{color:#3ddc84 !important}#vl_big .bc-q .no{color:#ff8a8a !important}#vl_big .bc-q .pk{color:#ff2bd6;font-size:20px}' +
+    '#vl_panel .sub2{font-size:14px;font-weight:800;color:#e8b400;margin:8px 0 4px}#vl_panel details.vl-cfold{background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;padding:8px 10px;margin:4px 0 10px}#vl_panel .vl-cfold>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:15px;font-weight:700;color:#eee}#vl_panel .vl-cfold>summary::-webkit-details-marker{display:none}#vl_panel .vl-cfold .cf-a::before{content:"▸";color:#e8b400}#vl_panel .vl-cfold[open] .cf-a::before{content:"▾"}#vl_panel .vl-cfold .cf-s{color:#9a9aa3;font-size:13px;font-weight:600}#vl_panel .vl-cfold .cf-o{margin-left:auto;color:#9a9aa3;font-size:13px}#vl_panel .vl-cfold .cf-o::before{content:"펼치기"}#vl_panel .vl-cfold[open] .cf-o::before{content:"접기"}#vl_panel .vl-cfold #vl_cols{margin-top:4px}' +
+    '#vl_big .rv .rv-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#fff;min-width:0}#vl_big .rv .rv-h>span:first-child{text-shadow:0 0 6px var(--cc);white-space:nowrap}' +
     '#vl_big .rv .rv-m{display:flex;align-items:baseline;gap:10px;margin-top:4px}#vl_big .rv .rv-p{font-size:20px;font-weight:900;color:#ddd}#vl_big .rv .rv-n{font-size:16px;color:#eee;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '#vl_big .rv .rv-t{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}#vl_big .rv .rv-g{font-size:20px;font-weight:900;color:var(--cc)}' +
     '#vl_big .bc-q{margin:6px 0 2px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;background:#221d0c;border:1px solid #5a4a12;border-radius:10px;padding:6px 10px}#vl_big .bc-q b{font-size:26px;color:#ffd54a}#vl_big .bc-q span{font-size:15px;color:#ddd;font-weight:700}#vl_big .bc-q .up{color:#3ddc84}#vl_big .bc-q .dn{color:#ff7a7a}' +
@@ -460,11 +468,6 @@ window.__vlAuto = true;
     '<div id="vl_vlog" class="vl-vlog"></div>' +
     '</div></div>' +
     '<div class="sec grp" data-g="race"><div class="gh"><span class="ar"></span><span class="sech">🏎 레이스 기능</span><span class="gs" id="vl_gs_race"></span><label class="gsw" title="이 그룹 기능 전체 켜기/끄기"><input type="checkbox" id="vl_raceOn"><i></i></label></div><div class="gb">' +
-    '<div class="sub"><span>Behind · 접전</span></div>' +
-    '<div class="gap"><label><input type="checkbox" id="vl_bhdc"><span>Behind 변화 표시 — 앞차와 차이가 줄면 <b class="pu">초록</b>, 늘면 <b class="pd">빨강</b>, 괄호 안에 변한 초</span></label></div>' +
-    '<div class="gap"><label><input type="checkbox" id="vl_cl">Behind가 <input type="number" id="vl_cls2" min="0.1" max="30" step="0.1" style="width:64px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">초 이내면 쫓는 선수 → 앞 선수로 네온 화살표 표시</label>' +
-    '<div class="lim">색 <input type="color" id="vl_clc" style="width:44px;height:28px;padding:0;border:1px solid #444;border-radius:6px;background:#111;cursor:pointer"><span style="color:#999">기본 네온 핑크 · Behind 숫자도 이 색 · 같은 랩일 때만 · P 순서로 볼 때 화살표</span></div>' +
-    '<div class="lim">↳ 1위가 <input type="number" id="vl_cla" min="0" max="99" step="1" style="width:60px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">랩을 지난 뒤부터 <span style="color:#999">(출발 직후엔 모두 붙어 있어서) · Open Practice에서는 Behind 칸·접전 색·차이 안내 음성 모두 꺼짐</span></div></div>' +
     '<div class="sub"><span>LAPS (랩 수 칸)</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_lpass">LAPS에 통과 시각 표시 <small style="color:#999">(그 랩을 지난 레이스 시간 · Open Practice와 좁은 화면에서는 자동으로 숨김)</small></label></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_llive">LAPS에 진행 중 랩 시간 표시 <small style="color:#999">(예: 12랩 0:14.2 · 라인을 지난 뒤 흐른 시간)</small></label>' +
@@ -484,13 +487,24 @@ window.__vlAuto = true;
     '<div class="sub"><span>⏱ 남은 시간 알림</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_remon">남은 시간을 음성으로 알림 <small style="color:#999">(안내 선수가 달리는 경기에서만 · Open Practice 제외)</small></label>' +
     '<div class="lim" id="vl_remat">' + [180, 120, 60, 30, 10].map(function (t) { return '<label><input type="checkbox" data-rt="' + t + '">' + (t >= 60 ? t / 60 + '분' : t + '초') + '</label>'; }).join(' ') + '</div></div>' +
-    '<div class="sub"><span>차이 안내 (음성)</span></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_tqsay">🏆 예선에서 TQ가 예상되면 남은 시간 알림 뒤에 함께 말하기</label>' +
+    '<div class="lim">문구 <input type="text" id="vl_tqword" style="width:140px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px"> <span style="color:#999">예: “1분 남음, TQ 예상” · 안내 선수가 2명 이상이면 이름도</span></div></div>' +
+    '<div class="sub" id="vl_gapsec"><span>📏 차이 안내 · Behind · 접전</span></div>' +
+    '<div class="sub2">🔊 음성</div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_gl">1위일 때 → 2위와의 차이</label>' +
     '<div class="lim">최대 <select id="vl_gln"><option value="0">같은 랩만</option><option value="1">1랩</option><option value="2">2랩</option><option value="3">3랩</option><option value="4">4랩</option><option value="5">5랩</option></select> 차이까지 안내</div></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_ga">2위 이하일 때 → 앞차와의 차이</label>' +
     '<div class="lim">최대 <select id="vl_gan"><option value="0">같은 랩만</option><option value="1">1랩</option><option value="2">2랩</option><option value="3">3랩</option><option value="4">4랩</option><option value="5">5랩</option></select> 차이까지 안내</div></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_gbh">뒤차가 <input type="number" id="vl_gbs" min="0.1" max="10" step="0.1" style="width:60px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">초 안으로 붙으면 “뒤차 0.4초”</label></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_posc">순위가 바뀐 랩에 “3등으로 올라감 / 내려감”</label></div>' +
+    '<div class="sub2">🖥 화면 — Behind 칸 · 접전</div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_bhdc"><span>Behind 변화 표시 — 앞차와 차이가 줄면 <b class="pu">초록</b>, 늘면 <b class="pd">빨강</b>, 괄호 안에 변한 초</span></label></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_cl">Behind가 <input type="number" id="vl_cls2" min="0.1" max="30" step="0.1" style="width:64px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">초 이내면 쫓는 선수 → 앞 선수로 네온 화살표 표시</label>' +
+    '<div class="lim">색 <input type="color" id="vl_clc" style="width:44px;height:28px;padding:0;border:1px solid #444;border-radius:6px;background:#111;cursor:pointer"><span style="color:#999">기본 네온 핑크 · Behind 숫자도 이 색 · 같은 랩일 때만 · P 순서로 볼 때 화살표</span></div>' +
+    '<div class="lim">↳ 1위가 <input type="number" id="vl_cla" min="0" max="99" step="1" style="width:60px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">랩을 지난 뒤부터 <span style="color:#999">(출발 직후엔 모두 붙어 있어서) · Open Practice에서는 Behind 칸·접전 색·차이 안내 음성 모두 꺼짐</span></div></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_gcshow">💬 접전 차이 변화 — 👤 크게 보기 앞차·뒤차 카드에 “0.2초 줄임 / 다가옴”</label>' +
+    '<div class="lim"><label><input type="checkbox" id="vl_gcsay">🔊 짧게 음성으로도 (“앞차 0.2 줄임”, “뒤차 0.2 다가옴”)</label></div>' +
+    '<div class="lim"><input type="number" id="vl_gcmin" min="0" max="2" step="0.01" style="width:64px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px">초보다 작은 변화는 무시 <span style="color:#999">· 접전(위 기준)일 때만</span></div></div>' +
     '<div class="sub"><span>앞차 통과 알림음</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_ding"><span>안내 중인 선수의 <b>앞차</b>가 라인을 통과하면 알림음</span></label>' +
     '<div class="lim">소리 <select id="vl_tone" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px">' + toneOpts() + '</select>' +
@@ -512,10 +526,10 @@ window.__vlAuto = true;
     '<details class="inf"><summary>ⓘ 설명</summary><div>팀을 2개 이상 만들고 선수를 팀에 넣으면, 레이스가 끝날 때(🏁 남은 시간 0 뒤 모두 통과, 또는 다음 레이스 시작) 최종 순위로 포인트를 매겨 팀 점수(팀원 전원 합계)를 쌓습니다. 레이스 중에는 지금 순위로 예상 점수를 보여 줍니다. 기록은 이 기기에 저장됩니다.</div></details>' +
     '</div></div>' +
     '<div class="sec grp" data-g="board"><div class="gh"><span class="ar"></span><span class="sech">🏁 레이스 보드 화면</span><span class="gs" id="vl_gs_board"></span></div><div class="gb">' +
-    '<div class="sub"><span>표시 항목 · 순서</span></div>' +
-    '<div style="font-size:12px;color:#999;margin:-2px 0 6px">체크 = 표시 · ▲▼ = 왼쪽/오른쪽으로 옮기기</div>' +
+    '<details class="vl-cfold" id="vl_cfold"><summary><span class="cf-a"></span><span class="cf-t">표시 항목 · 순서</span><span class="cf-s" id="vl_colsum"></span><span class="cf-o"></span></summary>' +
+    '<div style="font-size:12px;color:#999;margin:2px 0 6px">체크 = 표시 · ▲▼ = 왼쪽/오른쪽으로 옮기기</div>' +
     '<div id="vl_cols"></div>' +
-    '<div style="display:flex;gap:6px;margin:6px 0 10px"><button class="pb2" id="vl_colreset">기본 순서로</button></div>' +
+    '<div style="display:flex;gap:6px;margin:6px 0 4px"><button class="pb2" id="vl_colreset">기본 순서로</button></div></details>' +
     '<div class="sub"><span>색 표시</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_pcol"><span>변화 색 표시 — 빨라지면 <b class="pu">초록</b>, 느려지면 <b class="pd">빨강</b></span></label>' +
     '<div class="lim"><span style="white-space:nowrap">기준</span> <select id="vl_tsrc" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="pace">Pace (예상 랩 수/시간)</option><option value="avg">평균 랩 (Avg Lap)</option><option value="best">베스트 랩 차이 (Last Lap)</option></select><span style="color:#999" id="vl_tsrch"></span></div></div>' +
@@ -652,7 +666,7 @@ window.__vlAuto = true;
     setWide();
     if (cfg.tab === 'board') renderRaceBoard(true);
     if (cfg.tab === 'prac') pracOpen();
-    if (cfg.tab === 'set') try { teamSetRender(); } catch (e) {}
+    if (cfg.tab === 'set') try { teamSetRender(); $('vl_cfold').open = false; } catch (e) {}
   }
   $('vl_rbb').addEventListener('click', function (e) {
     var td = e.target.closest && e.target.closest('td.c-nm'); if (!td) return;
@@ -753,6 +767,9 @@ window.__vlAuto = true;
   function tsrcHint() { $('vl_tsrch').textContent = cfg.trendSrc === 'avg' ? 'Last Lap이 평균 랩보다 빠르면 초록, 느리면 빨강 · 괄호 안에 평균과의 차이 (예 21.200 (+0.140))' : cfg.trendSrc === 'best' ? 'Last Lap을 베스트 랩과의 차이로 — 베스트 보라 · 세션 랩타임 기준 초 이하 초록 · 그 이상 주황, 괄호 안에 차이 (기준·색은 🎨 랩타임 색)' : 'Pace가 빨라지면 초록, 느려지면 빨강 (Pace 칸에 표시)'; }
   $('vl_tsrc').value = cfg.trendSrc === 'avg' || cfg.trendSrc === 'best' ? cfg.trendSrc : 'pace'; tsrcHint(); $('vl_tsrc').onchange = function () { cfg.trendSrc = this.value; save(); tsrcHint(); renderRaceBoard(true); };
   bind('vl_bhdc', 'bhdColor', function () { renderRaceBoard(true); });
+  bind('vl_gcshow', 'gcShow', function () { renderRaceBoard(true); }); bind('vl_gcsay', 'gcSay'); bind('vl_tqsay', 'tqSay');
+  $('vl_gcmin').value = cfg.gcMin; $('vl_gcmin').onchange = function () { var v = +this.value; if (v >= 0) { cfg.gcMin = v; save(); renderRaceBoard(true); } };
+  $('vl_tqword').value = cfg.tqWord || ''; $('vl_tqword').oninput = function () { cfg.tqWord = this.value; save(); };
   $('vl_avgo').value = String(cfg.avgOut === undefined ? 15 : cfg.avgOut); $('vl_avgo').onchange = function () { cfg.avgOut = +this.value; save(); lastGSig = ''; renderRaceBoard(true); };
   $('vl_avgm').value = cfg.avgMode === 'site' ? 'site' : 'top10'; $('vl_avgm').onchange = function () { cfg.avgMode = this.value; save(); lastGSig = ''; renderRaceBoard(true); };
   $('vl_colreset').onclick = function () { cfg.colOrder = null; save(); renderColList(); renderRaceBoard(true); };
@@ -1994,7 +2011,7 @@ window.__vlAuto = true;
     $('vl_glaps').innerHTML = !sel.length || !show.list ? '' : '<div class="glrow">' + ser.map(function (s) {
       var lst = siteBest(s, s.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p }; }));
       return '<div class="glc"><h5 data-gf="' + esc(s.name) + '" title="눌러서 랩타임 변화를 이 선수만 보기"><i style="background:' + s.color + '"></i>' + esc(s.name) + '<small>' + (lst.length ? lst.length + '랩' : '') + '</small></h5>' + lapSum(lst) + '<div class="ll">' +
-        (lst.length ? lapTbl(lst, !isPractice(sc)) : '<div style="color:#777;font-size:12px;padding:12px">아직 기록이 없습니다</div>') + '</div></div>';
+        (lst.length ? lapTbl(lst, !isPractice(sc), true) : '<div style="color:#777;font-size:12px;padding:12px">아직 기록이 없습니다</div>') + '</div></div>';
     }).join('') + '</div><div class="glk">' + lapKey(null, true) + '</div>';
     fitWidths();
     var kinds = [['pos', '순위 변화', function (e) { return e.p; }], ['lap', '랩타임 변화', function (e) { return e.t; }], ['avg', '평균 랩 변화', null]];
@@ -2057,7 +2074,11 @@ window.__vlAuto = true;
       if (!b) { if (st) st.L = L; return; }
       if (!st) { bhdSt[k] = { L: L, v: b.v, dl: NaN }; return; }
       var changed = (b.v >= 0) !== (st.v >= 0) || (b.v >= 0 && Math.abs(b.v - st.v) > 0.0005);
-      if (changed) { st.dl = b.v >= 0 && st.v >= 0 ? Math.round((b.v - st.v) * 1000) / 1000 : NaN; st.v = b.v; }
+      if (changed) {
+        st.dl = b.v >= 0 && st.v >= 0 ? Math.round((b.v - st.v) * 1000) / 1000 : NaN; st.v = b.v;
+        var sd = st.dl === st.dl && Math.abs(st.dl) >= 0.0005 ? (st.dl < 0 ? -1 : 1) : 0;   /* same direction lap after lap → “3랩 연속” */
+        st.n = sd && sd === st.sd ? (st.n || 1) + 1 : sd ? 1 : 0; st.sd = sd; st.fr = 1;
+      }
       st.L = L;
     });
   }
@@ -2100,6 +2121,8 @@ window.__vlAuto = true;
         '<button data-mv="-1" data-k="' + k + '"' + (i === 0 ? ' disabled' : '') + ' title="왼쪽으로">▲</button>' +
         '<button data-mv="1" data-k="' + k + '"' + (i === o.length - 1 ? ' disabled' : '') + ' title="오른쪽으로">▼</button></div>';
     }).join('');
+    var on = o.filter(function (k) { return COLDEF[k].fixed || !cfg.colHide[k]; }).map(function (k) { return COLDEF[k].ko.replace(/\s*[(—].*$/, ''); });
+    $('vl_colsum').textContent = on.length + '개 표시 · ' + on.slice(0, 6).join(' · ') + (on.length > 6 ? ' …' : '');
   }
   /* sorting: dir 1 = ascending; empty values ('-') always go last */
   var SORT_DEF = { p: 1, nm: 1, l: -1, el: 1, bhd: 1, pace: -1, avg: 1, last: 1, fast: 1, t3: 1 };
@@ -2133,6 +2156,29 @@ window.__vlAuto = true;
     return 'rgb(' + ch(16) + ',' + ch(8) + ',' + ch(0) + ')';
   }
   /* 👤 big view: one large card per voice driver on track (pit wall / phone on a stand) — position, laps, last lap, lap in progress, best, gaps */
+  /* 👤 big view during a main: bump spot (engine, lower main) or overall standing (electric) for this driver */
+  function mainCard(r) {
+    try {
+      if (!mainLive) return '';
+      var sc = SC(), c = mainLive.c, m = mainLive.m;
+      if (c.kind === 'bump') {
+        var E = mainLive.E, up = mainLive.up; if (!E || !up || !(+r.p > 0)) return '';
+        var p = +r.p, head = '⬆ <span>' + esc(m.code) + '메인 → ' + esc(up.code) + '메인</span>';
+        if (p <= E) return '<div class="bc-q">' + head + '<b class="ok">범프권</b><span>' + esc(up.code) + '메인 ' + (up.rows.filter(function (x) { return !x.bump && !x.empty; }).length + p) + '번 그리드</span></div>';
+        var ord = list(sc.driverData).filter(function (d) { return nameOf(d); }).sort(function (a, b) { return (+a.position || 99) - (+b.position || 99); });
+        var me = ord.filter(function (d) { return keyOf(d) === r.key; })[0], g = gapTxt(ord[E - 1], me);
+        return '<div class="bc-q">' + head + '<b class="no">범프권 밖</b><span>' + E + '등까지' + (g ? ' · 범프까지 <b class="pk">' + esc(g) + '</b>' : '') + '</span></div>';
+      }
+      if (c.kind === 'pts') {
+        var live = mainLiveLeg(sc), st = mainStand(c, live).list, k = nmKey(r.nm), i = -1;
+        st.forEach(function (e, j) { if (nmKey(e.name) === k) i = j; }); if (i < 0) return '';
+        var gl = mainGoals(c, live, st[i].name) || [], g2 = gl.filter(function (x) { return !x.none; })[0], gt = '';
+        if (g2) gt = g2.all ? g2.k + '위 확정' : g2.k + '위 되려면 이번 ' + g2.p + '등 이상';
+        return '<div class="bc-q">🏆 <span>' + esc(m.code) + ' · 메인 종합</span><b>' + (i + 1) + '위</b>' + (gt ? '<span>' + esc(gt) + '</span>' : '') + '</div>';
+      }
+    } catch (e) {}
+    return '';
+  }
   function renderBig(rows, closeCol) {
     var on = !!cfg.bigView, mine = rows.filter(function (r) { return r.mine; }), box = $('vl_big');
     $('vl_bigb').classList.toggle('on', on);
@@ -2142,11 +2188,23 @@ window.__vlAuto = true;
     box.style.setProperty('--n', n); box.classList.toggle('two', mine.length > 1);
     var pred = (qd && qd.pred) || {}, tq = qd && qd.tq;
     var col = function (r) { return r.ls > 0 && r.bn > 0 ? lapCol(r.ls, r.bn, C) : '#fff'; };
-    /* the car ahead / behind gets its own card only while it is a close battle with this driver */
-    var rival = function (r, cls, lab, gap) {
-      return '<div class="vl-bc rv ' + cls + '" style="--cc:' + closeCol + '"><div class="rv-h"><span>' + lab + '</span><span class="rv-p">P' + esc(r.p || '-') + '</span><span class="rv-n">' + (r.fin ? '🏁 ' : '') + esc(r.nm) + '</span></div>' +
-        '<div class="rv-m"><span class="rv-t" style="color:' + col(r) + '">' + esc(r.last) + '</span><span class="rv-g">' + esc(gap) + '</span></div></div>';
+    /* races (qualifiers, mains): the car ahead / behind always has a card — neon only in a close battle (v2.29.4) */
+    var nbOn = !isPractice(SC());
+    /* 💬 how the gap moved at the last crossing: st = the Behind state of the car behind in this pair (me for the car ahead) */
+    var gcMsg = function (st, ahead) {
+      if (cfg.gcShow === false || !st || !(st.dl === st.dl) || Math.abs(st.dl) < (+cfg.gcMin || 0) || Math.abs(st.dl) < 0.0005) return '';
+      var a = Math.abs(st.dl).toFixed(3) + '초', shrink = st.dl < 0, n = st.n > 1 ? st.n + '랩 연속' : '';
+      var m = ahead ? (shrink ? ['good', '▲ ' + a + ' 줄임', '따라잡는 중'] : ['bad', '▼ ' + a + ' 벌어짐', ''])
+                    : (shrink ? ['warn', '⚠ ' + a + ' 다가옴', ''] : ['good', '▲ ' + a + ' 벌림', '달아나는 중']);
+      var sm = [m[2], n].filter(Boolean).join(' · ');
+      return '<div class="rv-x ' + m[0] + '"><span>' + m[1] + '</span>' + (sm ? '<small>' + sm + '</small>' : '') + '</div>';
     };
+    var rival = function (r, cls, lab, gap, st, ahead) {
+      var cl = / cl\b/.test(' ' + cls);
+      return '<div class="vl-bc rv ' + cls + '" style="--cc:' + closeCol + '"><div class="rv-h"><span>' + lab + '</span><span class="rv-p">P' + esc(r.p || '-') + '</span><span class="rv-n">' + (r.fin ? '🏁 ' : '') + esc(r.nm) + '</span></div>' +
+        '<div class="rv-m"><span class="rv-t" style="color:' + col(r) + '">' + esc(r.last) + '</span><span class="rv-g">' + esc(gap) + '</span>' + (cl ? gcMsg(st, ahead) : '') + '</div></div>';
+    };
+    var gapLab = function (g, w) { g = String(g || ''); return /L$/.test(g) ? g + ' ' + w : g + '초 ' + w; };
     box.innerHTML = mine.map(function (r) {
       var i = rows.indexOf(r), ahead = rows[i - 1], back = rows[i + 1], lc = col(r), dl = r.ls > 0 && r.bn > 0 ? r.ls - r.bn : NaN;
       var dTxt = dl === dl ? (dl < -0.0005 ? '제외' : dl < 0.0005 ? '베스트' : '+' + dl.toFixed(3)) : '';
@@ -2155,8 +2213,10 @@ window.__vlAuto = true;
       var q = pred[nmKey(r.nm)], qTxt = '';
       if (q) qTxt = '<div class="bc-q">🏆 <span>예선 예상</span><b>' + (q.rank ? q.rank + '위' : '대기') + '</b>' + (q.chg ? '<span class="' + (q.chg > 0 ? 'up' : 'dn') + '">' + (q.chg > 0 ? '▲' : '▼') + Math.abs(q.chg) + '</span>' : '') +
         (q.rank === 1 ? '<span class="up">TQ</span>' : tq ? '<span>· TQ 예상 ' + esc(tq) + '</span>' : '') + '</div>';
+      if (!qTxt) qTxt = mainCard(r);
       return '<div class="bcol">' +
-        (r.closeTo && ahead ? rival(ahead, 'ah', '▲ 앞차', r.bhd + '초 앞') : '') +
+        (nbOn && ahead ? rival(ahead, 'ah' + (r.closeTo ? ' cl' : ''), '▲ 앞차', gapLab(r.bhd, '앞'), bhdSt[r.key], true) :
+          nbOn && r.p == 1 ? '<div class="vl-bc rv ah lead"><div class="rv-h"><span>▲ 선두</span><span class="rv-n" style="color:#bbb">앞차 없음</span></div></div>' : '') +
         '<div class="vl-bc mine">' +
         '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + esc(r.alias || r.nm) + '</span><span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
@@ -2166,9 +2226,11 @@ window.__vlAuto = true;
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
           cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
         '</div></div>' +
-        (back && back.closeTo ? rival(back, 'bh', '▼ 뒤차', back.bhd + '초 뒤') : '') +
+        (nbOn && back ? rival(back, 'bh' + (back.closeTo ? ' cl' : ''), '▼ 뒤차', gapLab(back.bhd, '뒤'), bhdSt[back.key], false) : '') +
         '</div>';
     }).join('');
+    /* the change message sits beside the gap when there is room, else drops to its own line */
+    [].forEach.call(box.querySelectorAll('.rv-x'), function (x) { var f = x.parentNode.firstElementChild; if (f && x.offsetTop > f.offsetTop + f.offsetHeight * 0.6) x.classList.add('wr'); });
   }
   function renderRaceBoard(force) {
     if (cfg.tab !== 'board' && !force) return;
@@ -2230,6 +2292,7 @@ window.__vlAuto = true;
     $('vl_cls').textContent = hdr.cls;
     $('vl_rnd').textContent = hdr.rnd;
     $('vl_rem').textContent = hdr.rem || '0:00';
+    var remV = remSecs(); $('vl_rem').parentNode.style.display = !prc && remV > 0 ? '' : 'none';   /* 남은 시간: live races only (not practice, not a finished / old heat) */
     var cbOn = cfg.raceOn !== false && !!cfg.closeOn && !prc;
     $('vl_lgcl').style.display = cbOn ? '' : 'none'; $('vl_rb').classList.toggle('vl-cbon', cbOn);
     $('vl_lgfin').style.display = rowsData.some(function (r) { return r.fin; }) ? '' : 'none'; $('vl_lgpc').style.display = cfg.paceColor !== false ? '' : 'none'; $('vl_lgpc').innerHTML = cfg.trendSrc === 'best' ? (function () { var C = lapCols(); return 'Last Lap 베스트와 차이 <b style="color:' + C.B + '">베스트</b>/<b style="color:' + C.N + '">' + C.dev + '초 이하</b>/<b style="color:' + C.F + '">그 이상</b>'; })() : cfg.trendSrc === 'avg' ? 'Last Lap 평균보다 <b class="pu">빠름</b>/<b class="pd">느림</b>' : 'Pace <b class="pu">빨라짐</b>/<b class="pd">느려짐</b>'; $('vl_lgbd').style.display = cfg.raceOn !== false && cfg.bhdColor !== false ? '' : 'none'; $('vl_lgclc').style.setProperty('--cc', closeCol);
@@ -2295,6 +2358,12 @@ window.__vlAuto = true;
     var t = root.querySelector('#vl_rb .tw table'), h = $('vl_hdr'), l = root.querySelector('#vl_rb .lgd');
     if (t && !$('vl_rb').classList.contains('vl-bigon')) autoFit($('vl_rb'), [t], 'rb', true); else { $('vl_rb').style.zoom = ''; fitS.rb = 1; }
     var w = wide && t ? t.offsetWidth : 0;   /* offsetWidth: CSS px, unaffected by the zoom setting */
+    if (wide && $('vl_rb').classList.contains('vl-bigon')) {   /* 👤 big view: the header bar (and the 🏆 strip) as wide as the driver cards */
+      var L = 1e9, R = 0;
+      [].forEach.call(root.querySelectorAll('#vl_big .bcol'), function (c) { var b = c.getBoundingClientRect(); if (b.width) { L = Math.min(L, b.left); R = Math.max(R, b.right); } });
+      w = R > L ? Math.round(R - L) : 0;
+    }
+    var ms = $('vl_mstrip'); if (ms) { ms.style.width = w && $('vl_rb').classList.contains('vl-bigon') ? w + 'px' : ''; ms.style.boxSizing = 'border-box'; }
     if (h) { h.style.width = w ? w + 'px' : ''; h.style.boxSizing = w ? 'border-box' : ''; h.style.flexWrap = w ? 'wrap' : ''; }
     if (l) l.style.maxWidth = w ? w + 'px' : '';
     var r = root.querySelector('#vl_glaps .glrow'), k = root.querySelector('#vl_glaps .glk');
@@ -3306,16 +3375,18 @@ window.__vlAuto = true;
   function lapCol(v, best, C) { if (v < 0) return '#777'; var d = v - best; if (d < -0.0005) return '#777';   /* shorter than LiveRC's fast lap: not counted */ return d < 0.0005 ? C.B : (d <= C.dev + 1e-9 ? C.N : C.F); }
   /* laps top to bottom: lap · time · gap to the best (best purple, within the set seconds green, more orange, invalid grey) */
   /* pos: also the position each lap was completed in (heats / mains) — up green, down red */
-  function lapTbl(list, pos) {
+  function lapTbl(list, pos, rev) {
     var C = lapCols(), best = lapBest(list);
-    return '<table><thead><tr><th>랩</th><th>랩타임</th>' + (pos ? '<th>순위</th>' : '') + '<th>베스트와 차이</th></tr></thead><tbody>' + list.map(function (x, i) {
+    var h = '<table><thead><tr><th>랩</th><th>랩타임</th>' + (pos ? '<th>순위</th>' : '') + '<th>베스트와 차이</th></tr></thead><tbody>', rows = list.map(function (x, i) {
       var t = Math.abs(x.v), c = lapCol(x.v, best, C), d = t - best;
       var pp = '', pv = i > 0 ? list[i - 1].p : NaN;
       if (pos) pp = '<td' + (x.p > 0 && pv > 0 && x.p !== pv ? ' style="color:' + (x.p < pv ? '#3ddc84' : '#ff6b6b') + ';font-weight:700"' : '') + '>' + (x.p > 0 ? x.p + '등' : '-') + '</td>';
       var sh = x.v > 0 && d < -0.0005;
       return '<tr><td>' + x.n + '</td><td style="color:' + c + ';font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 600) + '"' + (sh ? ' title="LiveRC Fast Lap보다 짧은 랩 (출발 직후 등) — 베스트로 치지 않음"' : '') + '>' + fmtS(t) + (x.v < 0 ? '*' : '') + '</td>' + pp + '<td style="color:' + c + '">' +
         (x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3)) + '</td></tr>';
-    }).join('') + '</tbody></table>';
+    });
+    if (rev) rows.reverse();   /* race tab: newest lap on top (position colours still compare with the lap before) */
+    return h + rows.join('') + '</tbody></table>';
   }
   /* summary above a lap list: best lap, how many laps within the set seconds / beyond (count + % of valid laps), invalid, and a bar */
   function lapSum(list) {
@@ -3845,11 +3916,28 @@ window.__vlAuto = true;
       say(key, msg, t.tone ? +t.ti || 0 : -1, holdFor(key));   /* tone first, then the words — through the queue */
     });
     if (dingNow) ding();
+    if (remMsg && cfg.tqSay !== false && cfg.tqWord && !prcNow && qd && qd.pred) {   /* 🏆 qualifier: a voice driver heading for TQ → “1분 남음, TQ 예상” */
+      var tqN = all.filter(function (d) { var q = match(d) && qd.pred[nmKey(nameOf(d))]; return q && q.rank === 1; }).map(function (d) { return (match(d).alias) || nameOf(d); });
+      if (tqN.length) remMsg += ', ' + (nVoice > 1 ? tqN[0] + ' ' : '') + cfg.tqWord;
+    }
     if (remMsg) say('rem', remMsg, -1);
     try { teamTick(all, sc, sid, prcNow, over); } catch (e) {}
-    if (!prcNow && Date.now() - md.at > 60000 && !md.busy) mainFetch();
+    if (Date.now() - md.at > 60000 && !md.busy) mainFetch();   /* also during Open Practice: the 🏆 tab shows as soon as the line-up is up */
     try { mainTick(sc, all, rs.fin); mainStrip(); if (cfg.tab === 'main') renderMain(); } catch (e) {}
     trackBhd(all);
+    /* 💬 close battle: the gap to the car ahead / behind moved at the last crossing → a short call after the lap time */
+    if (running && cfg.gcSay !== false && cfg.voiceOn !== false && cfg.raceOn !== false && cfg.closeOn && !prcNow) {
+      var gOrd = all.slice().sort(function (a, b) { return (+a.position || 999) - (+b.position || 999); }), gLead = gOrd.length ? (+gOrd[0].laps || 0) : 0;
+      var gMin = Math.max(+cfg.gcMin || 0, 0.0005), gSec = +cfg.closeSec || 1;
+      var gTxt = function (v) { var t = Math.abs(v).toFixed(1); return t === '0.0' ? '0.1' : t; };
+      if (gLead >= (cfg.closeAfter === undefined ? 3 : +cfg.closeAfter)) gOrd.forEach(function (d, i) {
+        if (!match(d)) return;
+        var me = bhdSt[keyOf(d)], bk = gOrd[i + 1], bs = bk && bhdSt[keyOf(bk)];
+        if (me && me.fr && i > 0 && me.v >= 0 && me.v <= gSec && me.dl === me.dl && Math.abs(me.dl) >= gMin) say(keyOf(d) + ':ga', '앞차 ' + gTxt(me.dl) + (me.dl < 0 ? ' 줄임' : ' 벌어짐'), -1, holdFor(keyOf(d)));
+        if (bs && bs.fr && bs.v >= 0 && bs.v <= gSec && bs.dl === bs.dl && Math.abs(bs.dl) >= gMin) say(keyOf(d) + ':gb', '뒤차 ' + gTxt(bs.dl) + (bs.dl < 0 ? ' 다가옴' : ' 벌림'), -1);
+      });
+    }
+    Object.keys(bhdSt).forEach(function (k) { if (bhdSt[k]) bhdSt[k].fr = 0; });
     updFuel(all);
     backfill(); lhSave();
     renderRaceBoard();
