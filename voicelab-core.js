@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 79;   /* = VER below */
-  /* var VER = 79; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 80;   /* = VER below */
+  /* var VER = 80; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '2.29.4';
+  var VERSION = '3.0.0';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -51,13 +51,14 @@
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
-    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1 };
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1 };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
   cfg.closeV2 = 0;   /* stays 0 only for settings saved before v2.24 (see below) */
   cfg.v227 = 0;
   cfg.v2294 = 0;
+  cfg.v300 = 0;
   try { Object.assign(cfg, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
   try { if (DESK && DESK.cfgGet) { var dc = DESK.cfgGet(); if (dc) Object.assign(cfg, JSON.parse(dc)); } } catch (e) {}
   /* Google Drive sync address travels to another track's site in the address (#…&vl-sync=url%0Akey) */
@@ -71,6 +72,8 @@
   cfg.v228s = 1;
   /* v2.29.4: gap calls default to “same lap only” — devices still on the old default (1 lap) move once */
   if (!cfg.v2294) { if (+cfg.gapLeadLaps === 1) cfg.gapLeadLaps = 0; if (+cfg.gapAheadLaps === 1) cfg.gapAheadLaps = 0; cfg.v2294 = 1; }
+  /* v3.0.0 LAP X: one driver at a time — a device with several voice drivers keeps the first one */
+  if (!cfg.v300) { var on300 = Object.keys(cfg.sel || {}).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; }); on300.slice(1).forEach(function (k) { cfg.sel[k].on = false; }); cfg.v300 = 1; }
   var syncTs0 = +cfg._ts || 0, syncReady = false, syncSig = null;
   var running = false;
   if (!cfg.colHide || typeof cfg.colHide !== 'object') cfg.colHide = { el: cfg.colEl === false, pace: cfg.colPace === false, t3: cfg.colTop3 === false };
@@ -86,9 +89,9 @@
   var css = document.createElement('style');
   css.textContent =
     '#vl_root{position:fixed;right:14px;bottom:14px;z-index:2147483647;font:15px/1.45 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;color:#eee}' +
-    '#vl_fab{width:58px;height:58px;border-radius:50%;border:0;background:#e8b400;color:#000;font-size:26px;box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:pointer;float:right;position:relative}' +
+    '#vl_fab{width:58px;height:58px;border-radius:50%;border:0;background:#ff7a1a;color:#000;font-size:26px;box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:pointer;float:right;position:relative}' +
     '#vl_fab.on{background:#2ecc71}#vl_fab .dot{position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:50%;background:#c0392b;border:2px solid #111}#vl_fab.on .dot{background:#fff}' +
-    '#vl_panel{width:min(96vw,780px);height:min(82vh,760px);height:min(82svh,760px);display:flex;flex-direction:column;background:#141417;border:2px solid #e8b400;border-radius:14px;margin-bottom:10px;box-shadow:0 6px 28px rgba(0,0,0,.6);overflow:hidden}' +
+    '#vl_panel{width:min(96vw,780px);height:min(82vh,760px);height:min(82svh,760px);display:flex;flex-direction:column;background:#141417;border:2px solid #ff7a1a;border-radius:14px;margin-bottom:10px;box-shadow:0 6px 28px rgba(0,0,0,.6);overflow:hidden}' +
     '#vl_panel.pmode #vl_go{display:none}' +
     '.vl-ls{margin:2px 0 8px}.vl-ls .lsc{display:flex;flex-wrap:wrap;gap:5px}.vl-ls .lsc span{display:inline-flex;align-items:center;gap:4px;background:#22222a;border-radius:12px;padding:2px 9px;font-size:12px;color:#ccc;white-space:nowrap}' +
     '.vl-ls .lsc i{width:9px;height:9px;border-radius:2px;display:inline-block}.vl-ls .lsc b{color:#fff}.vl-ls .lsc small{color:#999;font-size:11px}.vl-ls .lsc .lx{color:#888}' +
@@ -99,20 +102,20 @@
     '#vl_tab_set .gb{display:none;padding:8px 12px 10px}#vl_tab_set .grp.open .gb{display:block}#vl_tab_set .grp.dim .gb{opacity:.45}' +
     '#vl_tab_set .gsw{position:relative;flex:none;width:40px;height:22px;cursor:pointer}#vl_tab_set .gsw input{position:absolute;opacity:0;width:0;height:0}' +
     '#vl_tab_set .gsw i{position:absolute;inset:0;border-radius:11px;background:#3a3a42;transition:background .15s}#vl_tab_set .gsw i:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#bbb;transition:left .15s}' +
-    '#vl_tab_set .gsw input:checked+i{background:#e8b400}#vl_tab_set .gsw input:checked+i:after{left:21px;background:#000}' +
+    '#vl_tab_set .gsw input:checked+i{background:#ff7a1a}#vl_tab_set .gsw input:checked+i:after{left:21px;background:#000}' +
     '#vl_tab_set .gtools{display:flex;gap:6px;margin:0 0 8px}#vl_tab_set .gb>.sub:first-child{margin-top:0}' +
     '#vl_tab_set details.inf{margin-top:4px}#vl_tab_set details.inf summary{color:#8aa;font-size:12px;cursor:pointer;list-style:none}#vl_tab_set details.inf summary::-webkit-details-marker{display:none}#vl_tab_set details.inf>div{color:#999;font-size:12px;margin-top:3px;line-height:1.5}' +
-    '#vl_tab_set .sec{border:1px solid #2a2a30;border-radius:10px;padding:10px 10px 6px;margin-bottom:12px}#vl_tab_set .sech{font-size:15px;font-weight:800;color:#e8b400;margin:0 0 8px}' +
+    '#vl_tab_set .sec{border:1px solid #2a2a30;border-radius:10px;padding:10px 10px 6px;margin-bottom:12px}#vl_tab_set .sech{font-size:15px;font-weight:800;color:#ff7a1a;margin:0 0 8px}' +
     '#vl_head{display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid #2a2a30;flex:none}' +
     '#vl_head .tab{position:relative;background:none;border:0;border-bottom:3px solid transparent;color:#999;padding:11px 10px 8px;font:600 15px/1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}' +
-    '#vl_head .tab.on{color:#fff;border-bottom-color:#e8b400}' +
+    '#vl_head .tab.on{color:#fff;border-bottom-color:#ff7a1a}' +
     '#vl_head .vl-tsep{flex:none;width:1px;height:24px;background:#444;margin:0 6px 0 8px}' +
-    '#vl_head .tab.vl-tkb{flex:none;border:1px solid #3a3a42 !important;border-radius:8px;padding:6px 8px !important;margin:0 2px}#vl_head .tab.vl-tkb.on{background:#e8b400;color:#000;border-color:#e8b400 !important}' +
+    '#vl_head .tab.vl-tkb{flex:none;border:1px solid #3a3a42 !important;border-radius:8px;padding:6px 8px !important;margin:0 2px}#vl_head .tab.vl-tkb.on{background:#ff7a1a;color:#000;border-color:#ff7a1a !important}' +
     '#vl_th{padding:4px 2px;font-size:16px;color:#eee}#vl_th .thc{background:#1b1b20;border:1px solid #2a2a30;border-radius:12px;padding:12px;margin-bottom:10px}' +
     '#vl_th .ths{color:#999;font-size:14px}#vl_th .thn{font-size:21px;font-weight:800;color:#fff;margin:2px 0}' +
-    '#vl_th .thchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}#vl_th .thchips button{border:1px solid #3a3a42;border-radius:16px;padding:7px 13px;font-size:15px;color:#ddd;background:#232329;cursor:pointer}#vl_th .thchips button.cur{border-color:#e8b400;color:#e8b400;cursor:default}' +
-    '#vl_th .thpg{margin-top:10px;color:#aaa;font-size:15px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}#vl_th .thpg button{background:#232329;color:#bbb;border:1px solid #3a3a42;border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer}#vl_th .thpg button.on{background:#3a3220;color:#ffd75e;border-color:#e8b400;font-weight:700}' +
-    '#vl_th #vl_thall{display:block;width:100%;background:#e8b400;color:#000;font-weight:800;border:0;border-radius:10px;padding:13px;font-size:17px;cursor:pointer}#vl_th .thnote{text-align:center;color:#999;font-size:14px;margin-top:8px}' +
+    '#vl_th .thchips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}#vl_th .thchips button{border:1px solid #3a3a42;border-radius:16px;padding:7px 13px;font-size:15px;color:#ddd;background:#232329;cursor:pointer}#vl_th .thchips button.cur{border-color:#ff7a1a;color:#ff7a1a;cursor:default}' +
+    '#vl_th .thpg{margin-top:10px;color:#aaa;font-size:15px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}#vl_th .thpg button{background:#232329;color:#bbb;border:1px solid #3a3a42;border-radius:8px;padding:5px 10px;font-size:14px;cursor:pointer}#vl_th .thpg button.on{background:#3a3220;color:#ffd75e;border-color:#ff7a1a;font-weight:700}' +
+    '#vl_th #vl_thall{display:block;width:100%;background:#ff7a1a;color:#000;font-weight:800;border:0;border-radius:10px;padding:13px;font-size:17px;cursor:pointer}#vl_th .thnote{text-align:center;color:#999;font-size:14px;margin-top:8px}' +
     '#vl_panel.tmode #vl_head .vl-tsep{display:none}' +
     '@media (max-width:430px){#vl_head .vl-tsep{margin:0 4px}#vl_head .tab.vl-tkb{padding:6px 6px !important;margin:0}}' +
     '@media (max-width:350px){#vl_head .vl-tsep{display:none}#vl_head .tab.vl-tkb{padding:5px 4px !important;margin-left:4px}}' +
@@ -121,7 +124,7 @@
     '#vl_zm i{font-style:normal;opacity:.7;margin:0 2px}#vl_zm button{background:#2a2a32;color:#eee;border:0;border-radius:50%;width:22px;height:22px;font-weight:800;cursor:pointer;padding:0;line-height:22px}' +
     '#vl_zm #vl_zv{width:auto;min-width:44px;border-radius:10px;background:none;font-weight:700;font-size:13px}' +
     '#vl_zl{display:none;position:absolute;top:30px;left:14px;z-index:5;flex-direction:column;background:#1e1e24;border:1px solid #3a3a42;border-radius:8px;padding:4px;box-shadow:0 6px 18px rgba(0,0,0,.5)}#vl_zl.on{display:flex}' +
-    '#vl_zl button{width:auto;height:auto;border-radius:5px;background:none;padding:4px 16px;font-weight:600;line-height:1.3;white-space:nowrap}#vl_zl button.sel{background:#e8b400;color:#000;font-weight:800}' +
+    '#vl_zl button{width:auto;height:auto;border-radius:5px;background:none;padding:4px 16px;font-weight:600;line-height:1.3;white-space:nowrap}#vl_zl button.sel{background:#ff7a1a;color:#000;font-weight:800}' +
     '@media (max-width:350px){#vl_head .tab{padding:11px 3px 8px !important;font-size:13px !important;letter-spacing:-.5px !important}#vl_go{padding:7px 6px !important;font-size:13px !important}#vl_zm #vl_zv{min-width:34px;font-size:12px}}@media (max-width:430px){#vl_zm i{display:none}#vl_zm #vl_zv{min-width:38px}#vl_zm button[data-zs]{display:none}#vl_zm{margin-right:4px;padding:2px}#vl_head .vl-tl{display:none}}' +
     '#vl_rb .hdr .vl-hl{font-size:14px;font-weight:800;opacity:1;background:rgba(0,0,0,.5);border-radius:6px;padding:2px 9px;display:inline-block;margin-right:6px;vertical-align:4px;color:#ffd54a}#vl_rb .hdr .vl-hl-ela{color:#9fe8ff;margin:0 0 3px;vertical-align:0}' +
     '#vl_go{margin-left:0;padding:7px 12px;border:0;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}' +
@@ -140,18 +143,18 @@
     '#vl_rb .tw{overflow-x:auto;border-radius:0 0 8px 8px;-webkit-overflow-scrolling:touch;-webkit-transform:translateZ(0);transform:translateZ(0)}' +
     '#vl_rb .tw{width:fit-content;max-width:100%}#vl_rb table{width:auto;border-collapse:collapse;font-variant-numeric:tabular-nums;background:#0b0b0d}' +
     '#vl_rb th{background:#202026;color:#aaa;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:6px;text-align:right;white-space:nowrap;cursor:pointer;user-select:none;-webkit-user-select:none}' +
-    '#vl_rb th:hover{color:#fff}#vl_rb th.sorted{color:#e8b400}#vl_rb th .ar{font-size:9px;margin-left:2px}' +
+    '#vl_rb th:hover{color:#fff}#vl_rb th.sorted{color:#ff7a1a}#vl_rb th .ar{font-size:9px;margin-left:2px}' +
     '#vl_rb td{padding:8px 6px;text-align:right;white-space:nowrap;border-bottom:1px solid #1c1c21;font-size:15px;color:#e6e6ea}' +
     '#vl_rb tbody tr:nth-child(even) td{background:#121216}' +
     '#vl_cols{display:flex;flex-direction:column;gap:3px}' +
     '#vl_rb th.c-sel,#vl_rb td.c-sel{width:30px;text-align:center;padding-left:4px;padding-right:2px;cursor:default}' +
-    '#vl_rb td.c-sel input{width:16px;height:16px;accent-color:#e8b400;cursor:pointer;vertical-align:middle}' +
+    '#vl_rb td.c-sel input{width:16px;height:16px;accent-color:#ff7a1a;cursor:pointer;vertical-align:middle}' +
     '#vl_rb td.c-sel i{display:inline-block;width:4px;height:16px;border-radius:2px;margin-left:3px;vertical-align:middle}' +
     '#vl_gbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0 6px;font-size:12px;color:#aaa;max-width:100%}' +
     '#vl_gsel{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 6px}#vl_gsel .gch{background:#202026;color:#ccc;border:1px solid #33333b;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer}' +
     '#vl_rb,#vl_tab_board,#vl_tab_prac,#vl_tab_set{min-width:0;max-width:100%}' +
     '#vl_gbar .gch{background:#202026;color:#888;border:1px solid #33333b;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer}' +
-    '#vl_gbar .gch.on{background:#e8b400;color:#000;border-color:#e8b400;font-weight:700}' +
+    '#vl_gbar .gch.on{background:#ff7a1a;color:#000;border-color:#ff7a1a;font-weight:700}' +
     '#vl_glg{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:12px;margin-bottom:4px}#vl_glg span[data-gf]{cursor:pointer;border-radius:10px;padding:1px 6px}#vl_glg span.on{background:#2a2a32;font-weight:700;color:#fff}#vl_glg span.off{opacity:.45}#vl_glg .gfh{color:#777;font-size:11px}#vl_glg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}' +
     '#vl_graphs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}' +
     '#vl_graphs .gc{flex:0 1 320px;min-width:220px;max-width:320px;background:#0f0f12;border:1px solid #24242b;border-radius:8px;padding:6px 6px 2px}' +
@@ -159,7 +162,7 @@
     '#vl_glaps .glc h5{margin:0 0 4px 2px;font-size:12px;color:#ddd;display:flex;align-items:center;gap:6px}#vl_glaps .glc h5 i{width:10px;height:10px;border-radius:2px;display:inline-block}#vl_glaps .glc h5 small{margin-left:auto;color:#777;font-weight:400}' +
     '#vl_glaps .ll{max-height:none;overflow:visible}#vl_glaps .ll td{height:22px !important;box-sizing:border-box}#vl_glaps .glc h5{cursor:pointer}#vl_glaps table{width:auto;font-size:12px}#vl_glaps td,#vl_glaps th{padding:2px 6px !important;font-size:13px !important;height:auto !important;text-align:right;border-bottom:1px solid #1d1d22}#vl_glaps th{color:#888;font-size:11px;position:sticky;top:0;background:#0f0f12}' +
     '#vl_glaps .glk{margin:2px 0 8px}#vl_glaps .glc{width:fit-content}#vl_glaps .vl-ls{width:0;min-width:100%}#vl_glaps .lk,#vl_graphs .lk{font-size:11px;color:#888}' +
-    '#vl_graphs .gc h5{margin:0 0 2px 2px;font-size:12px;color:#e8b400;font-weight:700;display:flex;justify-content:space-between}#vl_graphs .gc h5 small{color:#777;font-weight:400}' +
+    '#vl_graphs .gc h5{margin:0 0 2px 2px;font-size:12px;color:#ff7a1a;font-weight:700;display:flex;justify-content:space-between}#vl_graphs .gc h5 small{color:#777;font-weight:400}' +
     '#vl_graphs svg{width:100%;height:auto;display:block}' +
     '#vl_cols .cr{display:flex;align-items:center;gap:8px;background:#1f1f24;border-radius:7px;padding:5px 8px;font-size:14px}' +
     '#vl_cols .cr .cl{flex:1}#vl_cols .cr.off .cl{color:#777}' +
@@ -179,7 +182,7 @@
     '#vl_rb td.pu,#vl_panel b.pu{color:#3ddc84;font-weight:700}#vl_rb td.pd,#vl_panel b.pd{color:#ff6b6b;font-weight:700}' +
     '#vl_rb td.c-bhd small,#vl_rb td.c-last small{font-size:.78em;font-weight:600;margin-left:3px}#vl_rb small.pu{color:#3ddc84}#vl_rb small.pd{color:#ff6b6b}' +
     '#vl_qual .vl-qbox{margin-top:10px;border:1px solid #2a2a30;border-radius:10px;overflow:hidden;background:#0f0f12;width:fit-content;max-width:100%}' +
-    '#vl_qual .vl-qh{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#1a1a20;cursor:pointer;flex-wrap:wrap;user-select:none;-webkit-user-select:none}#vl_qual .vl-qar{color:#888}#vl_qual .vl-qtt{color:#e8b400;font-size:14px}' +
+    '#vl_qual .vl-qh{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#1a1a20;cursor:pointer;flex-wrap:wrap;user-select:none;-webkit-user-select:none}#vl_qual .vl-qar{color:#888}#vl_qual .vl-qtt{color:#ff7a1a;font-size:14px}' +
     '#vl_qual .vl-qm{font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px;color:#fff;background:#3d7bff}#vl_qual .vl-qm-points{background:#b04ad8}#vl_qual .vl-qi{color:#999;font-size:12px}' +
     '#vl_qual .vl-qb{margin-left:auto;font-size:12px;color:#ccc;border:1px solid #3a3a42;border-radius:12px;padding:1px 10px}' +
     '#vl_qual .vl-qpair{display:flex;flex-wrap:wrap;align-items:flex-start}#vl_qual .vl-qs+.vl-qs{border-left:1px solid #26262c}' +
@@ -188,7 +191,7 @@
     '#vl_qual .vl-qt th{background:#202026;color:#aaa;font-size:11px;font-weight:700}#vl_qual .vl-qt tr:nth-child(odd) td{background:#121216}#vl_qual .vl-qt .vl-qn{text-align:left}#vl_qual .vl-qt .vl-qp{text-align:center;font-weight:800}#vl_qual .vl-qt .vl-qc{text-align:center;color:#666}' +
     '#vl_qual .vl-qup{color:#3ddc84 !important;font-weight:700}#vl_qual .vl-qdn{color:#ff6b6b !important;font-weight:700}#vl_qual .vl-qw{color:#777 !important}#vl_qual td.vl-qe,#vl_qual td.vl-qe b{color:#3ddc84}#vl_qual td small{font-size:10px;margin-left:4px;color:#3ddc84}' +
     '#vl_qual tr.vl-ql td{background:#12301f !important}#vl_qual tr.vl-ql .vl-qn{color:#3ddc84;font-weight:700}#vl_qual tr.vl-qv td{background:#2a1838 !important}#vl_qual tr.vl-qv .vl-qn{color:#d27cff;font-weight:800}' +
-    '#vl_qual .vl-qd{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 6px #3ddc84}#vl_qual .vl-qtq{color:#e8b400 !important;margin-left:2px !important;font-size:11px !important}#vl_qual .vl-qtie{color:#ffb74d !important}' +
+    '#vl_qual .vl-qd{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;margin-right:6px;box-shadow:0 0 6px #3ddc84}#vl_qual .vl-qtq{color:#ff7a1a !important;margin-left:2px !important;font-size:11px !important}#vl_qual .vl-qtie{color:#ffb74d !important}' +
     '#vl_bigb{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.35);border-radius:6px;color:inherit;font-size:13px;font-weight:700;padding:2px 7px;cursor:pointer;opacity:.75;align-self:center;white-space:nowrap}#vl_bigb.on{opacity:1;background:rgba(0,0,0,.5)}' +
     '#vl_big{display:none}#vl_rb.vl-bigon #vl_big{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,600px));gap:12px;padding:10px 0;align-items:start}#vl_big .bcol{display:flex;flex-direction:column;gap:8px;min-width:0}#vl_big .bcol>.vl-bc{flex:none;max-width:none;width:100%;box-sizing:border-box}#vl_rb.vl-bigon .tw,#vl_rb.vl-bigon .lgd,#vl_rb.vl-bigon #vl_gbar,#vl_rb.vl-bigon #vl_gsel,#vl_rb.vl-bigon #vl_glg,#vl_rb.vl-bigon #vl_glaps,#vl_rb.vl-bigon #vl_graphs,#vl_rb.vl-bigon #vl_ghint{display:none!important}' +
     '#vl_big .vl-bc{flex:1 1 320px;max-width:560px;background:#141418;border:1px solid #2c2c34;border-radius:14px;padding:12px 14px;box-sizing:border-box}#vl_big .vl-bc.mine{border-color:#6a5a1a}' +
@@ -200,7 +203,7 @@
     '#vl_big .vl-bc.rv{border:1px solid #3a3a42;padding:8px 12px;background:#1b1b20}#vl_big .vl-bc.rv.cl{border:2px solid var(--cc);box-shadow:0 0 10px var(--cc);background:#18121a}#vl_big .rv:not(.cl) .rv-g{color:#ddd !important}#vl_big .rv.lead{padding:6px 12px}#vl_big .rv.lead .rv-h{color:#bbb}#vl_big .rv:not(.cl) .rv-h>span:first-child{text-shadow:none;color:#ccc}' +
     '#vl_big .rv .rv-m{flex-wrap:wrap;row-gap:2px}#vl_big .rv-x{margin:0 0 0 auto;padding-left:14px;font-size:24px;font-weight:800;display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}#vl_big .rv-x small{font-size:14px;color:#aaa;font-weight:700}#vl_big .rv-x.wr{flex-direction:row;align-items:baseline;gap:10px;margin-left:0;padding-left:0;font-size:17px}#vl_big .rv-x.good{color:#3ddc84}#vl_big .rv-x.bad{color:#ffa94d}#vl_big .rv-x.warn{color:#ff6b6b}' +
     '#vl_big .bc-q .ok{color:#3ddc84 !important}#vl_big .bc-q .no{color:#ff8a8a !important}#vl_big .bc-q .pk{color:#ff2bd6;font-size:20px}' +
-    '#vl_panel .sub2{font-size:14px;font-weight:800;color:#e8b400;margin:8px 0 4px}#vl_panel details.vl-cfold{background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;padding:8px 10px;margin:4px 0 10px}#vl_panel .vl-cfold>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:15px;font-weight:700;color:#eee}#vl_panel .vl-cfold>summary::-webkit-details-marker{display:none}#vl_panel .vl-cfold .cf-a::before{content:"▸";color:#e8b400}#vl_panel .vl-cfold[open] .cf-a::before{content:"▾"}#vl_panel .vl-cfold .cf-s{color:#9a9aa3;font-size:13px;font-weight:600}#vl_panel .vl-cfold .cf-o{margin-left:auto;color:#9a9aa3;font-size:13px}#vl_panel .vl-cfold .cf-o::before{content:"펼치기"}#vl_panel .vl-cfold[open] .cf-o::before{content:"접기"}#vl_panel .vl-cfold #vl_cols{margin-top:4px}' +
+    '#vl_panel .sub2{font-size:14px;font-weight:800;color:#ff7a1a;margin:8px 0 4px}#vl_panel details.vl-cfold{background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;padding:8px 10px;margin:4px 0 10px}#vl_panel .vl-cfold>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:15px;font-weight:700;color:#eee}#vl_panel .vl-cfold>summary::-webkit-details-marker{display:none}#vl_panel .vl-cfold .cf-a::before{content:"▸";color:#ff7a1a}#vl_panel .vl-cfold[open] .cf-a::before{content:"▾"}#vl_panel .vl-cfold .cf-s{color:#9a9aa3;font-size:13px;font-weight:600}#vl_panel .vl-cfold .cf-o{margin-left:auto;color:#9a9aa3;font-size:13px}#vl_panel .vl-cfold .cf-o::before{content:"펼치기"}#vl_panel .vl-cfold[open] .cf-o::before{content:"접기"}#vl_panel .vl-cfold #vl_cols{margin-top:4px}' +
     '#vl_big .rv .rv-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#fff;min-width:0}#vl_big .rv .rv-h>span:first-child{text-shadow:0 0 6px var(--cc);white-space:nowrap}' +
     '#vl_big .rv .rv-m{display:flex;align-items:baseline;gap:10px;margin-top:4px}#vl_big .rv .rv-p{font-size:20px;font-weight:900;color:#ddd}#vl_big .rv .rv-n{font-size:16px;color:#eee;font-weight:800;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '#vl_big .rv .rv-t{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}#vl_big .rv .rv-g{font-size:20px;font-weight:900;color:var(--cc)}' +
@@ -219,7 +222,7 @@
     '#vl_panel.wide #vl_qual .vl-qo .vl-qs+.vl-qs{border-left:1px solid #3a3a44}#vl_panel.wide #vl_qual .vl-qo .vl-qs .vl-qt th,#vl_panel.wide #vl_qual .vl-qo .vl-qs .vl-qt td{padding:5px 7px}' +
     '#vl_panel.wide #vl_qual .vl-qo .vl-qsh{border-top:0;font-size:13px;padding:8px 12px;border-left:4px solid #3d7bff;background:#18182a}#vl_panel.wide #vl_qual .vl-qo .vl-qs+.vl-qs .vl-qsh{border-left-color:#b04ad8;background:#22182a}#vl_panel.wide #vl_qual .vl-qo .vl-qsrc{max-width:none}' +
     '#vl_qual .vl-qfold td{border-top:1px solid #1c1c21;border-bottom:0;text-align:left}#vl_qual .vl-qfold .vl-qn{text-align:left}#vl_qual .vl-qbig{font-size:15px;color:#fff}#vl_qual .vl-qg{color:#3ddc84}' +
-    '#vl_qual tr.vl-qtqr td{background:#2a250f !important}#vl_qual tr.vl-qtqr .vl-qn{color:#ffd54a;font-weight:800}#vl_qual .vl-qtqb{display:inline-block;font-size:11px;font-weight:800;color:#000;background:#e8b400;border-radius:4px;padding:0 5px;margin-right:6px}' +
+    '#vl_qual tr.vl-qtqr td{background:#2a250f !important}#vl_qual tr.vl-qtqr .vl-qn{color:#ffd54a;font-weight:800}#vl_qual .vl-qtqb{display:inline-block;font-size:11px;font-weight:800;color:#000;background:#ff7a1a;border-radius:4px;padding:0 5px;margin-right:6px}' +
     '#vl_qual td.vl-qx{color:#666 !important;text-decoration:line-through}#vl_qual .vl-qsrc{line-height:1.6;font-size:11px;color:#888;padding:6px 12px;border-top:1px solid #222;max-width:760px}' +
     '#vl_rb th.c-l,#vl_rb td.c-l{text-align:left}#vl_rb td.c-l .ln{display:inline-block;min-width:3.2em;font-weight:600;color:#e6e6ea}#vl_rb td.c-l .ps{display:inline-block;min-width:5.6em;color:#b8b8be}' +
     '#vl_rb td.c-l .lt{font:700 15px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:inline-block;min-width:4.2em}#vl_rb tr.vl-mine td.c-l .ln{color:#ffd54a}#vl_panel:not(.wide) #vl_rb td.c-l .ps{display:none}#vl_panel:not(.wide) #vl_rb td.c-l .ln{min-width:2.4em}#vl_panel:not(.wide) #vl_rb td.c-l .lt{min-width:0;font-size:14px}' +
@@ -247,21 +250,21 @@
     '#vl_dq{width:100%;box-sizing:border-box;margin:0 0 6px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:6px 8px;font-size:15px}' +
     '#vl_tab_prac td.dtop{color:var(--vlTop,#d27cff);font-weight:700}#vl_tab_prac td.csok{color:var(--vlCons,#4fc3f7);font-weight:700}' +
     '#vl_pgbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0 6px;font-size:12px;color:#aaa}' +
-    '#vl_pgbar .gch{background:#202026;color:#888;border:1px solid #33333b;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer}#vl_pgbar .gch.on{background:#e8b400;color:#000;border-color:#e8b400;font-weight:700}' +
+    '#vl_pgbar .gch{background:#202026;color:#888;border:1px solid #33333b;border-radius:14px;padding:4px 11px;font-size:12px;cursor:pointer}#vl_pgbar .gch.on{background:#ff7a1a;color:#000;border-color:#ff7a1a;font-weight:700}' +
     '#vl_pgraphs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}#vl_pgraphs .card{flex:1 0 300px;min-width:300px;margin-bottom:0}' +
     '#vl_tab_prac .pb{background:#2a2a30;color:#ddd;border:1px solid #3a3a42;border-radius:7px;padding:6px 10px;font-size:13px;cursor:pointer}' +
-    '#vl_tab_prac .pb.pri{background:#e8b400;color:#000;border-color:#e8b400;font-weight:700}' +
+    '#vl_tab_prac .pb.pri{background:#ff7a1a;color:#000;border-color:#ff7a1a;font-weight:700}' +
     '#vl_tab_prac .pb:disabled{opacity:.5;cursor:default}' +
-    '#vl_pstat{font-size:12px;color:#aaa;min-height:16px;margin-bottom:6px}#vl_pstat .bar{height:4px;background:#2a2a30;border-radius:2px;margin-top:4px;overflow:hidden}#vl_pstat .bar i{display:block;height:100%;background:#e8b400}' +
+    '#vl_pstat{font-size:12px;color:#aaa;min-height:16px;margin-bottom:6px}#vl_pstat .bar{height:4px;background:#2a2a30;border-radius:2px;margin-top:4px;overflow:hidden}#vl_pstat .bar i{display:block;height:100%;background:#ff7a1a}' +
     '#vl_pdrv{display:flex;flex-direction:column;gap:5px;max-height:34vh;overflow:auto;margin-bottom:10px}' +
     '#vl_pdrv button.dch{display:grid;grid-template-columns:12px minmax(0,1fr) 150px 58px 22px;gap:8px;align-items:center;width:100%;box-sizing:border-box;text-align:left;background:#202026;color:#ccc;border:1px solid #33333b;border-radius:8px;padding:8px 12px;font-size:14px;cursor:pointer}' +
     '#vl_pdrv button.dch .tp{color:#9ab;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}#vl_pdrv button.dch small{text-align:right}' +
     '#vl_pdrv button.dch.on .tp{color:#e8d48a}' +
-    '#vl_pdrv button.dch.on{background:#2a2614;color:#fff;border-color:#e8b400;font-weight:700}' +
+    '#vl_pdrv button.dch.on{background:#2a2614;color:#fff;border-color:#ff7a1a;font-weight:700}' +
     '#vl_pdrv .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#vl_pdrv small{color:#888;font-weight:400;white-space:nowrap}' +
     '#vl_pdrv .sw{width:10px;height:10px;border-radius:2px;flex:none}' +
     '#vl_pres .card{background:#0f0f12;border:1px solid #24242b;border-radius:10px;padding:10px;margin-bottom:10px}' +
-    '#vl_pres h4{margin:0 0 8px;font-size:14px;color:#e8b400;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}#vl_pres h4 small{color:#888;font-weight:400}' +
+    '#vl_pres h4{margin:0 0 8px;font-size:14px;color:#ff7a1a;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}#vl_pres h4 small{color:#888;font-weight:400}' +
     '#vl_pres .tw{overflow-x:auto}' +
     '#vl_pres table{width:auto;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}' +
     '#vl_pres th{color:#999;font-size:11px;font-weight:700;text-align:right;padding:5px 6px;white-space:nowrap;border-bottom:1px solid #2a2a30}' +
@@ -278,16 +281,16 @@
     '#vl_panel textarea{width:100%;box-sizing:border-box;background:#222;color:#fff;border:1px solid #444;border-radius:8px;padding:8px;font-size:16px}' +
     '#vl_panel .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}' +
     '#vl_panel label.ck{background:#1f1f24;border-radius:8px;padding:8px;display:flex;gap:6px;align-items:center;font-size:14px}' +
-    '#vl_panel input[type=checkbox]{width:18px;height:18px;accent-color:#e8b400}' +
+    '#vl_panel input[type=checkbox]{width:18px;height:18px;accent-color:#ff7a1a}' +
     '#vl_test{width:100%;padding:10px;border:0;border-radius:8px;background:#333;color:#fff;margin-top:10px;cursor:pointer;font-size:14px}' +
     '#vl_hint{font-size:12px;color:#999;margin-top:8px}' +
     '#vl_panel input.vlcol{width:40px;height:26px;padding:0;border:1px solid #444;border-radius:6px;background:#111;cursor:pointer;vertical-align:middle}' +
     '#vl_drv{display:flex;flex-direction:column;gap:5px;max-height:38vh;overflow:auto}' +
     '#vl_drv .d{background:#1f1f24;border-radius:8px;padding:7px 8px}' +
-    '.vl-fv{background:none;border:0;color:#666;font-size:17px;line-height:1;cursor:pointer;padding:0 2px}.vl-fv.on{color:#e8b400}' +
+    '.vl-fv{background:none;border:0;color:#666;font-size:17px;line-height:1;cursor:pointer;padding:0 2px}.vl-fv.on{color:#ff7a1a}' +
     '.vl-favs{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:0 0 8px;font-size:12px;color:#aaa}.vl-favs button{background:#26220f;color:#e8d48a;border:1px solid #5c4d12;border-radius:14px;padding:3px 10px;font-size:13px;cursor:pointer}' +
-    '.vl-favs button.on{background:#e8b400;color:#000;border-color:#e8b400;font-weight:700}.vl-favs button.na{opacity:.55}' +
-    '#vl_tab_set .vlver{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;padding:8px 10px;background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;font-size:13px;color:#bbb}#vl_tab_set .vlver b{color:#e8b400;font-size:15px}' +
+    '.vl-favs button.on{background:#ff7a1a;color:#000;border-color:#ff7a1a;font-weight:700}.vl-favs button.na{opacity:.55}' +
+    '#vl_tab_set .vlver{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;padding:8px 10px;background:#1b1b20;border:1px solid #2a2a30;border-radius:10px;font-size:13px;color:#bbb}#vl_tab_set .vlver b{color:#ff7a1a;font-size:15px}' +
     '#vl_drv .r1{display:flex;align-items:center;gap:8px}' +
     '#vl_drv .r2{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 0 26px;font-size:13px;color:#ccc}' +
     '#vl_drv .d.on .r2{display:flex}' +
@@ -347,7 +350,7 @@
     '#vl_drv .vl-rm{margin:6px 0 0 26px;font-size:14px;color:#aaa;display:flex;flex-wrap:wrap;gap:6px;align-items:center}' +
     '#vl_drv .vl-rm>*{white-space:nowrap}#vl_drv .d.on .vl-rm{display:none!important}' +
     '#vl_drv .vl-rmt{background:#2a2033;border:1px solid #6a4a80;color:#e6c8ff;border-radius:10px;padding:0 9px}' +
-    '#vl_drv .d.on{background:#2a2614;outline:1px solid #e8b400}' +
+    '#vl_drv .d.on{background:#2a2614;outline:1px solid #ff7a1a}' +
     '#vl_drv .d.off .nm{color:#777}' +
     '#vl_drv .nm{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '#vl_drv .nm small{color:#999;margin-right:4px}' +
@@ -369,6 +372,43 @@
     '@media (max-width:430px){#vl_head .tab{padding:11px 6px 8px;font-size:14px;letter-spacing:-.3px}#vl_go{padding:7px 9px}#vl_fs{padding:0 3px}#vl_min{padding:6px 2px 6px 6px}}' +
     '#vl_net{display:inline-flex;align-items:center;padding:0 4px 0 8px}#vl_net svg{width:22px;height:22px}' +
     '#vl_fs{background:none;border:0;color:#bbb;font-size:18px;cursor:pointer;padding:0 6px;line-height:1}';
+
+  /* ---------- LAP X (v3.0.0): wide screens (PC, iPad landscape) = side menu + Live Race in two columns ---------- */
+  css.textContent +=
+    '#vl_brand,#vl_lxsp,#vl_lxft,#vl_head .vl-lxn{display:none}#vl_lxR,#vl_lxL{display:contents}#vl_lxl,#vl_lxg,#vl_lxm{display:none}' +
+    '#vl_tms{display:none;flex-wrap:wrap;align-items:center;gap:4px 16px;padding:7px 12px;background:#10162a;border:1px solid #232b40;border-radius:8px;margin:8px 0 2px;font-size:14px;color:#dfe4ee}' +
+    '#vl_tms .tsh{color:#fff;font-size:14px}#vl_tms .tsi{white-space:nowrap}#vl_tms .tsi i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}' +
+    '#vl_tms .tsi b{font-size:16px;color:#fff;margin-left:3px}#vl_tms .tsi em{font-style:normal;color:#7dffa8;margin-left:4px;font-size:13px}#vl_tms .tsi.mine{color:#ffb070;font-weight:700}#vl_tms small{margin-left:auto;color:#b8c0d0;font-size:12px}' +
+    '#vl_big .bc-tq{background:#ffd400;color:#111;font-weight:900;border-radius:6px;padding:1px 7px;font-size:14px;flex:none;align-self:center}' +
+    'table.vl-lt{border-collapse:collapse;font-variant-numeric:tabular-nums}table.vl-lt th{color:#999;font-size:12px;font-weight:600;text-align:right;white-space:nowrap}table.vl-lt td{text-align:right;white-space:nowrap}table.vl-lt td.lt-d{font-weight:600}table.vl-lt td.lt-p{color:#ffd27a;font-weight:700}' +
+    '#vl_root.vl-lx #vl_panel{display:grid;grid-template-columns:212px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);background:#0b0f1a}' +
+    '#vl_root.vl-lx #vl_head{grid-row:1/-1;grid-column:1;flex-direction:column;align-items:stretch;gap:4px;padding:14px 12px;border-bottom:0;border-right:1px solid #232b40;background:#0f1424;overflow-y:auto;overflow-x:hidden;min-height:0}' +
+    '#vl_root.vl-lx #vl_unl{grid-column:2;grid-row:1}#vl_root.vl-lx #vl_warn{grid-column:2;grid-row:2}#vl_root.vl-lx #vl_body{grid-column:2;grid-row:3;padding:14px 18px 18px}' +
+    '#vl_root.vl-lx #vl_brand{display:flex;align-items:center;gap:10px;padding:0 4px 14px;order:0}#vl_brand img{width:44px;height:44px;border-radius:11px;flex:none}' +
+    '#vl_brand b{display:block;font-size:24px;font-weight:900;font-style:italic;letter-spacing:1px;color:#fff;line-height:1}#vl_brand b i{color:#ff7a1a}#vl_brand small{display:block;font-size:11px;color:#b8c0d0;font-weight:500;margin-top:4px;white-space:nowrap}' +
+    '#vl_root.vl-lx #vl_head .tab{display:flex;align-items:center;gap:10px;text-align:left;padding:12px !important;border:0 !important;border-radius:10px;font-size:16px !important;color:#d8deea;order:1;margin:0 !important;letter-spacing:0 !important}' +
+    '#vl_root.vl-lx #vl_head .tab.on{background:linear-gradient(90deg,rgba(255,122,26,.25),rgba(255,122,26,.05));color:#fff;box-shadow:inset 3px 0 0 #ff7a1a}' +
+    '#vl_root.vl-lx #vl_head .tab .vl-tn,#vl_root.vl-lx #vl_head .tab .vl-tl{display:none !important}#vl_root.vl-lx #vl_head .tab .vl-lxn{display:inline}' +
+    '#vl_root.vl-lx #vl_lxsp{display:block;flex:1;min-height:10px;order:2}#vl_root.vl-lx #vl_head .tab.vl-tkb{order:3}#vl_root.vl-lx #vl_head .tab[data-tab=set]{order:4}' +
+    '#vl_root.vl-lx #vl_go{order:5;margin:8px 0 0;align-self:stretch}#vl_root.vl-lx #vl_zm{order:6;align-self:flex-start;margin-top:6px}#vl_root.vl-lx #vl_net{order:7}#vl_root.vl-lx #vl_fs{order:7;align-self:flex-start;margin-top:4px}' +
+    '#vl_root.vl-lx #vl_head .vl-tsep,#vl_root.vl-lx #vl_min,#vl_root.vl-lx #vl_bigb{display:none !important}' +
+    '#vl_root.vl-lx #vl_lxft{display:block;order:8;border-top:1px solid #232b40;padding:10px 4px 0;margin-top:8px;font-size:13px;color:#c9d0dd;line-height:1.7;white-space:normal}#vl_lxft b{color:#fff}#vl_lxft .v{font-size:11px;color:#9aa4b8;margin-top:4px}' +
+    '#vl_root.vl-lx #vl_rb{display:grid;grid-template-columns:minmax(0,1fr) 440px;column-gap:16px;align-items:start;grid-auto-flow:row dense}' +
+    '#vl_root.vl-lx #vl_rb>*{grid-column:1/-1;min-width:0}' +
+    '#vl_root.vl-lx #vl_lxL{display:flex;flex-direction:column;gap:14px;grid-column:1;margin-top:10px}#vl_root.vl-lx #vl_lxR{display:flex;flex-direction:column;gap:12px;grid-column:2;margin-top:10px}' +
+    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxR{display:none}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start}' +
+    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>*{grid-column:1/-1;min-width:0}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxg{grid-column:1}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_qual,#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxm{grid-column:2}#vl_root.vl-lx #vl_rb.vl-nosel:not(.vl-hasq) #vl_lxL>#vl_lxg{grid-column:1/-1}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxm{display:block}#vl_root.vl-lx #vl_qual:empty,#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxm:empty{display:none}' +
+    '#vl_root.vl-lx #vl_rb.vl-lxsel #vl_qual,#vl_root.vl-lx #vl_rb.vl-lxsel #vl_lxm{display:none}#vl_root.vl-lx #vl_qual .vl-qbox{margin:0 !important;max-width:none !important;width:auto !important}' +
+    '#vl_root.vl-lx #vl_lxg{display:flex;gap:14px;align-items:stretch}#vl_root.vl-lx #vl_lxl{display:block}' +
+    '#vl_root.vl-lx #vl_rb .lgd,#vl_root.vl-lx #vl_gbar,#vl_root.vl-lx #vl_gsel,#vl_root.vl-lx #vl_glg,#vl_root.vl-lx #vl_glaps,#vl_root.vl-lx #vl_graphs{display:none !important}' +
+    '#vl_root.vl-lx #vl_rb .c-sel,#vl_root.vl-lx #vl_rb .c-el,#vl_root.vl-lx #vl_rb .c-l .ps{display:none !important}#vl_root.vl-lx #vl_rb .tw{width:auto;max-width:none}#vl_root.vl-lx #vl_rb .tw table{width:100%}#vl_root.vl-lx #vl_rbb td.c-nm{cursor:pointer}#vl_root.vl-lx #vl_rbb tr:hover td.c-nm{text-decoration:underline}' +
+    '#vl_root.vl-lx #vl_rb.vl-lxsel #vl_big{display:grid;grid-template-columns:minmax(0,1fr);padding:0;gap:10px}#vl_root.vl-lx #vl_big .vl-bc{max-width:none}' +
+    '#vl_root.vl-lx #vl_rb.vl-lxsel.vl-lxst #vl_lxL{display:contents}#vl_root.vl-lx #vl_rb.vl-lxsel.vl-lxst #vl_lxL>.tw{grid-column:1/-1;order:1;margin-top:10px}#vl_root.vl-lx #vl_rb.vl-lxsel.vl-lxst #vl_lxR{order:2;margin-top:12px}#vl_root.vl-lx #vl_rb.vl-lxsel.vl-lxst #vl_lxL>#vl_lxg{grid-column:1;order:3;flex-direction:column;margin-top:12px}' +
+    '.vl-lxc{background:#141a2a;border:1px solid #232b40;border-radius:12px;padding:10px 12px;min-width:0;flex:1 1 0;box-sizing:border-box}' +
+    '.vl-lxc h5{margin:0 0 6px;font-size:15px;color:#fff;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.vl-lxc h5 small{margin-left:auto;font-size:12px;color:#b8c0d0;font-weight:500}' +
+    '.vl-lxc svg{width:100%;height:auto;display:block}.vl-lxlg{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;color:#dfe4ee;margin:0 0 4px}.vl-lxlg i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px}' +
+    '#vl_root .vl-lxc table.vl-lt{width:100% !important;background:none}#vl_root .vl-lxc table.vl-lt td{height:auto !important}.vl-lxc table.vl-lt th{padding:4px 8px;border-bottom:1px solid #2a3248}.vl-lxc table.vl-lt td{padding:5px 8px;border-bottom:1px solid #1c2336;font-size:15px}.vl-lxc table.vl-lt th:first-child,.vl-lxc table.vl-lt td:first-child{text-align:left}' +
+    '.vl-lxc .vl-ls{margin:0 0 8px}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -377,9 +417,9 @@
   root.setAttribute('data-vl-ver', String(VER));
   root.innerHTML =
     '<div id="vl_panel">' +
-    '<div id="vl_head"><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span></button><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
+    '<div id="vl_head"><div id="vl_brand"><img alt="" src="data:image/webp;base64,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"><div><b>LAP <i>X</i></b><small>Live · Results · Practice</small></div></div><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span><span class="vl-lxn">Live Race</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span><span class="vl-lxn">대회 결과</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span><span class="vl-lxn">연습 기록</span></button><span id="vl_lxsp"></span><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><span class="vl-lxn">설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
     '<span id="vl_zm" title="화면 확대/축소"><i>🔍</i><button data-zs="-1" title="작게">−</button><button id="vl_zv" title="눌러서 퍼센트 고르기">100%</button><button data-zs="1" title="크게">+</button><span id="vl_zl"></span></span>' +
-    '<button id="vl_go"></button><span class="vl-tsep"></span><button class="tab vl-tkb" data-tab="trk" title="트랙 바꾸기 — 눌러도 바로 이동하지 않아요">📍<span class="vl-tn"> 트랙</span></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span></div>' +
+    '<button id="vl_go"></button><span class="vl-tsep"></span><button class="tab vl-tkb" data-tab="trk" title="트랙 바꾸기 — 눌러도 바로 이동하지 않아요">📍<span class="vl-tn"> 트랙</span><span class="vl-lxn">트랙</span></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span><div id="vl_lxft"></div></div>' +
     '<div id="vl_unl">🔊 화면을 한 번 누르면 음성이 켜져요</div>' +
     '<div id="vl_warn" style="display:none;background:#5a1414;color:#ffd2d2;font-size:12px;line-height:1.45;padding:8px 12px;border-bottom:1px solid #7a2020"></div>' +
     '<div id="vl_body">' +
@@ -389,15 +429,15 @@
     '<div style="white-space:nowrap"><span class="sub2 vl-hl vl-hl-rem">남은 시간</span><span class="clk" id="vl_rem">0:00</span></div>' +
     '<div id="vl_fuel"><button id="vl_fbtn" title="주유 타이머 켜기/끄기">⛽</button><span id="vl_fbox"></span><button id="vl_freset" title="수동 리셋 — 지금 주유 (다음 라인 통과 때 피트 타임 계산)">↺</button></div><button id="vl_bigb" title="내 선수 크게 보기 ↔ 표 보기">👤 크게</button></div><div class="sub2" id="vl_rnd"></div></div>' +
     '<div style="text-align:right" id="vl_elab"><div class="sub2 vl-hl vl-hl-ela">경과 시간</div><div class="clk" id="vl_clk"></div></div></div>' +
-    '<div id="vl_mstrip"></div><div id="vl_big"></div><div class="tw"><table><thead id="vl_rbh"></thead><tbody id="vl_rbb"></tbody></table></div>' +
-    '<div id="vl_qual"></div>' +
+    '<div id="vl_tms"></div><div id="vl_mstrip"></div><div id="vl_lxR"><div id="vl_big"></div><div id="vl_lxl"></div></div><div id="vl_lxL"><div class="tw"><table><thead id="vl_rbh"></thead><tbody id="vl_rbb"></tbody></table></div><div id="vl_lxg"></div>' +
+    '<div id="vl_qual"></div><div id="vl_lxm"></div>' +
     '<div class="lgd"><span id="vl_lgfin" style="display:none">🏁 완주 (남은 시간 0 뒤 통과)</span><span><i style="background:#2b250f;outline:1px solid #ffd54a"></i>안내 중인 선수</span><span><i style="background:#17351f"></i>방금 통과</span><span><b class="pb">하늘색</b> 개인 베스트</span><span><b class="rf">보라</b> 레이스 최고</span><span><b style="color:#ffb74d">+1L</b> Behind 랩 차이</span><span id="vl_lgcl"><i id="vl_lgclc" class="vl-cbk">↑</i>접전 (뒤 선수 → 앞 선수, 설정한 초 이내)</span><span id="vl_lgpc"></span><span id="vl_lgbd">Behind <b class="pu">줄어듦</b>/<b class="pd">늘어남</b> (변한 초)</span></div>' +
     '<div id="vl_team"></div>' +
     '<div id="vl_gbar"><span>그래프</span><button class="gch" data-g="pos">순위</button><button class="gch" data-g="lap">랩타임</button><button class="gch" data-g="avg">평균 랩</button><button class="gch" data-g="list">랩타임 표</button>' +
     '<span id="vl_ghint" style="margin-left:4px"></span></div>' +
     '<div id="vl_gsel"><button class="gch" id="vl_gall">전체 선택</button><button class="gch" id="vl_gclr">선택 해제</button></div>' +
     '<div id="vl_glg"></div><div id="vl_glaps"></div><div id="vl_graphs"></div>' +
-    '</div></div>' +
+    '</div></div></div>' +
     '<div id="vl_tab_main" style="display:none"><div id="vl_main"></div></div>' +
     '<div id="vl_tab_trk" style="display:none"><div id="vl_th"></div><div id="vl_tk"></div></div>' +
     '<div id="vl_tab_set">' +
@@ -432,10 +472,10 @@
     '<details class="inf"><summary>ⓘ 설명</summary><div>안내 중인 선수의 경과 시간 기준, 그 시간이 지난 뒤 첫 라인 통과 때 한 번 · Open Practice에서만 (예선·결승 등 경기에서는 알리지 않음)</div></details></div>' +
     '<div class="sub"><span>목소리</span></div>' +
     '<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:8px;flex-wrap:wrap">음성<select id="vl_voice" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="def">기본 (현재 음성)</option><option value="f1">여성 1 · 또렷하게</option><option value="f2">여성 2 · 밝고 높게</option><option value="f3">여성 3 · 차분하게</option></select><span id="vl_vinfo" style="color:#999;font-size:12px"></span></div>' +
-    '<div style="display:flex;align-items:center;gap:8px;font-size:14px">속도<input type="range" id="vl_rate" min="0.6" max="2" step="0.1" style="flex:1;accent-color:#e8b400"><span id="vl_rv" style="width:28px"></span></div>' +
+    '<div style="display:flex;align-items:center;gap:8px;font-size:14px">속도<input type="range" id="vl_rate" min="0.6" max="2" step="0.1" style="flex:1;accent-color:#ff7a1a"><span id="vl_rv" style="width:28px"></span></div>' +
     '<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:8px">랩타임 소수점<select id="vl_dec" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="0">0자리 (23초)</option><option value="1">1자리 (23.6초)</option><option value="2">2자리 (23.69초)</option><option value="3">3자리 (23.698초)</option></select><span style="color:#999;font-size:12px">아래는 버림</span></div>' +
     '<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:8px">앞뒤 여유<select id="vl_pad" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px"><option value="0">없음</option><option value="1">짧게</option><option value="2">보통</option><option value="3">길게</option></select><span style="color:#999;font-size:12px">앞뒤가 잘리면 늘리세요</span></div>' +
-    '<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0">알림음 크기<input type="range" id="vl_tvol" min="20" max="100" step="5" style="flex:1;accent-color:#e8b400"><b id="vl_tvv" style="width:44px"></b><button class="pb2" id="vl_tvt" title="알림음 들어 보기">▶</button></div>' +
+    '<div style="display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0">알림음 크기<input type="range" id="vl_tvol" min="20" max="100" step="5" style="flex:1;accent-color:#ff7a1a"><b id="vl_tvv" style="width:44px"></b><button class="pb2" id="vl_tvt" title="알림음 들어 보기">▶</button></div>' +
     '<div class="lim" style="margin:0 0 8px"><span style="color:#999">음성 크기는 그대로 · 알림음(띵·선수별 소리·출발 총성)만</span></div>' +
     '<div class="sub"><span>여러 명이 함께 지나갈 때</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_vmerge">1.5초 안에 함께 지나가면 <b>한 문장으로 묶어서</b></label>' +
@@ -564,17 +604,18 @@
     '<div class="pr-row"><button class="pb" data-r="t">오늘</button><button class="pb" data-r="7">7일</button><button class="pb" data-r="30">30일</button><button class="pb" data-r="90">90일</button><button class="pb" data-r="m">이번 달</button>' +
     '<button class="pb pri" id="vl_pload">불러오기</button></div>' +
     '<div id="vl_pstat"></div>' +
-    '<div id="vl_pselbox" style="display:none"><div class="sub" style="align-items:center"><span>선수 선택 (눌러서 켜기/끄기 · 여러 명 가능) <span id="vl_pcnt" style="color:#e8b400;margin-left:4px"></span></span><span style="display:flex;gap:6px"><button class="pb" id="vl_pclr">모두 해제</button><button class="pb" id="vl_ptog"></button></span></div>' +
+    '<div id="vl_pselbox" style="display:none"><div class="sub" style="align-items:center"><span>선수 선택 (눌러서 켜기/끄기 · 여러 명 가능) <span id="vl_pcnt" style="color:#ff7a1a;margin-left:4px"></span></span><span style="display:flex;gap:6px"><button class="pb" id="vl_pclr">모두 해제</button><button class="pb" id="vl_ptog"></button></span></div>' +
     '<div id="vl_plist"><input id="vl_pq" type="search" placeholder="이름·초성(ㄱㄴㅎ) 또는 트랜스폰더 검색">' +
     '<div class="vl-favs" id="vl_pfav"></div>' +
     '<div id="vl_pdrv"></div></div></div>' +
     '<div id="vl_pres"></div>' +
     '</div>' +
     '</div></div>' +
-    '<button id="vl_fab" title="보이스랩">🎙<span class="dot"></span></button>';
+    '<button id="vl_fab" title="LAP X">🎙<span class="dot"></span></button>';
   document.body.appendChild(root);
   var $ = function (id) { return root.querySelector('#' + id); };
   var panel = $('vl_panel');
+  try { var tset0 = $('vl_teamset'); tset0.parentNode.insertBefore($('vl_team'), tset0.nextSibling); } catch (e) {}
   var trkOnly = !SC() && onTracks;
   var pracOnly = !SC() && onPractice;
   if (pracOnly) panel.classList.add('pmode');
@@ -588,10 +629,12 @@
   function isPhone() {
     try { return W.matchMedia('(pointer:coarse)').matches && Math.min(screen.width, screen.height) < 700; } catch (e) { return false; }
   }
-  function fullOn() { return cfg.full === true || (cfg.full !== false && isPhone()); }
+  function isLx() { return (W.innerWidth || 0) >= 1000; }   /* LAP X wide layout: PC, iPad landscape */
+  function fullOn() { return cfg.full === true || (cfg.full !== false && (isPhone() || isLx())); }
   function fit() {
     var on = fullOn() && panel.style.display !== 'none', st = root.style;
     root.classList.toggle('full', on);
+    root.classList.toggle('vl-lx', on && isLx());
     document.documentElement.classList.toggle('vl-lock', on);
     if (on) {
       var vv = W.visualViewport;
@@ -645,7 +688,8 @@
     setWide();
     if (cfg.tab === 'board') renderRaceBoard(true);
     if (cfg.tab === 'prac') pracOpen();
-    if (cfg.tab === 'set') try { teamSetRender(); $('vl_cfold').open = false; } catch (e) {}
+    if (cfg.tab === 'set') try { teamSetRender(); renderTeam(true); $('vl_cfold').open = false; } catch (e) {}
+    try { lxFoot(); } catch (e) {}
   }
   $('vl_rbb').addEventListener('click', function (e) {
     var td = e.target.closest && e.target.closest('td.c-nm'); if (!td) return;
@@ -1090,7 +1134,7 @@
     });
     return { n: n, bad: bad };
   }
-  function cfgMsg(t) { $('vl_cfgmsg').textContent = t; $('vl_cfgmsg').style.color = '#e8b400'; }
+  function cfgMsg(t) { $('vl_cfgmsg').textContent = t; $('vl_cfgmsg').style.color = '#ff7a1a'; }
   $('vl_cfgexp').onclick = function () {
     var csv = cfgCSV(), name = 'voicelab-settings-' + todayS() + '.csv';
     if (DESK && DESK.saveSettings) { DESK.saveSettings(csv, name).then(function (p) { if (p) cfgMsg('저장했습니다: ' + p); }); return; }
@@ -1613,7 +1657,13 @@
   /* ---------- driver picker ---------- */
   var rows = {};
   function setSel(name, patch) {
-    var was = cfg.sel[name] || {};
+    var was = cfg.sel[name] || {}, offs = [];
+    /* LAP X: one driver at a time — picking someone switches the one before off (their name / tone settings are kept) */
+    if (patch.on === true) Object.keys(cfg.sel).forEach(function (k) {
+      var o = cfg.sel[k]; if (k === name || !o || !o.on) return;
+      offs.push(k);
+      if (cfg.selKeep === false || (!o.alias && o.nm !== false && !o.tone && !o.ti)) delete cfg.sel[k]; else o.on = false;
+    });
     var s = Object.assign({ on: false, alias: '' }, was, patch);
     if (patch.on === false && cfg.selKeep === false) s = { on: false, alias: '' };   /* “forget on un-pick” */
     if (!s.on && !s.alias && s.nm !== false && !s.tone && !s.ti) delete cfg.sel[name]; else cfg.sel[name] = s;
@@ -1629,7 +1679,7 @@
         });
       }
     }
-    save(); touched.forEach(rowSync);
+    save(); touched.concat(offs).forEach(rowSync);
   }
   /* settings row ↔ saved settings (also after changes made from the race board / favourites) */
   function rowSync(name) {
@@ -1902,8 +1952,8 @@
   }
   function median(a) { var b = a.slice().sort(function (x, y) { return x - y; }); return b.length ? b[Math.floor(b.length / 2)] : NaN; }
   /* small line chart over laps; smaller values (1st place, faster times) are drawn higher up */
-  function lapChart(series, kind) {
-    var W2 = 300, H = 170, L = 38, R = 8, T = 8, B = 20, pts = [];
+  function lapChart(series, kind, W2o, Ho) {
+    var FS = W2o ? 13 : 10, W2 = W2o || 300, H = Ho || 170, L = W2o ? 46 : 38, R = 8, T = 8, B = W2o ? 24 : 20, pts = [];
     series.forEach(function (s) { s.pts.forEach(function (p) { pts.push(p); }); });
     if (!pts.length) return '<div style="color:#777;font-size:12px;padding:30px 6px;text-align:center">아직 기록이 없습니다<br>선수가 라인을 지나면 그려집니다</div>';
     var xs = pts.map(function (p) { return p.x; }), ys = pts.map(function (p) { return p.y; });
@@ -1919,15 +1969,16 @@
     var g = '', i;
     if (kind === 'pos') {
       var step = Math.max(1, Math.ceil((Math.round(y1) - 1) / 5));
-      for (i = 1; i <= Math.round(y1); i += step) g += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(i) + '" y2="' + Y(i) + '" stroke="#24242a"/><text x="' + (L - 5) + '" y="' + (Y(i) + 4) + '" fill="#888" font-size="10" text-anchor="end">' + i + '위</text>';
+      for (i = 1; i <= Math.round(y1); i += step) g += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(i) + '" y2="' + Y(i) + '" stroke="#24242a"/><text x="' + (L - 5) + '" y="' + (Y(i) + 4) + '" fill="#888" font-size="' + FS + '" text-anchor="end">' + i + '위</text>';
     } else {
-      for (i = 0; i <= 3; i++) { var yv = y0 + (y1 - y0) * i / 3; g += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#24242a"/><text x="' + (L - 5) + '" y="' + (Y(yv) + 4) + '" fill="#888" font-size="10" text-anchor="end">' + (yv < 60 ? yv.toFixed(1) : fmtS(yv).replace(/\.\d+$/, '')) + '</text>'; }
+      for (i = 0; i <= 3; i++) { var yv = y0 + (y1 - y0) * i / 3; g += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#24242a"/><text x="' + (L - 5) + '" y="' + (Y(yv) + 4) + '" fill="#888" font-size="' + FS + '" text-anchor="end">' + (yv < 60 ? yv.toFixed(1) : fmtS(yv).replace(/\.\d+$/, '')) + '</text>'; }
     }
     var nx = Math.min(5, x1 - x0 + 1);
-    for (i = 0; i < nx; i++) { var xv = Math.round(x0 + (x1 - x0) * i / Math.max(1, nx - 1)); g += '<text x="' + X(xv) + '" y="' + (H - 6) + '" fill="#888" font-size="10" text-anchor="middle">' + xv + '</text>'; }
+    for (i = 0; i < nx; i++) { var xv = Math.round(x0 + (x1 - x0) * i / Math.max(1, nx - 1)); g += '<text x="' + X(xv) + '" y="' + (H - 6) + '" fill="#888" font-size="' + FS + '" text-anchor="middle">' + xv + '</text>'; }
     series.filter(function (s) { return !s.v; }).concat(series.filter(function (s) { return s.v; })).forEach(function (s) {   /* 🔊 drivers on top, thicker */
       if (!s.pts.length) return;
-      g += '<path d="' + s.pts.map(function (p, k) { return (k ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(' ') + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.v ? 3.4 : 1.8) + '"/>';
+      g += '<path d="' + s.pts.map(function (p, k) { return (k ? 'L' : 'M') + X(p.x).toFixed(1) + ' ' + Y(p.y).toFixed(1); }).join(' ') + '" fill="none" stroke="' + s.color + '" stroke-width="' + (s.v ? 3.4 : 1.8) + '"' + (s.dash ? ' stroke-dasharray="6 5" opacity=".85"' : '') + '/>';
+      if (!s.dot && s.dot !== undefined) return;
       s.pts.forEach(function (p) {
         var out = p.y > y1;   /* clipped slow lap: hollow marker at the edge */
         g += '<circle cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="' + (s.v ? 3.4 : 2.6) + '" fill="' + (out ? '#0f0f12' : s.color) + '" stroke="' + s.color + '"><title>' +
@@ -1988,9 +2039,9 @@
       lst.best = f; lst.bestOn = d ? +d.fastLapOn || 0 : 0; return lst;
     };
     $('vl_glaps').innerHTML = !sel.length || !show.list ? '' : '<div class="glrow">' + ser.map(function (s) {
-      var lst = siteBest(s, s.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p }; }));
+      var lst = siteBest(s, s.h.filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p, e: e.e }; }));
       return '<div class="glc"><h5 data-gf="' + esc(s.name) + '" title="눌러서 랩타임 변화를 이 선수만 보기"><i style="background:' + s.color + '"></i>' + esc(s.name) + '<small>' + (lst.length ? lst.length + '랩' : '') + '</small></h5>' + lapSum(lst) + '<div class="ll">' +
-        (lst.length ? lapTbl(lst, !isPractice(sc), true) : '<div style="color:#777;font-size:12px;padding:12px">아직 기록이 없습니다</div>') + '</div></div>';
+        (lst.length ? lapTbl(lst, !isPractice(sc), true, { D: raceDur() }) : '<div style="color:#777;font-size:12px;padding:12px">아직 기록이 없습니다</div>') + '</div></div>';
     }).join('') + '</div><div class="glk">' + lapKey(null, true) + '</div>';
     fitWidths();
     var kinds = [['pos', '순위 변화', function (e) { return e.p; }], ['lap', '랩타임 변화', function (e) { return e.t; }], ['avg', '평균 랩 변화', null]];
@@ -2073,7 +2124,7 @@
   var COLDEF = {
     p: { lg: 'P', sm: 'P', ko: '순위 (P)', fixed: 1 }, nm: { lg: 'Name', sm: 'Name', ko: '이름 (Name)', fixed: 1 }, l: { lg: 'Laps', sm: 'L', ko: '랩 수 (Laps) — 랩 · 통과 시각 · 진행 중 시간' },
     el: { lg: '경과 시간', sm: '경과', ko: '경과 시간 (Elapsed)' }, bhd: { lg: 'Behind', sm: 'Bhd', ko: '앞차와 차이 (Behind)' },
-    pace: { lg: 'Pace', sm: 'Pace', ko: '페이스 (Pace)' }, avg: { lg: 'Avg Lap', sm: 'Avg', ko: '평균 랩 (Avg Lap)' },
+    pace: { lg: '예상 기록', sm: '예상', ko: '예상 기록 (대회 시간 기준 직접 계산 · 연습은 LiveRC Pace)' }, avg: { lg: 'Avg Lap', sm: 'Avg', ko: '평균 랩 (Avg Lap)' },
     last: { lg: 'Last Lap', sm: 'Last', ko: '마지막 랩 (Last Lap)' }, fast: { lg: 'Fast Lap', sm: 'Fast', ko: '베스트 랩 (Fast Lap)' },
     t3: { lg: 'Top 3', sm: 'Top3', ko: '연속 3랩 (Top 3)' }
   };
@@ -2159,11 +2210,11 @@
     return '';
   }
   function renderBig(rows, closeCol) {
-    var on = !!cfg.bigView, mine = rows.filter(function (r) { return r.mine; }), box = $('vl_big');
+    var lx = root.classList.contains('vl-lx'), on = !!cfg.bigView || lx, mine = rows.filter(function (r) { return r.mine; }), box = $('vl_big');
     $('vl_bigb').classList.toggle('on', on);
-    $('vl_rb').classList.toggle('vl-bigon', on && mine.length > 0);
+    $('vl_rb').classList.toggle('vl-bigon', !lx && on && mine.length > 0);
     if (!on || !mine.length) { if (box.innerHTML) box.innerHTML = ''; return; }
-    var C = lapCols(), wide = panel.classList.contains('wide'), n = Math.min(mine.length, wide ? 3 : 2);
+    var C = lapCols(), wide = panel.classList.contains('wide'), n = lx ? 1 : Math.min(mine.length, wide ? 3 : 2);
     box.style.setProperty('--n', n); box.classList.toggle('two', mine.length > 1);
     var pred = (qd && qd.pred) || {}, tq = qd && qd.tq;
     var col = function (r) { return r.ls > 0 && r.bn > 0 ? lapCol(r.ls, r.bn, C) : '#fff'; };
@@ -2191,13 +2242,13 @@
       var cell = function (k, v, cls, st) { return '<div><div class="bc-k">' + k + '</div><div class="bc-v' + (cls ? ' ' + cls : '') + '"' + (st || '') + '>' + v + '</div></div>'; };
       var q = pred[nmKey(r.nm)], qTxt = '';
       if (q) qTxt = '<div class="bc-q">🏆 <span>예선 예상</span><b>' + (q.rank ? q.rank + '위' : '대기') + '</b>' + (q.chg ? '<span class="' + (q.chg > 0 ? 'up' : 'dn') + '">' + (q.chg > 0 ? '▲' : '▼') + Math.abs(q.chg) + '</span>' : '') +
-        (q.rank === 1 ? '<span class="up">TQ</span>' : tq ? '<span>· TQ 예상 ' + esc(tq) + '</span>' : '') + '</div>';
+        (q.rank === 1 ? '' : tq ? '<span>· TQ 예상 ' + esc(tq) + '</span>' : '') + '</div>';
       if (!qTxt) qTxt = mainCard(r);
       return '<div class="bcol">' +
         (nbOn && ahead ? rival(ahead, 'ah' + (r.closeTo ? ' cl' : ''), '▲ 앞차', gapLab(r.bhd, '앞'), bhdSt[r.key], true) :
           nbOn && r.p == 1 ? '<div class="vl-bc rv ah lead"><div class="rv-h"><span>▲ 선두</span><span class="rv-n" style="color:#bbb">앞차 없음</span></div></div>' : '') +
         '<div class="vl-bc mine">' +
-        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + esc(r.alias || r.nm) + '</span><span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
+        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + esc(r.alias || r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
         '<div class="bc-row">' +
           cell('진행 중', '-', 'lt', ' data-lt="' + esc(r.key) + '"') +
@@ -2210,6 +2261,105 @@
     }).join('');
     /* the change message sits beside the gap when there is room, else drops to its own line */
     [].forEach.call(box.querySelectorAll('.rv-x'), function (x) { var f = x.parentNode.firstElementChild; if (f && x.offsetTop > f.offsetTop + f.offsetHeight * 0.6) x.classList.add('wr'); });
+  }
+  /* ---------- LAP X helpers ---------- */
+  /* race length in seconds (elapsed + remaining, read while the clock runs) — 0 in practice or when unknown */
+  function raceDur() { var sc = SC(); return sc && !isPractice(sc) && rs && rs.id === sessId(sc) && rs.dur > 0 ? rs.dur : 0; }
+  /* our own projected result for a driver (laps/time at the end of the race), from this session's lap history */
+  function projLT(d) {
+    var D = raceDur(); if (!D) return null;
+    var h = (lapHist[keyOf(d)] || []).filter(function (e) { return e.t > 0; }); if (!h.length) return null;
+    var lst = h.map(function (e) { return { n: e.l, v: e.t, e: e.e }; }); lst.best = siteFast(d);
+    var p = projAt(lst, lst.length - 1, D, lapBest(lst)); if (!p) return null;
+    return { L: p.L, T: p.T, s: fmtLT(p) };
+  }
+  /* 👥 one line with every team's place and points (the race on track counted as it stands) */
+  function teamStrip() {
+    var el = $('vl_tms'); if (!el) return;
+    var off = function () { if (el.innerHTML) el.innerHTML = ''; el.style.display = 'none'; };
+    if (!cfg.teamOn || teams().length < 2) return off();
+    var cup = tcCup(tcLoad(), false), live = tcur.res && !tcur.stored && hasTeamDriver(tcur.res) ? { res: tcur.res, label: tcur.label } : null;
+    if (!cup && !live) return off();
+    var tb = teamTable(cup, live), mineN = Object.keys(cfg.sel || {}).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; })[0], mt = mineN ? teamOfName(mineN) : null;
+    var h = '<b class="tsh">👥 팀전</b>' + tb.teams.map(function (x, i) {
+      return '<span class="tsi' + (mt && mt.id === x.t.id ? ' mine' : '') + '"><i style="background:' + esc(x.t.color) + '"></i>' + (i + 1) + ' ' + esc(x.t.name) + ' <b>' + x.tot + '</b>' + (live ? '<em>+' + (x.now || 0) + '</em>' : '') + '</span>';
+    }).join('') + '<small>' + (live ? '합계 = 지난 ' + tb.nRaces + '레이스 + 이번 레이스 예상(초록)' : '레이스 ' + tb.nRaces + '개') + '</small>';
+    if (el.innerHTML !== h) el.innerHTML = h;
+    el.style.display = 'flex';
+  }
+  /* side menu footer: track · driver · version */
+  function lxFoot() {
+    var el = $('vl_lxft'); if (!el) return;
+    var nm = Object.keys(cfg.sel || {}).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; })[0];
+    var h = '📍 <b>' + esc((location.hostname || '').split('.')[0]) + '</b><br>' + (nm ? '🔊 <b>' + esc((cfg.sel[nm].alias || '').trim() || nm) + '</b>' : '🔊 선수 선택 안 함') + '<div class="v">LAP X v' + VERSION + ' · Made by NAMO</div>';
+    if (el.innerHTML !== h) el.innerHTML = h;
+  }
+  /* no driver picked during a main: electric = predicted overall result (points), engine = bump-up places */
+  function lxMainBox(rows) {
+    if (!mainLive) return '';
+    var c = mainLive.c, m = mainLive.m, card = function (t, sm, body) { return '<div class="vl-lxc"><h5>' + t + '<small>' + sm + '</small></h5>' + body + '</div>'; };
+    if (c.kind === 'pts') {
+      var st = mainStand(c, mainLiveLeg(SC())), nl = c.mains.filter(function (x) { return x.leg > 0; }).length, L = Math.max(nl || st.nLegs || 0, st.li + 1, 1), legs = [];
+      for (var i = 0; i < L; i++) legs.push(i);
+      var lt = String(m.letter || '').toUpperCase() || 'A';
+      var h = '<table class="vl-lt"><thead><tr><th>예상</th><th style="text-align:left">선수</th>' + legs.map(function (i) { return '<th>' + esc(lt) + (i + 1) + (i === st.li ? ' 지금' : '') + '</th>'; }).join('') + '<th>합계</th></tr></thead><tbody>' +
+        st.list.map(function (e, k) {
+          return '<tr><td>' + (k + 1) + '</td><td style="text-align:left">' + (e.voice ? '🔊 ' : '') + esc(e.name) + '</td>' + legs.map(function (i) {
+            if (e.legs[i] === undefined) return '<td>-</td>';
+            return '<td style="' + (e.est[i] ? 'color:#7dffa8;font-weight:700;' : '') + (!e.use[i] ? 'text-decoration:line-through;color:#8a93a6;' : '') + '">' + e.legs[i] + '</td>';
+          }).join('') + '<td><b>' + e.tot + '</b></td></tr>';
+        }).join('') + '</tbody></table>';
+      return card('🏆 메인 예상 결과 (포인트)', esc(c.name || '') + ' · 좋은 ' + st.K + '/' + L + ' · ' + (st.rule.low ? '적은' : '많은') + ' 순 · 초록 = 지금 레그 예상 · 취소선 = 합계에서 빠짐', h);
+    }
+    var E = mainLive.E, up = mainLive.up; if (!E || !up) return '';
+    var base = up.rows.filter(function (r) { return !r.bump && !r.empty; }).length, byK = {};
+    list(SC().driverData).forEach(function (d) { byK[keyOf(d)] = d; });
+    var g = rows[E] && rows[E - 1] ? gapTxt(byK[rows[E - 1].key], byK[rows[E].key]) : '';
+    var top = rows[E] ? '<div style="background:#2a2410;border:1px solid #ffd400;border-radius:10px;padding:7px 12px;margin:0 0 8px;font-size:15px">⬆ 범프권 경계 <b style="color:#ffd400">' + E + '등 ' + esc(rows[E - 1].nm) + '</b> ↔ ' + (E + 1) + '등 ' + esc(rows[E].nm) + (g ? ' <b style="color:#ffd400">' + esc(g) + '</b> 차' : '') + '</div>' : '';
+    var h2 = '<table class="vl-lt"><thead><tr><th>P</th><th style="text-align:left">선수</th><th>랩</th><th>Behind</th><th style="text-align:left">범프</th><th style="text-align:left">' + esc(up.code) + '메인 그리드</th></tr></thead><tbody>' +
+      rows.map(function (r, k) {
+        var inZ = k < E, ln = k === E - 1 ? ' style="box-shadow:inset 0 -2px 0 #ffd400"' : '';
+        return '<tr' + ln + '><td>' + esc(r.p) + '</td><td style="text-align:left">' + (r.mine ? '🔊 ' : '') + esc(r.nm) + '</td><td>' + (+r.l || 0) + '</td><td>' + esc(r.bhd) + '</td><td style="text-align:left;' + (inZ ? 'color:#3ddc84;font-weight:800' : 'color:#b8c0d0') + '">' + (inZ ? '⬆ 범프권' : k === E && g ? '범프까지 ' + esc(g) : '') + '</td><td style="text-align:left">' + (inZ ? (base + k + 1) + '번' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    return card('⬆ 범프업 예상', esc(m.code) + '메인 위 ' + E + '명 → ' + esc(up.code) + '메인', top + h2);
+  }
+  /* wide screens: lap + position graphs, the picked driver's lap list; no driver picked = everyone's positions next to the qualifier / main box */
+  var lxSig = '';
+  function renderLx(rows, prc) {
+    teamStrip(); lxFoot();
+    var rb = $('vl_rb'), mine = rows.filter(function (r) { return r.mine; })[0];
+    rb.classList.toggle('vl-lxsel', !!mine); rb.classList.toggle('vl-nosel', !mine);
+    if (!root.classList.contains('vl-lx')) { if ($('vl_lxg').innerHTML) $('vl_lxg').innerHTML = ''; if ($('vl_lxl').innerHTML) $('vl_lxl').innerHTML = ''; lxSig = ''; return; }
+    var D = prc ? 0 : raceDur(), hOf = function (k) { return lapHist[k] || []; };
+    var sig = JSON.stringify([mine && mine.key, rows.map(function (r) { var h = hOf(r.key); return [r.key, h.length, h.length ? h[h.length - 1].p : 0]; }), D, prc, cfg.lapDev, cfg.lapBest, cfg.lapNear, cfg.lapFar, $('vl_qual').innerHTML ? 1 : 0, !!mainLive, rows.map(function (r) { return r.bhd; })]);
+    if (sig === lxSig) return; lxSig = sig;
+    var mb = ''; if (!mine && mainLive) try { mb = lxMainBox(rows); } catch (e) {}
+    if ($('vl_lxm').innerHTML !== mb) $('vl_lxm').innerHTML = mb;
+    rb.classList.toggle('vl-hasq', !!(mb || $('vl_qual').innerHTML));
+    var lg = function (ser) { return '<div class="vl-lxlg">' + ser.map(function (s) { return '<span><i style="background:' + s.color + (s.dash ? ';height:0;border-top:2px dashed ' + s.color + ';background:none' : '') + '"></i>' + esc(s.name) + '</span>'; }).join('') + '</div>'; };
+    var card = function (t, sm, body) { return '<div class="vl-lxc"><h5>' + t + '<small>' + sm + '</small></h5>' + body + '</div>'; };
+    var lapPts = function (k) { return hOf(k).filter(function (e) { return e.t > 0; }).map(function (e) { return { x: e.l, y: e.t }; }); };
+    var posPts = function (k) { return hOf(k).filter(function (e) { return e.p > 0; }).map(function (e) { return { x: e.l, y: e.p }; }); };
+    var g = '';
+    if (mine) {
+      var i = rows.indexOf(mine), A = rows[i - 1], B = rows[i + 1], s1 = [];
+      if (A) s1.push({ name: '앞차 ' + A.nm, color: '#8fa0c0', dash: 1, dot: false, pts: lapPts(A.key) });
+      if (B) s1.push({ name: '뒤차 ' + B.nm, color: '#c9a0ff', dash: 1, dot: false, pts: lapPts(B.key) });
+      s1.push({ name: mine.alias || mine.nm, color: '#ff7a1a', v: true, pts: lapPts(mine.key) });
+      var s2 = rows.map(function (r) { return { name: r.nm, color: r === mine ? '#ff7a1a' : '#5b6680', v: r === mine, dot: r === mine, pts: posPts(r.key) }; });
+      g = card('📈 랩 그래프', '위쪽이 빠름', lg(s1.slice().reverse()) + lapChart(s1, 'lap', 380, 250)) +
+          card('📊 순위 그래프', '위 = 1등 · 랩마다', lapChart(s2, 'pos', 380, 272));
+    } else if (rows.length) {
+      var s3 = rows.map(function (r, k) { return { name: r.nm, color: PCOL[k % PCOL.length], dot: false, pts: posPts(r.key) }; });
+      g = card('📊 순위 그래프', '위 = 1등 · 랩마다 · 이름을 누르면 그 선수 화면', lg(s3) + lapChart(s3, 'pos', 560, 330));
+    }
+    $('vl_lxg').innerHTML = g;
+    if (mine) {
+      var lst = hOf(mine.key).filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p, e: e.e }; });
+      lst.best = mine.bn > 0 ? mine.bn : NaN;
+      if (!(lst.best > 0)) for (var q = lst.length - 1, hh = hOf(mine.key); q >= 0; q--) if (hh[q] && hh[q].b > 0) { lst.best = hh[q].b; break; }
+      $('vl_lxl').innerHTML = card('📋 랩 타임', '최신 랩 위' + (D ? ' · 예상 = ' + fmtClock(D) + ' 기준' : ''), lst.length ? lapSum(lst) + lapTbl(lst, !prc, true, { D: D }) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>');
+    } else $('vl_lxl').innerHTML = '';
   }
   function renderRaceBoard(force) {
     if (cfg.tab !== 'board' && !force) return;
@@ -2234,7 +2384,7 @@
       var m = match(d), av = avgOf(d), bs = bhdSt[key], bm = cfg.paceColor !== false && cfg.trendSrc === 'best';
       var bd = cfg.raceOn !== false && cfg.bhdColor !== false && bs && bhd.charAt(0) !== '+' && bhd !== '-' && bs.dl === bs.dl && Math.abs(bs.dl) >= 0.0005 ? bs.dl : NaN;
       return {
-        key: key, p: d.position || '', nm: nameOf(d), car: d.carNum || '', l: d.laps || '0', el: short(d.elapsedTime), bhd: bhd, bhdN: bhdN, pace: d.pace || '-', avg: av > 0 ? fmtS(av) : '-',
+        key: key, p: d.position || '', nm: nameOf(d), car: d.carNum || '', l: d.laps || '0', el: short(d.elapsedTime), bhd: bhd, bhdN: bhdN, pace: (function () { var pq = prc ? null : projLT(d); return pq ? pq.s : prc ? (d.pace || '-') : '-'; })(), avg: av > 0 ? fmtS(av) : '-',
         bhdD: bd, bhdCls: bd < 0 ? 'pu' : (bd > 0 ? 'pd' : ''),
         lastD: cfg.paceColor !== false && cfg.trendSrc === 'avg' && lapS > 0 && av > 0 ? Math.round((lapS - av) * 1000) / 1000 : NaN,
         /* "베스트 랩 차이": this lap against the driver's best (site F:), coloured like the session lap lists */
@@ -2261,6 +2411,7 @@
       rem: pageText('#time_remaining .value'), ela: pageText('#time_elapsed .value'),
       color: (sc && sc.raceData && sc.raceData.raceClassColor) || '#01B2F0' };
     renderBig(rowsData, closeCol);
+    try { renderLx(rowsData, prc); } catch (e) {}
     rowsData = sortRows(rowsData);   /* Behind was computed in position order above; only the display order changes */
     var sig = JSON.stringify([rowsData, hdr, cols.map(function (c) { return c.k; }), cfg.sortK, cfg.sortD, closeCol, cfg.trendSrc, cfg.paceColor, cfg.graphSel, cfg.lapLive, cfg.lapPass, cfg.raceOn, cfg.finOn, cfg.bigView, prc, cfg.lapDev, cfg.lapNear, cfg.lapFar, cfg.lapBest]);
     if (sig === lastSig && !force) return;
@@ -2333,6 +2484,18 @@
   }
   /* wide panel: the header bar, the colour keys and the open qualifier box follow the width of the board table (narrow: tables fill the screen anyway) */
   function fitWidths() {
+    if (root.classList.contains('vl-lx')) {
+      $('vl_rb').style.zoom = ''; fitS.rb = 1;
+      var h0 = $('vl_hdr'); h0.style.width = ''; h0.style.flexWrap = ''; h0.style.boxSizing = '';
+      var ms0 = $('vl_mstrip'); if (ms0) ms0.style.width = '';
+      var l0 = root.querySelector('#vl_rb .lgd'); if (l0) l0.style.maxWidth = '';
+      var qb0 = root.querySelector('#vl_qual .vl-qbox'); if (qb0) qb0.style.width = '';
+      [].forEach.call(root.querySelectorAll('#vl_qual .vl-qsc'), function (q) { q.style.setProperty('--qh', 'none'); });
+      /* the board needs more room than the left column has (iPad, small PC windows): board on top across, card + graphs below */
+      var tb0 = root.querySelector('#vl_rb .tw table'), rb0 = $('vl_rb');
+      if (tb0 && rb0.clientWidth) { tb0.style.width = 'max-content'; var nat0 = tb0.offsetWidth; tb0.style.width = ''; rb0.classList.toggle('vl-lxst', nat0 + 456 > rb0.clientWidth); }
+      return;
+    }
     var wide = panel.classList.contains('wide');
     var t = root.querySelector('#vl_rb .tw table'), h = $('vl_hdr'), l = root.querySelector('#vl_rb .lgd');
     if (t && !$('vl_rb').classList.contains('vl-bigon')) autoFit($('vl_rb'), [t], 'rb', true); else { $('vl_rb').style.zoom = ''; fitS.rb = 1; }
@@ -2457,7 +2620,7 @@
       var nm = nameOf(d); if (!nm) return;
       var e = get(nm); e.live = true; e.voice = !!match(d); e.name = nm;
       if (!withLive) { if (running) delete e.r[R]; return; }
-      var lt = ltParse(d.pace) || (+d.laps > 0 ? ltParse(d.laps + '/' + short(d.elapsedTime)) : null);
+      var lt = projLT(d) || (+d.laps > 0 ? ltParse(d.laps + '/' + short(d.elapsedTime)) : null);
       if (lt && (running || !e.r[R])) { e.r[R] = lt; e.est[R] = true; }
     });
     return Object.keys(by).map(function (k) { return by[k]; });
@@ -3112,7 +3275,7 @@
     try { localStorage.setItem(PK, JSON.stringify(pc)); }
     catch (e) { pc.days = {}; try { localStorage.setItem(PK, JSON.stringify(pc)); } catch (e2) {} }
   }
-  var PCOL = ['#e8b400', '#4fc3f7', '#3ddc84', '#ff7a7a', '#d27cff', '#ffa94d', '#8bd3c7', '#f06292', '#c5e1a5', '#b0bec5'];
+  var PCOL = ['#ff7a1a', '#4fc3f7', '#3ddc84', '#ff7a7a', '#d27cff', '#ffa94d', '#8bd3c7', '#f06292', '#c5e1a5', '#b0bec5'];
   var prac = { rows: [], lseq: 0, aseq: 0, loaded: '', busy: false };
   function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function todayS() { return ymd(new Date()); }
@@ -3354,17 +3517,33 @@
   function lapCol(v, best, C) { if (v < 0) return '#777'; var d = v - best; if (d < -0.0005) return '#777';   /* shorter than LiveRC's fast lap: not counted */ return d < 0.0005 ? C.B : (d <= C.dev + 1e-9 ? C.N : C.F); }
   /* laps top to bottom: lap · time · gap to the best (best purple, within the set seconds green, more orange, invalid grey) */
   /* pos: also the position each lap was completed in (heats / mains) — up green, down red */
-  function lapTbl(list, pos, rev) {
-    var C = lapCols(), best = lapBest(list);
-    var h = '<table><thead><tr><th>랩</th><th>랩타임</th>' + (pos ? '<th>순위</th>' : '') + '<th>베스트와 차이</th></tr></thead><tbody>', rows = list.map(function (x, i) {
+  /* projected result of a race of D seconds, as seen when lap i was completed (no LiveRC pace):
+     race time at that crossing + the average of the last 3 laps (laps more than 2 s off the best left out) until the clock runs out, then the lap that crosses the line */
+  function projAt(list, i, D, best) {
+    var x = list[i]; if (!x || !(D > 0)) return null;
+    var T = x.e > 0 ? x.e : 0; if (!T) for (var k = 0; k <= i; k++) T += Math.abs(list[k].v) || 0;
+    if (!(T > 0)) return null;
+    var ok = [], lim = best > 0 ? best + 2 : Infinity;
+    for (var j = i; j >= 0 && ok.length < 3; j--) { var v = list[j].v; if (v > 0 && v <= lim && !(best > 0 && v < best - 0.0005)) ok.push(v); }
+    var a = ok.length ? ok.reduce(function (t, v) { return t + v; }, 0) / ok.length : Math.abs(x.v);
+    if (!(a > 0)) return null;
+    var n = T >= D ? 0 : Math.ceil((D - T) / a - 1e-9);
+    return { L: (+x.n || 0) + n, T: T + n * a };
+  }
+  function fmtLT(p) { var m = Math.floor(p.T / 60), r = p.T - m * 60; return p.L + '/' + m + ':' + (r < 10 ? '0' : '') + r.toFixed(3); }
+  /* laps: lap · time (gap to the best, same colour: best purple, within the set seconds green, more orange, invalid grey) · projected result (races) · position (heats / mains, up green, down red) */
+  function lapTbl(list, pos, rev, pj) {
+    var C = lapCols(), best = lapBest(list), D = pj && pj.D > 0 ? pj.D : 0;
+    var h = '<table class="vl-lt"><thead><tr><th>랩</th><th>랩타임 (베스트 차)</th>' + (D ? '<th>예상 기록</th>' : '') + (pos ? '<th>순위</th>' : '') + '</tr></thead><tbody>', rows = list.map(function (x, i) {
       var t = Math.abs(x.v), c = lapCol(x.v, best, C), d = t - best;
       var pp = '', pv = i > 0 ? list[i - 1].p : NaN;
-      if (pos) pp = '<td' + (x.p > 0 && pv > 0 && x.p !== pv ? ' style="color:' + (x.p < pv ? '#3ddc84' : '#ff6b6b') + ';font-weight:700"' : '') + '>' + (x.p > 0 ? x.p + '등' : '-') + '</td>';
-      var sh = x.v > 0 && d < -0.0005;
-      return '<tr><td>' + x.n + '</td><td style="color:' + c + ';font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 600) + '"' + (sh ? ' title="LiveRC Fast Lap보다 짧은 랩 (출발 직후 등) — 베스트로 치지 않음"' : '') + '>' + fmtS(t) + (x.v < 0 ? '*' : '') + '</td>' + pp + '<td style="color:' + c + '">' +
-        (x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3)) + '</td></tr>';
+      if (pos) pp = '<td' + (x.p > 0 && pv > 0 && x.p !== pv ? ' style="color:' + (x.p < pv ? '#3ddc84' : '#ff6b6b') + ';font-weight:700"' : '') + '>' + (x.p > 0 ? x.p : '-') + '</td>';
+      var sh = x.v > 0 && d < -0.0005, gap = x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3);
+      var pr = D ? projAt(list, i, D, best) : null;
+      return '<tr><td>' + x.n + '</td><td class="lt-d" style="color:' + c + '"' + (sh ? ' title="LiveRC Fast Lap보다 짧은 랩 (출발 직후 등) — 베스트로 치지 않음"' : '') + '><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')</td>' +
+        (D ? '<td class="lt-p">' + (pr ? fmtLT(pr) : '-') + '</td>' : '') + pp + '</tr>';
     });
-    if (rev) rows.reverse();   /* race tab: newest lap on top (position colours still compare with the lap before) */
+    if (rev) rows.reverse();   /* newest lap on top (position colours still compare with the lap before) */
     return h + rows.join('') + '</tbody></table>';
   }
   /* summary above a lap list: best lap, how many laps within the set seconds / beyond (count + % of valid laps), invalid, and a bar */
@@ -3419,7 +3598,7 @@
     if (laps === undefined) return '<div style="color:#888;padding:6px">랩타임 불러오는 중…</div>';
     if (!laps || !laps.length) return '<div style="color:#888;padding:6px">이 세션의 랩타임이 없습니다</div>' + (link ? '<div class="lk"><a href="' + link + '" target="_blank" rel="noopener">LiveRC 원본 ↗</a></div>' : '');
     var list = laps.map(function (v, i) { return { n: i + 1, v: v }; });
-    return lapSum(list) + '<div class="vl-ld"><div class="ll">' + lapTbl(list) + '</div><div class="lc">' + lapSvg(list) + lapKey(link) + '</div></div>';
+    return lapSum(list) + '<div class="vl-ld"><div class="ll">' + lapTbl(list, false, true) + '</div><div class="lc">' + lapSvg(list) + lapKey(link) + '</div></div>';
   }
   var psOpen = null;   /* session whose laps are unfolded in the session list */
   var dgOpen = {};   /* date groups the user collapsed: key name|date → false */
@@ -3518,7 +3697,7 @@
       o.rs.forEach(function (r) { var d = r[4].slice(0, 10); (byDay[d] || (byDay[d] = [])).push(r); });
       var days = Object.keys(byDay).sort(); if (!(psK === 'd' && psD > 0)) days.reverse();
       h += '<details data-pn="' + esc(o.name) + '"><summary><span style="color:' + o.color + '">●</span> ' + esc(o.name) + ' · 세션 ' + o.n + '개 · ' + days.length + '일</summary><div class="tw"><table><thead><tr>' +
-        cols.map(function (k) { return '<th data-ps="' + k + '" style="cursor:pointer;white-space:nowrap' + (k === psK ? ';color:#e8b400' : '') + '">' + pcolHead(k) + (k === psK ? (psD > 0 ? ' ▲' : ' ▼') : '') + '</th>'; }).join('') +
+        cols.map(function (k) { return '<th data-ps="' + k + '" style="cursor:pointer;white-space:nowrap' + (k === psK ? ';color:#ff7a1a' : '') + '">' + pcolHead(k) + (k === psK ? (psD > 0 ? ' ▲' : ' ▼') : '') + '</th>'; }).join('') +
         '</tr></thead>';
       days.forEach(function (d) {
         var rs = byDay[d], bB = NaN, bT = NaN, bP = null, laps = 0;
@@ -3830,6 +4009,8 @@
         !all.some(function (d) { return (+d.laps || 0) > 0; })) { rs.gun = 1; playTone(9); }
     if (remNow > 0 && remNow < rs.rem) rs.still = 0;
     rs.rem = remNow;
+    var elaNow = secs(pageText('#time_elapsed .value'));
+    if (!prcNow && remNow > 0 && elaNow >= 0) { var dN = Math.round(elaNow + remNow); if (!(rs.dur > 0) || Math.abs(dN - rs.dur) > 3) rs.dur = dN; }
     /* another voice driver due at the line within 1.5 s → hold this call a moment so both are said together */
     var holdFor = function (k) {
       if (cfg.voiceMerge === false) return 0;
