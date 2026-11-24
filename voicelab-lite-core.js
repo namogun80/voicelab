@@ -2,8 +2,8 @@
    화면: 선수 등록 입력 칸 → 크게 보기 카드(프로와 같은 모양, 앞차·뒤차 없음) → 랩 타임표(프로와 같은 색).
    음성: 라인을 지날 때마다 랩타임만, 소수 1자리(버림), "초" 없이 — 23.640 → "23.6". 안드로이드·아이폰 사파리용. */
 (function () {
-  var VER0 = 2;   /* = LVER below; the loader compares it */
-  var LVERSION = '1.1.0';
+  var VER0 = 3;   /* = LVER below; the loader compares it */
+  var LVERSION = '1.2.0';
   var TRACK = 'thetrackkr', HOME = 'https://' + TRACK + '.liverc.com/live/scoring/';
   if (window.__vlLite && !((+window.__vlLite.ver || 0) < VER0)) return;   /* same or newer copy already running */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -107,6 +107,8 @@
     '#vll_root #vll_mu{border:1px solid #3a3a42;background:#1a1a20;color:#3ddc84;border-radius:8px;padding:5px 9px;font-size:14px;font-weight:800;min-width:40px}#vll_root #vll_mu.off{color:#ff6b6b;border-color:#5a2a2a}' +
     '#vll_root .vll-cls{display:flex;gap:8px;align-items:center;font-size:13px;color:#ccc;padding:6px 2px 0;min-width:0}#vll_root .vll-cls i{flex:none;width:10px;height:10px;border-radius:2px;display:inline-block}#vll_root .vll-cls span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '#vll_root .vll-warn{margin-top:8px;background:#3a1418;border:1px solid #7a2a32;color:#ffc8cc;border-radius:10px;padding:8px 10px;font-size:13px}' +
+    '#vll_root #vll_move{margin-top:10px;background:#1d1a17;border:1px solid #ff7a1a;border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.55;color:#eee}#vll_root #vll_move b{font-size:17px}#vll_root #vll_move b span{color:#ff7a1a}#vll_root #vll_move p{margin:6px 0}#vll_root #vll_move p.s{font-size:14px;color:#ccc}' +
+    '#vll_root #vll_mvdl{display:block;background:#ff7a1a;color:#111;font-weight:800;text-align:center;border-radius:10px;padding:11px;text-decoration:none;margin:8px 0}#vll_root #vll_mvx{background:none;border:0;color:#bbb;font-size:14px;display:block;margin-left:auto;cursor:pointer;padding:2px 0}' +
     '#vll_root #vll_unl{display:none;margin-top:10px;width:100%;background:#2a2614;border:1px solid #6a5a1a;color:#ffd54a;border-radius:12px;padding:12px;font-size:16px;font-weight:800}#vll_root #vll_unl.on{display:block}' +
     '#vll_root .vll-reg{margin:10px 0 4px;position:relative}#vll_root .vll-row{display:flex;gap:6px}' +
     '#vll_q{flex:1;min-width:0;font-size:17px;padding:10px 12px;border-radius:10px;border:1px solid #444;background:#141418;color:#fff;outline:none;margin:0;-webkit-appearance:none;appearance:none}#vll_q:focus{border-color:#ffd54a}#vll_q::placeholder{color:#777}' +
@@ -142,6 +144,9 @@
   root.innerHTML = '<div class="vll-in">' +
     '<div class="vll-hd"><span class="vll-lg">VoiceLab<small>Lite</small><em>Made by NAMO</em></span><span class="vll-trk">📍 ' + TRACK + '</span><span class="vll-sp"></span><span class="vll-rem" id="vll_rem"></span><button id="vll_mu" title="음성 켜기/끄기">🔊</button></div>' +
     '<div class="vll-cls" id="vll_cls"></div><div id="vll_warn"></div>' +
+    '<div id="vll_move"><b>보이스랩 라이트는 이제 <span>LAP X Pit</span>로 바뀝니다</b><p>라이트 기능 그대로 + 모든 트랙 · 대회 중 크게 보기(앞차·뒤차·예선 예상·TQ) · 내 대회. 라이트는 더 이상 업데이트되지 않아요.</p>' +
+    '<a id="vll_mvdl" href="https://raw.githubusercontent.com/namogun80/voicelab/main/voicelab-auto.user.js" target="_blank" rel="noopener">⬇ LAP X Pit 받기 (voicelab-auto.user.js)</a>' +
+    '<p class="s">아이폰: 받은 파일을 파일 앱 › Userscripts 폴더로 옮기고, 예전 voicelab-lite 파일은 지우세요. 안드로이드: 유저스크립트 앱에서 열어 설치하세요.</p><button id="vll_mvx">오늘은 그만 보기 ✕</button></div>' +
     '<button id="vll_unl">👆 여기를 눌러 음성 켜기</button>' +
     '<div class="vll-reg"><div class="vll-row"><input id="vll_q" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="선수 한 명 · 이름 또는 초성 (예: ㄴㅎ)"><button id="vll_add">등록</button></div>' +
     '<div id="vll_sug"></div><div id="vll_chip"></div></div>' +
@@ -153,6 +158,14 @@
   document.documentElement.classList.add('vll-lock');
   var $ = function (id) { return document.getElementById(id); };
   window.__vlLite = { ver: LVER, version: LVERSION };
+  /* v1.2.0: Lite is retired — point to LAP X Pit (hidden for the day when closed) */
+  (function () {
+    var mv = document.getElementById('vll_move'); if (!mv) return;
+    var day = new Date().toISOString().slice(0, 10), hid = false;
+    try { hid = localStorage.getItem('vlLiteMoveHide') === day; } catch (e) {}
+    if (hid) mv.style.display = 'none';
+    document.getElementById('vll_mvx').onclick = function () { mv.style.display = 'none'; try { localStorage.setItem('vlLiteMoveHide', day); } catch (e) {} };
+  })();
   /* Pro running on the same page would speak too */
   function proWarn() {
     var pro = !!(document.getElementById('vl_root') || window.__voiceLap);
