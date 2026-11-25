@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.16
+// @version      3.2.17
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 100;   /* = VER below */
-  /* var VER = 100; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 101;   /* = VER below */
+  /* var VER = 101; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.16';
+  var VERSION = '3.2.17';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -642,6 +642,9 @@ window.__vlAuto = true;
     '#vl_root.vl-lx #vl_rb th.c-lps,#vl_root.vl-lx #vl_rb th.c-llv{text-align:right;white-space:nowrap;line-height:1.2}#vl_root.vl-lx #vl_rb th.c-lps small,#vl_root.vl-lx #vl_rb th.c-llv small{display:block;color:#7d8698;font-weight:500;font-size:11px;text-transform:none;letter-spacing:0}' +
     '#vl_root.vl-lx #vl_rb td.c-lps{text-align:right;color:#b8c0d0;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}#vl_root.vl-lx #vl_rb td.c-llv{text-align:right;white-space:nowrap}#vl_root.vl-lx #vl_rb td.c-llv .lt{min-width:0;font-size:inherit !important;font-weight:700}#vl_root.vl-lx #vl_rb td.c-llv .lt:empty::before{content:"-";color:#8b93a6;font-family:inherit}' +
     '#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-lps{display:none}#vl_root.vl-lx #vl_rb .c-el{display:none !important}#vl_root.vl-lx #vl_rb td.c-l .ln{min-width:0}';
+
+  css.textContent +=
+    '#vl_root.vl-pit #vl_lxl .px-seg{margin:6px 0 8px}.pi-new{background:#12301f;border:1px solid #3ddc84;border-radius:10px;padding:7px 9px;font-size:14px;color:#c8f5d8;margin:4px 0 6px;cursor:pointer}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -2170,10 +2173,12 @@ window.__vlAuto = true;
   function backfill() {
     var sc = SC();
     if (cfg.gBackfill === false || bf.busy || Date.now() < bf.next || !sc || !sc.driverData || !isPractice(sc)) return;
-    if (!(cfg.graphSel || []).length) return;
+    var me0 = myName(), gs = cfg.graphSel || [];
+    if (!gs.length && !me0) return;
     var all = list(sc.driverData);
     var need = all.filter(function (d) {
       var k = keyOf(d), h = lapHist[k];
+      if (gs.indexOf(nameOf(d)) < 0 && !match(d)) return false;
       return h && h.length && h[0].l > 1 && !bf.done[k] && (bf.tried[k] || 0) < 8;
     });
     if (!need.length) return;
@@ -2527,6 +2532,7 @@ window.__vlAuto = true;
       var i = rows.indexOf(r), ahead = rows[i - 1], back = rows[i + 1], lc = col(r), dl = r.ls > 0 && r.bn > 0 ? r.ls - r.bn : NaN;
       var dTxt = dl === dl ? (dl < -0.0005 ? '제외' : dl < 0.0005 ? '베스트' : '+' + dl.toFixed(3)) : '';
       var gapA = r.p == 1 ? '선두' : r.bhd, gapB = back ? back.bhd : '-';
+      var BC = lapCols().B, bst = function (v) { return '<span style="color:' + BC + '">' + v + '</span>'; };
       var cell = function (k, v, cls, st) { return '<div><div class="bc-k">' + k + '</div><div class="bc-v' + (cls ? ' ' + cls : '') + '"' + (st || '') + '>' + v + '</div></div>'; };
       var q = pred[nmKey(r.nm)], qTxt = '';
       if (q) qTxt = '<div class="bc-q">🏆 <span>예선 예상</span><b>' + (q.rank ? q.rank + '위' : '대기') + '</b>' + (q.chg ? '<span class="' + (q.chg > 0 ? 'up' : 'dn') + '">' + (q.chg > 0 ? '▲' : '▼') + Math.abs(q.chg) + '</span>' : '') +
@@ -2538,8 +2544,8 @@ window.__vlAuto = true;
         '<div class="vl-bc mine">' +
         '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
-        '<div class="bc-row">' + (!nbOn ? cell('베스트', esc(r.fast)) + cell('랩', (+r.l || 0) + '') + cell('Top 3', esc(r.t3)) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
-          cell('베스트', esc(r.fast)) +
+        '<div class="bc-row">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('랩', (+r.l || 0) + '') + cell('Top 3', esc(r.t3)) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
+          cell(bst('베스트'), bst(esc(r.fast))) +
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
           cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '')) +
         '</div>' + (r.pj ? '<div class="bc-pj">예상 기록 <b>' + esc(r.pj) + '</b>' + (raceDur() ? '<small>' + fmtClock(raceDur()) + ' 기준</small>' : '') + '</div>' : '') + '</div>' +
@@ -2735,7 +2741,7 @@ window.__vlAuto = true;
     var pit = root.classList.contains('vl-pit');
     if (!root.classList.contains('vl-lx') && !pit) { if ($('vl_lxg').innerHTML) $('vl_lxg').innerHTML = ''; if ($('vl_lxl').innerHTML) $('vl_lxl').innerHTML = ''; lxSig = ''; return; }
     var D = prc ? 0 : raceDur(), hOf = function (k) { return lapHist[k] || []; };
-    var sig = JSON.stringify([+cfg.projMin || 5, pit, mine && mine.key, rows.map(function (r) { var h = hOf(r.key); return [r.key, h.length, h.length ? h[h.length - 1].p : 0]; }), D, prc, cfg.lapDev, cfg.lapBest, cfg.lapNear, cfg.lapFar, $('vl_qual').innerHTML ? 1 : 0, !!mainLive, rows.map(function (r) { return r.bhd; })]);
+    var sig = JSON.stringify([+cfg.projMin || 5, pit, mine && mine.key, rows.map(function (r) { var h = hOf(r.key); return [r.key, h.length, h.length ? h[h.length - 1].p : 0]; }), D, prc, cfg.lapDev, cfg.lapBest, cfg.lapNear, cfg.lapFar, cfg.pitPv, runNote.until > Date.now() ? runNote.txt : '', $('vl_qual').innerHTML ? 1 : 0, !!mainLive, rows.map(function (r) { return r.bhd; })]);
     if (sig === lxSig) return; lxSig = sig;
     var mb = ''; if (!mine && mainLive) try { mb = lxMainBox(rows); } catch (e) {}
     if ($('vl_lxm').innerHTML !== mb) $('vl_lxm').innerHTML = mb;
@@ -2765,9 +2771,28 @@ window.__vlAuto = true;
       var lst = hOf(mine.key).filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p, e: e.e }; });
       lst.best = mine.bn > 0 ? mine.bn : NaN;
       if (!(lst.best > 0)) for (var q = lst.length - 1, hh = hOf(mine.key); q >= 0; q--) if (hh[q] && hh[q].b > 0) { lst.best = hh[q].b; break; }
-      $('vl_lxl').innerHTML = card('📋 랩 타임', '최신 랩 위', lst.length ? lapSum(lst) + liveLapTbl(lst, !prc, prc ? (+cfg.projMin || 5) * 60 : D, prc) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>');
+      var tbl = lst.length ? lapSum(lst) + liveLapTbl(lst, !prc, prc ? (+cfg.projMin || 5) * 60 : D, prc) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>';
+      if (pit) {
+        /* this run (practice): when it started, a note when the same driver starts a new run; table or lap graph like 연습 기록 */
+        var h0 = hOf(mine.key)[0], st = h0 && h0.w > 0 && h0.e > 0 ? h0.w - h0.e * 1000 : 0;
+        if (prc && runMem.key === mine.key && runMem.st && st && Math.abs(st - runMem.st) > 60000 && runMem.n) runNote = { until: Date.now() + 90000, txt: '🔄 새 런 — 표 · 그래프 새로 (지난 런 ' + runHM(runMem.st) + ' · ' + runMem.n + '랩' + (runMem.b > 0 ? ' · 베스트 ' + fmtS(runMem.b) : '') + ' ▸)' };
+        if (runMem.key !== mine.key) runNote = { until: 0, txt: '' };
+        runMem = { key: mine.key, st: st, n: lst.length, b: lapBest(lst) };
+        var sub = prc && st ? '이번 런 · ' + runHM(st) + ' 시작' + (lst.length ? ' · ' + lst[0].n + '~' + lst[lst.length - 1].n + '랩' : '') : '최신 랩 위', gv = cfg.pitPv === 'svg';
+        var body = (runNote.until > Date.now() ? '<div class="pi-new" data-goprac="1">' + esc(runNote.txt) + '</div>' : '') +
+          '<div class="px-seg"><button data-lpv="tbl" class="' + (gv ? '' : 'on') + '">📋 랩 표</button><button data-lpv="svg" class="' + (gv ? 'on' : '') + '">📈 랩타임 그래프</button></div>' +
+          (gv ? (lst.length ? lapGapSvg(lst, [], 360, 220) + lapKey('', true) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>') : tbl);
+        $('vl_lxl').innerHTML = card('📋 랩 타임', sub, body);
+      } else $('vl_lxl').innerHTML = card('📋 랩 타임', '최신 랩 위', tbl);
     } else $('vl_lxl').innerHTML = '';
   }
+  var runMem = {}, runNote = { until: 0, txt: '' };
+  function runHM(ms) { var d = new Date(ms); return d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2); }
+  $('vl_lxl').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-lpv]'), g = e.target.closest && e.target.closest('[data-goprac]');
+    if (b) { cfg.pitPv = b.getAttribute('data-lpv'); save(); lxSig = ''; renderRaceBoard(true); }
+    else if (g) { runNote.until = 0; var t = root.querySelector('#vl_pitbar [data-tab="prac"]'); if (t) t.click(); }
+  });
   function renderRaceBoard(force) {
     if (cfg.tab !== 'board' && !force) return;
     renderGraphs(force);
@@ -5066,7 +5091,7 @@ window.__vlAuto = true;
     var pitDet = function (id) {
       var l = lapList(id); if (pc.laps[id] === undefined) return '<div class="px-wait">랩타임 불러오는 중…</div>'; if (!l) return '<div class="px-wait">랩타임이 없어요</div>';
       var g = cfg.pitPv === 'svg';
-      return '<div class="px-seg"><button data-pv="tbl" class="' + (g ? '' : 'on') + '">📋 랩 표</button><button data-pv="svg" class="' + (g ? 'on' : '') + '">📈 랩타임 그래프</button></div>' + (g ? lapSvg(l, 360, 230) + lapKey(l) : lapSum(l) + pracLapTbl(l));
+      return '<div class="px-seg"><button data-pv="tbl" class="' + (g ? '' : 'on') + '">📋 랩 표</button><button data-pv="svg" class="' + (g ? 'on' : '') + '">📈 랩타임 그래프</button></div>' + (g ? lapSvg(l, 360, 230) + lapKey('') : lapSum(l) + pracLapTbl(l));
     };
     var pm = +cfg.projMin || 5;
     var sess = '<div class="vl-lxc"><h5>세션별 요약<small>' + pdate(pxs.day) + (pit ? ' · 누르면 랩 표 / 그래프' : ' · 줄을 누르면 오른쪽에 랩') + '</small></h5><div class="px-sw"><table class="vl-lt px-st"><thead><tr><th>시각</th>' + (showCar ? '<th>차</th>' : '') + '<th class="px-n">랩</th>' + (pit ? '' : '<th>시간</th>') + '<th>베스트</th><th class="px-x">평균</th><th>Top 3</th><th class="px-x">' + pm + '분 예상</th><th class="px-x">Consistency</th></tr></thead><tbody>' +
@@ -5080,7 +5105,7 @@ window.__vlAuto = true;
     var sr = dr.filter(function (r) { return r[0] === pxs.sid; })[0], lp = pc.laps[pxs.sid], lapsH;
     if (lp === undefined) lapsH = '<div style="color:#999;padding:10px 2px">랩타임 불러오는 중…</div>';
     else if (!lp || !lp.length) lapsH = '<div style="color:#999;padding:10px 2px">이 세션의 랩타임이 없어요</div>';
-    else { var lst = lp.map(function (v, i) { return { n: i + 1, v: v }; }); lapsH = '<div class="px-g">' + lapSvg(lst, 320, 200) + lapKey(lst) + '</div>' + lapSum(lst) + pracLapTbl(lst); }
+    else { var lst = lp.map(function (v, i) { return { n: i + 1, v: v }; }); lapsH = '<div class="px-g">' + lapSvg(lst, 320, 200) + lapKey('') + '</div>' + lapSum(lst) + pracLapTbl(lst); }
     var right = '<div class="vl-lxc"><h5>' + (sr ? esc(sr[4].slice(11, 16)) + ' 세션' : '세션') + '<small>' + (lp ? lp.length + '랩 · ' : '') + '첫 랩 위 · <a href="/practice/?p=view_session&id=' + esc(pxs.sid) + '" target="_blank" rel="noopener" style="color:#8ab4ff">LiveRC ↗</a></small></h5>' + lapsH + '</div>';
     var dayL = '<div class="vl-lxc px-days"><h5>날짜<small>세션 · 랩 · 베스트</small></h5>' + dl.map(function (d) {
       var x = pstats(days[d]);
