@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.4
+// @version      3.2.5
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 88;   /* = VER below */
-  /* var VER = 88; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 89;   /* = VER below */
+  /* var VER = 89; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.4';
+  var VERSION = '3.2.5';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -516,6 +516,7 @@ window.__vlAuto = true;
     '#vl_pitin .pi-row{display:flex;gap:8px}#vl_piq{flex:1;min-width:0;background:#141a2a;border:1px solid #2b3550;border-radius:12px;padding:12px;font-size:16px;color:#fff;font-family:inherit}#vl_piq:focus{border-color:#ff7a1a;outline:none}' +
     '#vl_piadd{background:#ff7a1a;color:#111;border:0;border-radius:12px;font-weight:800;font-size:16px;padding:0 16px;font-family:inherit;cursor:pointer;flex:none}' +
     '#vl_pisug{display:none;margin-top:8px;background:#141a2a;border:1px solid #2b3550;border-radius:12px;overflow:hidden}#vl_pisug .pi-s{display:flex;justify-content:space-between;gap:8px;padding:11px 12px;font-size:16px;border-bottom:1px solid #1c2336;cursor:pointer}#vl_pisug .pi-s:last-child{border-bottom:0}' +
+    '#vl_pisug{max-height:55vh;overflow:auto;padding:6px;border-color:#ff7a1a}#vl_pisug .dp-sec{color:#ffb070;font-size:12px;font-weight:700;margin:8px 6px 2px}#vl_pisug .dp-r{padding:10px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;gap:6px;align-items:baseline;color:#e8ecf3}#vl_pisug .dp-r.on{background:#1a2135}#vl_pisug .dp-r.me{background:#1d1a17;box-shadow:inset 3px 0 0 #ff7a1a}#vl_pisug .dp-r em{margin-left:auto;font-style:normal;font-size:12px;color:#3ddc84;border:1px solid #2b5a3c;border-radius:6px;padding:0 6px}#vl_pisug .dp-x{color:#ffb0b0}' +
     '#vl_pisug .pi-s b{color:#ffd54a}#vl_pisug .pi-s small{color:#b8c0d0}#vl_pisug .pi-s.on{background:#1d1a17}#vl_pisug .pi-s.no{color:#b8c0d0;font-size:14px;cursor:default}' +
     '#vl_pichip{margin-top:10px}#vl_pichip .pc{display:inline-flex;align-items:center;gap:8px;border:1px solid #ff7a1a;border-radius:999px;padding:5px 6px 5px 14px;font-weight:800;font-size:16px}#vl_pichip .pc small{color:#b8c0d0;font-weight:500;font-size:13px}#vl_pichip.off .pc{opacity:.55}' +
     '#vl_pix{background:#2b3550;border:0;color:#fff;border-radius:50%;width:24px;height:24px;font-size:12px;cursor:pointer}' +
@@ -4604,21 +4605,28 @@ window.__vlAuto = true;
   /* ---------- LAP X Pit (phone) live tab: like VoiceLab Lite — type a name (or 초성), pick, one driver ---------- */
   var piSel = 0, piList = [];
   function piDrivers() { var sc = SC(); return sc && sc.driverData ? list(sc.driverData).filter(function (d) { return nameOf(d); }).sort(function (a, b) { return (+a.position || 999) - (+b.position || 999); }) : []; }
+  /* the same list as the PC picker: clear · on the course now (가나다) · everyone else (가나다), cars beside the names */
+  var piOpen = false;
   function piSug() {
     var q = ($('vl_piq').value || '').trim(), box = $('vl_pisug');
-    if (!q) { piList = []; box.innerHTML = ''; box.style.display = 'none'; return; }
-    var me = myName();
-    piList = piDrivers().filter(function (d) { return kmatch(nameOf(d), q) || String(d.carNum || '') === q; }).slice(0, 6);
+    if (!q && !piOpen) { piList = []; box.innerHTML = ''; box.style.display = 'none'; return; }
+    var me = myName(), mk = pKey(me);
+    var ps = dpkPeople().filter(function (o) { return kmatch(o.p, q); }).sort(function (a, b) { return (b.live ? 1 : 0) - (a.live ? 1 : 0) || nmSort(a.p, b.p); }).slice(0, 80);
+    piList = (me && !q ? [{ x: 1, p: '' }] : []).concat(ps);
     if (piSel >= piList.length) piSel = 0;
-    box.innerHTML = piList.length ? piList.map(function (d, i) {
-      var n = nameOf(d);
-      return '<div class="pi-s' + (i === piSel ? ' on' : '') + '" data-pn="' + esc(n) + '"><span><b>' + nmH(n) + '</b> <small>P' + esc(d.position || '-') + ' · ' + (+d.laps || 0) + '랩</small></span><small>' + (pName(n) === me ? '등록됨' : i === piSel ? 'Enter' : '') + '</small></div>';
-    }).join('') : '<div class="pi-s no">지금 코스에 맞는 선수가 없어요 — 등록하면 나올 때 안내해요</div>';
+    var nLive = ps.filter(function (o) { return o.live; }).length, off = me && !q ? 1 : 0;
+    box.innerHTML = piList.map(function (o, i) {
+      var sec = (nLive && i === off ? '<div class="dp-sec">지금 코스</div>' : '') + (i === off + nLive && !o.x ? '<div class="dp-sec">전체</div>' : '');
+      if (o.x) return '<div class="dp-r dp-x' + (i === piSel ? ' on' : '') + '" data-pn="">✕ 선택 해제 (' + esc(me) + ')</div>';
+      var cs = Object.keys(o.cars).map(function (c) { return o.cars[c]; });
+      return sec + '<div class="dp-r' + (o.k === mk ? ' me' : '') + (i === piSel ? ' on' : '') + '" data-pn="' + esc(o.p) + '"><b>' + esc(o.p) + '</b>' + (cs.length ? ' <span class="vl-car">(' + esc(cs.slice(0, 3).join(' · ')) + (cs.length > 3 ? ' …' : '') + ')</span>' : '') + (o.live ? '<em>코스</em>' : '') + '</div>';
+    }).join('') + (q && !ps.length ? '<div class="dp-r" data-pn="' + esc(q) + '">“' + esc(q) + '” 으로 등록 — 코스에 나오면 안내</div>' : '');
     box.style.display = 'block';
+    var on = box.querySelector('.dp-r.on'); if (on && on.scrollIntoView) try { on.scrollIntoView({ block: 'nearest' }); } catch (e) {}
   }
-  function piPick(n) {
-    n = String(n || '').trim(); if (!n) return;
-    setSel(n, { on: true }); $('vl_piq').value = ''; piSug(); count(); renderRaceBoard(true); try { $('vl_piq').blur(); } catch (e) {}
+  function piPick(n, clear) {
+    n = String(n || '').trim(); if (!n && !clear) return;
+    setPerson(n); piOpen = false; $('vl_piq').value = ''; piSug(); count(); renderRaceBoard(true); try { $('vl_piq').blur(); } catch (e) {}
   }
   function piRender(rows) {
     if (!root.classList.contains('vl-pit')) return;
@@ -4637,12 +4645,15 @@ window.__vlAuto = true;
     if ($('vl_piq').value) piSug();
   }
   $('vl_piq').addEventListener('input', function () { piSel = 0; piSug(); });
+  $('vl_piq').addEventListener('focus', function () { piOpen = true; piSel = 0; piSug(); });
+  document.addEventListener('click', function (e) { if (piOpen && !(e.target.closest && e.target.closest('#vl_pitin .pi-row,#vl_pisug'))) { piOpen = false; piSug(); } }, true);
   $('vl_piq').addEventListener('keydown', function (e) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (piList.length) { piSel = (piSel + (e.key === 'ArrowDown' ? 1 : piList.length - 1)) % piList.length; piSug(); } }
-    else if (e.key === 'Enter') { e.preventDefault(); piPick(piList[piSel] ? nameOf(piList[piSel]) : this.value); }
+    else if (e.key === 'Enter') { e.preventDefault(); var o = piList[piSel]; if (o && o.x) piPick('', true); else piPick(o ? o.p : this.value); }
+    else if (e.key === 'Escape') { piOpen = false; this.value = ''; piSug(); try { this.blur(); } catch (x) {} }
   });
-  $('vl_piadd').onclick = function () { var q = $('vl_piq').value; piPick(piList[piSel] ? nameOf(piList[piSel]) : q); };
-  $('vl_pisug').addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-pn]'); if (t) piPick(t.getAttribute('data-pn')); });
+  $('vl_piadd').onclick = function () { var q = ($('vl_piq').value || '').trim(), o = q ? piList[piSel] : null; piPick(o && !o.x ? o.p : q); };
+  $('vl_pisug').addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-pn]'); if (t) piPick(t.getAttribute('data-pn'), true); });
   $('vl_pichip').addEventListener('click', function (e) { if (e.target.id === 'vl_pix') { var n = myName(); if (n) { setSel(n, { on: false }); count(); renderRaceBoard(true); } } });
   /* ---------- LAP X practice records (wide screens): days · summary · trend · sessions · laps of one session ---------- */
   var pxs = { day: '', sid: '' };
