@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.9
+// @version      3.2.10
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 93;   /* = VER below */
-  /* var VER = 93; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 94;   /* = VER below */
+  /* var VER = 94; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.9';
+  var VERSION = '3.2.10';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -72,7 +72,7 @@ window.__vlAuto = true;
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
-    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl', pracStart: true, pracStartWord: '스타트', selQ: '' };
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl', pracStart: true, pracStartWord: '스타트', selQ: '', resMode: 'ev', srM: 'pt', srN: 5, srMin: 2, srCls: '', srMerge: {} };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
@@ -610,6 +610,17 @@ window.__vlAuto = true;
     '.rg-h{font-size:22px;font-weight:800;margin:0 0 10px}.rg-h small{font-size:13px;color:#b8c0d0;font-weight:500}.rg-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}.rg-k div{background:#111729;border:1px solid #1f2740;border-radius:12px;padding:10px}.rg-k small{display:block;color:#b8c0d0;font-size:13px}.rg-k b{font-size:22px}' +
     '.rg-lg{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;margin:4px 0 6px}.rg-lg i{display:inline-block;width:18px;height:4px;border-radius:2px;margin-right:6px;vertical-align:3px}.rg-svg g:hover circle{stroke:#fff}' +
     '.vl-gap{max-height:none !important}';
+
+  css.textContent +=
+    '.sr-tg{display:inline-flex;border:1px solid #ff7a1a;border-radius:999px;overflow:hidden;margin-right:10px}.sr-tg button{background:none;border:0;color:#b8c0d0;padding:6px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}.sr-tg button.on{background:#ff7a1a;color:#111}' +
+    '.sr-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 10px}.sr-bar .lab{color:#b8c0d0;font-size:14px;margin-left:8px}.pjc .sr-v{min-width:1.6ch;text-align:center;font-size:15px}' +
+    '.sr-mg{background:#1a2135 !important;border:1px solid #2b3550 !important;color:#dfe4ee !important;border-radius:9px !important;padding:5px 8px !important;font-size:14px !important;height:auto !important;width:auto !important;margin:0 0 0 8px !important;font-family:inherit !important}' +
+    '.sr-xev{background:#141a2c;border:1px dashed #3a4460;border-radius:10px;padding:7px 10px;margin:0 0 10px;color:#b8c0d0;font-size:14px}.sr-xev b{color:#ff9e5e}' +
+    '#vl_root table.sr-t th,#vl_root table.sr-t td{white-space:nowrap;vertical-align:middle}#vl_root table.sr-t th.sr-ev{white-space:normal;min-width:64px;max-width:96px;line-height:1.25;cursor:pointer}#vl_root table.sr-t th.sr-ev:hover{color:#ff7a1a}' +
+    'table.sr-t th.sr-ev b{display:block;color:#fff;font-size:14px}table.sr-t th.sr-ev small{display:block;color:#9aa4b8;font-size:12px;font-weight:500}table.sr-t th.sr-ev i{display:block;font-style:normal;color:#7d8698;font-size:12px}' +
+    'table.sr-t td.sr-sc b{color:#3ddc84;font-size:17px}table.sr-t td.sr-sc small{display:block;color:#9aa4b8;font-size:12px}table.sr-t th.sr-sc .sr-n{margin-top:4px}table.sr-t th.sr-sc .sr-n small{color:#b8c0d0;font-weight:600;padding-left:4px}.sr-hs{display:block;color:#9aa4b8;font-size:12px;font-weight:500}' +
+    '#vl_root table.sr-t td.u b{color:#fff}#vl_root table.sr-t td.u small{color:#3ddc84;font-weight:800;font-size:13px}#vl_root table.sr-t td.sr-w b{color:#ffd54a}#vl_root table.sr-t td.x.sr-w b{color:#7d8698}table.sr-t td.na{color:#4a5266}.sr-wn{color:#ffd54a}table.sr-t tr.sr-o td{color:#8b93a6}table.sr-t tr.sr-sep td{color:#9aa4b8;font-size:13px;text-align:left !important;background:#0e1322}' +
+    '.rs-min{white-space:nowrap}.sr-lg{color:#b8c0d0;font-size:13px;margin-top:8px;line-height:1.6}.rs-e em b.sr-me{display:inline;color:#ff7a1a}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -4482,6 +4493,8 @@ window.__vlAuto = true;
     var box = $('vl_res'); if (!box) return;
     if (!ev.list) { box.innerHTML = '<div class="vl-pnone">' + (ev.err ? '⚠ ' + esc(ev.err) : '대회 목록을 읽는 중…') + '</div>'; evListLoad(renderRes); return; }
     var me = myName(), cache = evCacheGet(), q = nmKey(ev.q), mn = +cfg.resMin || 0;
+    var tog = '<span class="sr-tg"><button data-rmode="ev"' + (cfg.resMode !== 'sr' ? ' class="on"' : '') + '>📋 대회별</button><button data-rmode="sr"' + (cfg.resMode === 'sr' ? ' class="on"' : '') + '>🏆 종합 순위</button></span>';
+    if (cfg.resMode === 'sr') { renderSeries(box, '<div class="rs-top">' + tog + '<span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '<span class="lab sp">선수</span><button class="rs-who" data-dpk="1">' + (me ? '<span class="vl-mk">🏎</span>' + esc(me) : '선수 고르기') + ' ▾</button></div>'); return; }
     /* period + at least N drivers (today's event always) */
     var per = ev.list.filter(function (e) { return resPerOk(e.date || '') && (evIsToday(e) || !mn || (e.d || e.n || 0) >= mn); });
     var perAll = ev.list.filter(function (e) { return resPerOk(e.date || ''); }).length;
@@ -4496,7 +4509,7 @@ window.__vlAuto = true;
       .filter(function (e) { if (!me || e === todayE) return true; var ms = msOf[e.id]; return ms && ms.length && (!CAR || ms.some(function (m) { return (m.car || '').toLowerCase() === CAR; })); }).slice(0, 200);
     if (!ev.picked && todayE && lst.indexOf(todayE) >= 0) ev.sel = todayE.id;   /* today's event opens by itself */
     if (ev.sel && !lst.some(function (e) { return e.id === ev.sel; })) ev.sel = '';
-    var top = '<div class="rs-top"><span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
+    var top = '<div class="rs-top">' + tog + '<span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
       '<span class="lab sp">선수</span><button class="rs-who" data-dpk="1">' + (me ? '<span class="vl-mk">🏎</span>' + esc(me) : '선수 고르기') + ' ▾</button>' +
       (me && Object.keys(cars).length ? '<span class="lab sp">차</span><button class="rs-car' + (!CAR ? ' on' : '') + '" data-rcar="">전체 <small>' + joined + '</small></button>' + Object.keys(cars).map(function (k) { return '<button class="rs-car' + (CAR === k ? ' on' : '') + '" data-rcar="' + esc(k) + '" data-rcd="' + esc(cars[k].d) + '">' + esc(cars[k].d) + ' <small>' + cars[k].n + '</small></button>'; }).join('') : '') + '</div>';
     if (!ev.sel && lst.length && !me) ev.sel = lst[0].id;   /* a driver picked: nothing selected = his graph */
@@ -4669,11 +4682,164 @@ window.__vlAuto = true;
     svg += '</svg>';
     return head + '<div class="vl-lxc"><h5>클래스별 최종 순위<small>위쪽이 좋은 순위 · 점을 누르면 그 대회 열기</small></h5><div class="rg-lg">' + ks.map(function (k, ci) { return '<span><i style="background:' + COLS[ci % COLS.length] + '"></i>' + esc(pts[k].name) + ' · ' + pts[k].list.length + '개</span>'; }).join('') + '</div>' + svg + '</div>';
   }
+  /* ---------- 🏆 종합 순위: one class over the period's events (events with at least N drivers, same setting as the list) ---------- */
+  var SRM = [['pt', '포인트'], ['wr', '이긴 비율'], ['h2h', '맞대결'], ['sp', '속도']];
+  function srClsKey(n) { return nmKey(n).replace(/[^0-9a-z가-힣\/\.]+/g, ' ').split(' ').filter(Boolean).sort().join(' '); }
+  function srKeyOf(n) { var k = srClsKey(n), m = cfg.srMerge || {}, g = 0; while (m[k] && m[k] !== k && g++ < 8) k = m[k]; return k; }
+  /* every class of one event with its final places (final results, or the A-Main standings when there is no final page) */
+  function srClassRows(o) {
+    var out = [], seen = {};
+    (o.classes || []).forEach(function (c) { if (c.rows.length) { seen[nmKey(c.name)] = 1; out.push({ cls: c.name, rows: c.rows.map(function (r) { return { pos: r.pos, name: r.name }; }) }); } });
+    Object.keys(o.multi || {}).forEach(function (k) { var m = o.multi[k]; if (!seen[k] && m.rows && m.rows.length) out.push({ cls: m.name || k, rows: m.rows.map(function (r) { return { pos: r.pos, name: r.name }; }) }); });
+    return out;
+  }
+  function srGroups(per, cache) {
+    var C = {}, wait = 0;
+    per.slice().reverse().forEach(function (e) {   /* oldest first */
+      var o = evGet(e.id, cache); if (!o) { wait++; return; }
+      srClassRows(o).forEach(function (c) {
+        var k = srKeyOf(c.cls), g = C[k] = C[k] || { k: k, names: {}, evs: [], raw: {} }; g.raw[srClsKey(c.cls)] = c.cls;
+        g.names[c.cls] = (g.names[c.cls] || 0) + 1;
+        if (!g.evs.some(function (x) { return x.e === e; })) g.evs.push({ e: e, o: o, cls: c.cls, rows: c.rows });
+      });
+    });
+    Object.keys(C).forEach(function (k) { var g = C[k]; g.name = Object.keys(g.names).sort(function (a, b) { return g.names[b] - g.names[a]; })[0]; g.drv = {}; g.evs.forEach(function (x) { x.rows.forEach(function (r) { g.drv[pKey(r.name)] = 1; }); }); g.nd = Object.keys(g.drv).length; });
+    return { C: C, wait: wait };
+  }
+  /* fastest lap of every driver of this class in one event: qualifier round rankings (read when 속도 is picked, 4 pages at a time) */
+  function srFast(x, k, again) {
+    var o = x.o, out = {}, miss = 0;
+    (o.ranks || []).forEach(function (rk) {
+      var key = 'rk' + rk.name, rr = o.x && o.x[key] !== undefined ? o.x[key] : undefined;
+      if (rr === undefined) { if (Object.keys(ev.loading).filter(function (q) { return q[0] === 'x'; }).length < 4) rr = evX(x.e.id, o, key, rk.href, evParseRank, again); if (rr === undefined) { miss++; return; } }
+      (rr || []).forEach(function (r) { if (r.cls && srKeyOf(r.cls) !== k) return; var v = toSec(r.fast), p = pKey(r.name); if (v > 0 && (!out[p] || v < out[p])) out[p] = v; });
+    });
+    (o.mainRaces || []).forEach(function (r) { if (nmKey(r.name).indexOf(nmKey(x.cls)) !== 0) return; (o.races[r.id] || []).forEach(function (y) { var v = toSec(y.fast), p = pKey(y.name); if (v > 0 && (!out[p] || v < out[p])) out[p] = v; }); });
+    return { f: out, miss: miss };
+  }
+  function srRank(g, M, again) {
+    var N = +cfg.srN || 5, MIN = +cfg.srMin || 2, D = {}, E = g.evs.length;
+    g.evs.forEach(function (x, i) {
+      var cnt = x.rows.length;
+      x.rows.forEach(function (r) {
+        var p = pKey(r.name), d = D[p] = D[p] || { k: p, res: new Array(E), nm: '', car: '' };
+        if (d.res[i] && d.res[i].pos <= r.pos) return;
+        var sn = splitName(r.name); d.nm = sn.p || r.name; d.car = sn.c || d.car;
+        d.res[i] = { pos: r.pos, pts: Math.max(1, 101 - r.pos), wr: cnt > 1 ? (cnt - r.pos) / (cnt - 1) * 100 : 100 };
+      });
+    });
+    var miss = 0;
+    if (M === 'sp') g.evs.forEach(function (x, i) {
+      var F = srFast(x, g.k, again); miss += F.miss; var best = Infinity; Object.keys(F.f).forEach(function (p) { if (F.f[p] < best) best = F.f[p]; });
+      Object.keys(D).forEach(function (p) { var c = D[p].res[i]; if (c && F.f[p] && best < Infinity) { c.f = F.f[p]; c.sp = (F.f[p] / best - 1) * 100; } });
+    });
+    var L = Object.keys(D).map(function (p) { return D[p]; });
+    L.forEach(function (d) {
+      var at = []; d.res.forEach(function (c, i) { if (c) at.push(i); });
+      d.n = at.length; d.w = at.filter(function (i) { return d.res[i].pos === 1; }).length; d.used = {};
+      if (M === 'pt') { at.slice().sort(function (a, b) { return d.res[b].pts - d.res[a].pts || b - a; }).slice(0, N).forEach(function (i) { d.used[i] = 1; d.sc = (d.sc || 0) + d.res[i].pts; }); d.sc = d.sc || 0; }
+      else if (M === 'wr') { d.sc = at.reduce(function (t, i) { return t + d.res[i].wr; }, 0) / (at.length || 1); }
+      else if (M === 'sp') { var s = at.filter(function (i) { return d.res[i].sp >= 0; }); d.sn = s.length; d.sc = s.length ? s.reduce(function (t, i) { return t + d.res[i].sp; }, 0) / s.length : Infinity; }
+    });
+    if (M === 'h2h') L.forEach(function (a) {
+      a.hw = 0; a.hl = 0;
+      L.forEach(function (b) { if (a === b) return; a.res.forEach(function (c, i) { var o2 = b.res[i]; if (c && o2) { if (c.pos < o2.pos) a.hw++; else if (c.pos > o2.pos) a.hl++; } }); });
+      a.sc = a.hw + a.hl ? a.hw / (a.hw + a.hl) * 100 : 0;
+    });
+    var tie = function (a, b) {
+      if (b.w !== a.w) return b.w - a.w;
+      var pa = a.res.filter(Boolean).map(function (c) { return c.pos; }).sort(function (x, y) { return x - y; }), pb = b.res.filter(Boolean).map(function (c) { return c.pos; }).sort(function (x, y) { return x - y; });
+      for (var i = 0; i < Math.min(pa.length, pb.length); i++) if (pa[i] !== pb[i]) return pa[i] - pb[i];
+      for (i = E - 1; i >= 0; i--) { var x = a.res[i], y = b.res[i]; if (x && y && x.pos !== y.pos) return x.pos - y.pos; if (x && !y) return -1; if (y && !x) return 1; }
+      return nmSort(a.nm, b.nm);
+    };
+    L.sort(function (a, b) {
+      var x = a.sc, y = b.sc;
+      if (M === 'sp') { if (x !== y) { if (!isFinite(x)) return 1; if (!isFinite(y)) return -1; return x - y; } }
+      else if (Math.abs(x - y) > 1e-9) return y - x;
+      if (M === 'h2h' && b.hw !== a.hw) return b.hw - a.hw;
+      return tie(a, b);
+    });
+    var ok = L.filter(function (d) { return d.n >= MIN && (M !== 'sp' || d.sn > 0); }), out = L.filter(function (d) { return ok.indexOf(d) < 0; });
+    return { ok: ok, out: out, miss: miss };
+  }
+  function srScore(d, M, lead) {
+    if (M === 'pt') return '<b>' + d.sc + '</b>' + (lead && lead !== d ? '<small>−' + (lead.sc - d.sc) + '</small>' : '');
+    if (M === 'wr') return '<b>' + d.sc.toFixed(1) + '%</b>';
+    if (M === 'h2h') return '<b>' + Math.round(d.sc) + '%</b><small>' + d.hw + '승 ' + d.hl + '패</small>';
+    return isFinite(d.sc) ? '<b>+' + d.sc.toFixed(2) + '%</b><small>' + d.sn + '개 대회</small>' : '<b>-</b>';
+  }
+  function srCell(c, i, d, M) {
+    if (!c) return '<td class="na">-</td>';
+    var w = c.pos === 1 ? ' sr-w' : '';
+    if (M === 'pt') return '<td class="' + (d.used[i] ? 'u' : 'x') + w + '"><b>' + c.pos + '위</b><small>' + c.pts + '</small></td>';
+    if (M === 'wr') return '<td class="' + w + '"><b>' + c.pos + '위</b><small>' + Math.round(c.wr) + '%</small></td>';
+    if (M === 'sp') return '<td class="' + w + '"><b>' + c.pos + '위</b><small>' + (c.f ? c.f.toFixed(3) + ' · +' + c.sp.toFixed(2) + '%' : '-') + '</small></td>';
+    return '<td class="' + w + '"><b>' + c.pos + '위</b></td>';
+  }
+  function renderSeries(box, top) {
+    var me = myName(), mk = pKey(me), cache = evCacheGet(), mn = +cfg.resMin || 0, M = cfg.srM || 'pt';
+    var inPer = ev.list.filter(function (e) { return resPerOk(e.date || ''); });
+    var per = inPer.filter(function (e) { return !mn || (e.d || e.n || 0) >= mn; }), perX = inPer.filter(function (e) { return per.indexOf(e) < 0; });
+    var G = srGroups(per, cache), C = G.C, again = function () { if (cfg.tab === 'res' && cfg.resMode === 'sr') renderRes(); };
+    var ks = Object.keys(C).sort(function (a, b) { return C[b].evs.length - C[a].evs.length || nmSort(C[a].name, C[b].name); });
+    var mine = function (g) { return !!(me && g.drv[mk]); };
+    if (!C[cfg.srCls]) cfg.srCls = (ks.filter(function (k) { return mine(C[k]); })[0] || ks[0] || '');
+    var perN = RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1];
+    var left = '<div class="vl-lxc rs-l"><div class="rs-lh"><h5>클래스<small>' + perN + ' · 대회 ' + per.length + '개</small></h5>' +
+      '<div class="rs-min">참가 <span class="pjc"><button data-rmin="-1">−</button><input type="number" class="rminin" min="0" max="99" value="' + mn + '">명<button data-rmin="1">+</button></span> 이상만</div></div>' +
+      ks.map(function (k) {
+        var g = C[k], my = '';
+        if (mine(g)) { var R = srRank(g, M === 'sp' ? 'pt' : M), ix = R.ok.map(function (d) { return d.k; }).indexOf(mk), dd = R.ok[ix] || R.out.filter(function (d) { return d.k === mk; })[0]; my = '<em>🏎 ' + esc(me) + ' ' + (ix >= 0 ? '<b class="sr-me">' + (ix + 1) + '위</b>' : '순위 밖') + ' · ' + (dd ? dd.n : 0) + '개 출전</em>'; }
+        return '<div class="rs-e' + (k === cfg.srCls ? ' on' : '') + '" data-srcls="' + esc(k) + '"><b>' + esc(g.name) + '</b><span>대회 ' + g.evs.length + '개 · 선수 ' + g.nd + '명</span>' + my + '</div>';
+      }).join('') + (G.wait ? '<div class="rs-wait">⏳ 대회 결과 읽는 중 · ' + G.wait + '개 남음</div>' : '') + (!ks.length && !G.wait ? '<div class="vl-pnone">이 기간에 결과가 있는 대회가 없어요</div>' : '') + '</div>';
+    var g = C[cfg.srCls], right;
+    if (!g) right = '<div class="vl-pnone">' + (G.wait ? '대회 결과를 읽는 중…' : '클래스가 없어요') + '</div>';
+    else {
+      var R = srRank(g, M, again), N = +cfg.srN || 5, MIN = +cfg.srMin || 2, lead = R.ok[0];
+      var kids = Object.keys(cfg.srMerge || {}).filter(function (x) { return srKeyOf(x) === g.k && x !== g.k; });
+      right = '<div class="rs-h"><b>' + esc(g.name) + ' · ' + esc(perN) + ' 종합 순위</b><span>대회 ' + g.evs.length + '개 · 선수 ' + g.nd + '명 · 순위 ' + R.ok.length + '명</span></div>' +
+        '<div class="sr-bar">' + SRM.map(function (x) { return '<button class="rs-p' + (M === x[0] ? ' on' : '') + '" data-srm="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
+        '<span class="lab">최소</span><span class="pjc"><button data-srmin="-1">−</button><b class="sr-v">' + MIN + '</b>개 대회<button data-srmin="1">+</button></span>' +
+        '<select class="sr-mg" data-srmg="1"><option value="">다른 클래스와 합치기 ▾</option>' + ks.filter(function (k) { return k !== g.k; }).map(function (k) { return '<option value="' + esc(k) + '">' + esc(C[k].name) + ' (대회 ' + C[k].evs.length + '개)</option>'; }).join('') + '</select>' +
+        kids.map(function (x) { return '<button class="rs-car" data-srun="' + esc(x) + '">합침: ' + esc(g.raw[x] || x) + ' ✕</button>'; }).join('') + '</div>' +
+        (perX.length ? '<div class="sr-xev">제외된 대회 ' + perX.length + '개 (참가 ' + mn + '명 미만): ' + perX.slice(0, 8).map(function (e) { return esc(e.date.slice(5, 10).replace('-', '.')) + ' ' + esc(e.name) + ' <b>' + (e.d || e.n || 0) + '명</b>'; }).join(' · ') + (perX.length > 8 ? ' …' : '') + '</div>' : '') +
+        (M === 'sp' && R.miss ? '<div class="rs-wait">⏳ 예선 기록 읽는 중 · ' + R.miss + '쪽 남음</div>' : '');
+      var sh = M === 'pt' ? '점수<span class="pjc sr-n"><small>좋은</small><button data-srn="-1">−</button><b class="sr-v">' + N + '</b>개<button data-srn="1">+</button></span>' : M === 'wr' ? '이긴 비율<small class="sr-hs">평균</small>' : M === 'h2h' ? '맞대결 승률' : '베스트 랩<small class="sr-hs">그날 1등 대비</small>';
+      var th = '<tr><th>#</th><th>선수</th><th class="sr-sc">' + sh + '</th><th>대회</th><th>우승</th>' + g.evs.map(function (x) { return '<th class="sr-ev" data-ev="' + esc(x.e.id) + '" data-evc="' + esc(x.cls) + '" data-srgo="1" title="이 대회 결과 열기"><b>' + esc(x.e.date.slice(5, 10).replace('-', '.')) + '</b><small>' + esc(x.e.name) + '</small><i>' + (x.e.d || x.e.n || 0) + '명</i></th>'; }).join('') + '</tr>';
+      var row = function (d, rk) { var isMe = me && d.k === mk; return '<tr' + (isMe ? ' class="me"' : rk ? '' : ' class="sr-o"') + '><td>' + (rk || '-') + '</td><td>' + (isMe ? MK() : '') + esc(d.nm) + (d.car ? ' <span class="vl-car">(' + esc(d.car) + ')</span>' : '') + '</td><td class="sr-sc">' + srScore(d, M, lead) + '</td><td>' + d.n + '</td><td>' + (d.w ? '<b class="sr-wn">' + d.w + '</b>' : '-') + '</td>' + g.evs.map(function (x, i) { return srCell(d.res[i], i, d, M); }).join('') + '</tr>'; };   /* (res is sparse: map over the events) */
+      right += '<div class="vl-lxc"><div class="px-sw"><table class="vl-lt rs-t rs-m sr-t"><thead>' + th + '</thead><tbody>' + R.ok.map(function (d, i) { return row(d, i + 1); }).join('') +
+        (R.out.length ? '<tr class="sr-sep"><td colspan="' + (5 + g.evs.length) + '">' + (M === 'sp' ? '대회 ' + MIN + '개 미만 또는 랩 기록 없음' : '대회 ' + MIN + '개 미만') + ' — 순위에서 빠짐</td></tr>' + R.out.map(function (d) { return row(d, 0); }).join('') : '') + '</tbody></table></div>' +
+        '<div class="sr-lg">' + (M === 'pt' ? '점수 = 대회 최종 순위 1위 100 · 2위 99 · 3위 98 …(1점씩) · 좋은 ' + N + '개만 합계(초록), 빠진 대회 회색 취소선' : M === 'wr' ? '이긴 비율 = 그 대회 그 클래스에서 내 아래 선수 비율((인원 − 순위) ÷ (인원 − 1)), 나간 대회 평균' : M === 'h2h' ? '맞대결 = 같은 대회에 나온 두 선수 중 누가 앞섰는지, 전체 승률' : '속도 = 그 대회 그 클래스 가장 빠른 랩 대비 내 베스트 랩(예선 · 메인), 나간 대회 평균 — 작을수록 빠름') +
+        ' · 동점 = 우승 수 → 좋은 순위 수 → 최근 대회 · 대회 이름을 누르면 그 대회 결과</div></div>';
+    }
+    var ol = box.querySelector('.rs-l'), st = ol ? ol.scrollTop : 0;
+    box.innerHTML = top + '<div class="vl-res">' + left + '<div class="rs-r">' + right + '</div></div>';
+    var nl = box.querySelector('.rs-l'); if (nl) nl.scrollTop = st;
+    /* read the period's events in the background, 4 at a time */
+    var todo = per.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, Math.max(0, 4 - Object.keys(ev.loading).filter(function (k) { return /^\d+$/.test(k); }).length));
+    todo.forEach(function (e) { evLoad(e.id, again); });
+  }
   function setRmin(v) { v = Math.round(+v); if (!(v >= 0 && v <= 99)) return; cfg.resMin = v; save(); renderRes(); }
-  $('vl_res').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('rminin')) setRmin(e.target.value); });
+  $('vl_res').addEventListener('change', function (e) {
+    if (e.target.classList && e.target.classList.contains('rminin')) setRmin(e.target.value);
+    else if (e.target.getAttribute && e.target.getAttribute('data-srmg') && e.target.value) { cfg.srMerge = cfg.srMerge || {}; cfg.srMerge[e.target.value] = cfg.srCls; save(); renderRes(); }
+  });
   $('vl_res').addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('[data-ev]'), c = e.target.closest && e.target.closest('[data-cls]');
     var rp = e.target.closest && e.target.closest('[data-rper]'), rc = e.target.closest && e.target.closest('[data-rcar]'), rm = e.target.closest && e.target.closest('[data-rmin]');
+    var sx = e.target.closest && e.target.closest('[data-rmode],[data-srcls],[data-srm],[data-srmin],[data-srn],[data-srun],[data-srgo]');
+    if (sx) {
+      var at = function (k) { return sx.getAttribute(k); };
+      if (at('data-rmode') !== null) cfg.resMode = at('data-rmode');
+      else if (at('data-srcls') !== null) cfg.srCls = at('data-srcls');
+      else if (at('data-srm') !== null) cfg.srM = at('data-srm');
+      else if (at('data-srmin') !== null) cfg.srMin = Math.max(1, Math.min(20, (+cfg.srMin || 2) + (+at('data-srmin'))));
+      else if (at('data-srn') !== null) cfg.srN = Math.max(1, Math.min(30, (+cfg.srN || 5) + (+at('data-srn'))));
+      else if (at('data-srun') !== null) { delete (cfg.srMerge || {})[at('data-srun')]; }
+      else if (at('data-srgo') !== null) { cfg.resMode = 'ev'; ev.picked = true; ev.sel = at('data-ev'); ev.cls = at('data-evc') || ''; ev.jump = true; }
+      save(); renderRes(); return;
+    }
     if (rm) setRmin((+cfg.resMin || 0) + (+rm.getAttribute('data-rmin')));
     else if (rp) { cfg.resPer = rp.getAttribute('data-rper'); save(); renderRes(); }
     else if (rc) setCar(rc.getAttribute('data-rcar'), rc.getAttribute('data-rcd') || '');
