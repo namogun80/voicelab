@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 85;   /* = VER below */
-  /* var VER = 85; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 86;   /* = VER below */
+  /* var VER = 86; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.1';
+  var VERSION = '3.2.2';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -553,6 +553,16 @@
     '#vl_root .gap:has(#vl_pjm){display:none !important}#vl_tools #vl_zm>i{display:none}#vl_tools #vl_net:empty{display:none !important}#vl_tools #vl_zm{min-width:0}' +
     '#vl_root.vl-lx .vl-plx:not(.pit){grid-template-columns:230px minmax(0,1fr) 340px}.vl-plx:not(.pit) .px-kp em{white-space:normal !important;overflow:visible !important}#vl_root.vl-lx.vl-lxmd .vl-plx:not(.pit){grid-template-columns:190px minmax(0,1fr) 300px}' +
     '.px-right .px-lt th,.px-right .px-lt td{padding:5px 6px !important}.px-lt .lt-p{white-space:nowrap}.px-right .px-lt .lt-p small,.vl-plx.pit .px-lt .lt-p small{display:block;line-height:1.1}#vl_root.vl-lxmd .px-right .px-lt td{font-size:14px !important}';
+
+  css.textContent +=
+    '.rs-lh{position:sticky;top:-12px;z-index:2;background:#111729;margin:-12px -12px 6px;padding:12px 12px 4px}.rs-lh input{margin-bottom:4px !important}' +
+    '.rs-wait{color:#9aa4b8;font-size:13px;padding:9px 10px;border:1px dashed #2b3550;border-radius:10px;margin-top:6px}' +
+    '.rs-t td.u b{color:#3ddc84;font-weight:800}.rs-t td.x b{color:#7d8698;text-decoration:line-through;font-weight:600}.rs-t td small{display:block;color:#9aa4b8;font-size:12px;font-weight:500;line-height:1.15;white-space:nowrap}.rs-t td.x small{color:#6b7488}' +
+    '#vl_root .rs-m th,#vl_root .rs-m td{text-align:center !important}#vl_root .rs-m td:nth-child(2),#vl_root .rs-m th:nth-child(2){text-align:left !important}' +
+    '.rs-flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}.rs-flow>i.ar{align-self:center;color:#ff7a1a;font-weight:800;font-style:normal}.rs-flow span i{display:block;font-style:normal;font-size:12px;color:#9aa4b8;font-weight:500;margin-top:2px;white-space:nowrap}.rs-flow span i.g{color:#3ddc84;font-weight:800;font-size:13px}' +
+    '.rs-flow span.dr{opacity:.55;text-decoration:line-through}.rs-flow span.tot{border-color:#ff7a1a !important}' +
+    '.rs-mn2 tr.bu td:first-child{box-shadow:inset 3px 0 0 #3ddc84}.rs-bu{display:inline-block;background:#3ddc84;color:#0b0f1a;font-size:12px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:1px}' +
+    '#vl_root .rs-tabs{display:flex !important;flex-direction:column !important;align-items:stretch !important;gap:12px}#vl_root .rs-tabs>*{min-width:0}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -4206,24 +4216,80 @@
     });
     return out;
   }
+  /* Triple / Double A-Main standings page: legs per driver (place · points · laps/time) */
+  function evParseMulti(doc) {
+    var r = mainParseMulti(doc); if (!r) return null;
+    var t = doc.querySelector('table.multi_main');
+    r.legN = [].map.call(t.querySelectorAll('thead th'), function (x) { return x.textContent.replace(/\s+/g, ' ').trim(); }).filter(function (x) { return /^[A-Z]\d+$/.test(x); });
+    return r;
+  }
+  /* one race result (a main): place · driver · laps/time · fastest lap */
+  function evParseRace(doc) {
+    var t = doc.querySelector('table.race_result'); if (!t) return null;
+    var hr = [].filter.call(t.querySelectorAll('thead tr'), function (tr) { return /pos/i.test(tr.textContent) && /driver/i.test(tr.textContent); })[0]; if (!hr) return null;
+    var hs = [].map.call(hr.children, function (c) { return c.textContent.replace(/\s+/g, ' ').trim().toLowerCase(); });
+    var iL = hs.indexOf('laps/time'), iF = hs.indexOf('fastest lap'), iD = hs.indexOf('driver');
+    return [].map.call(t.querySelectorAll('tbody tr'), function (tr) {
+      var td = tr.children; if (td.length <= iD) return null;
+      var nm = td[iD].querySelector('.driver_name'), f = iF >= 0 && td[iF] ? td[iF].cloneNode(true) : null; if (f) [].forEach.call(f.querySelectorAll('sup'), function (x) { x.remove(); });
+      return { pos: +td[0].textContent.trim() || 0, name: (nm ? nm.textContent : cellTxt(td[iD]).replace(/view laps/i, '')).replace(/\s+/g, ' ').trim(), lt: iL >= 0 && td[iL] ? td[iL].textContent.trim() : '', fast: f ? f.textContent.trim() : '' };
+    }).filter(function (r) { return r && r.name; });
+  }
+  function evGet(id, cache) { return ev.data[id] || (cache && cache[id] && cache[id].v === 2 ? cache[id] : null); }
   function evLoad(id, cb) {
     if (ev.data[id]) { if (cb) cb(ev.data[id]); return; }
-    var c = evCacheGet()[id]; if (c && c.v === 1) { ev.data[id] = c; if (cb) cb(c); return; }
+    var c = evCacheGet()[id]; if (c && c.v === 2) { ev.data[id] = c; if (cb) cb(c); return; }
     if (ev.loading[id]) return; ev.loading[id] = 1;
     getDoc('/results/?p=view_event&id=' + id).then(function (doc) {
       var fin = doc.querySelector('a[href*="event_overall_ranking"]'), pts = doc.querySelector('a[href*="view_points"]');
-      var o = { v: 1, t: Date.now(), name: ((doc.querySelectorAll('h2,h3')[1] || {}).textContent || '').trim(), classes: [], points: {}, mains: [].map.call(doc.querySelectorAll('a[href*="view_race_result"]'), function (a) { return a.textContent.replace(/\s+/g, ' ').trim(); }).filter(function (x) { return /main/i.test(x); }) };
+      var o = { v: 2, t: Date.now(), name: ((doc.querySelectorAll('h2,h3')[1] || {}).textContent || '').trim(), classes: [], points: {}, multi: {}, races: {}, mainRaces: [],
+        mains: [].map.call(doc.querySelectorAll('a[href*="view_race_result"]'), function (a) { return a.textContent.replace(/\s+/g, ' ').trim(); }).filter(function (x) { return /main/i.test(x); }) };
+      /* the "Main Events" block of the race list: every main of every class, top (latest) first */
+      var sec = '';
+      [].forEach.call(doc.querySelectorAll('table.entry_list_data tr'), function (tr) {
+        var a = tr.querySelector('a[href*="view_race_result"]');
+        if (!a) { var tx = tr.textContent.replace(/\s+/g, ' ').trim(); if (/time completed/i.test(tx)) sec = tx; return; }
+        if (/main events/i.test(sec)) o.mainRaces.push({ id: (a.getAttribute('href').match(/id=(\d+)/) || [])[1], name: a.textContent.replace(/\s+/g, ' ').trim().replace(/^race\s*\d+\s*:\s*/i, '') });
+      });
       var jobs = [];
       if (fin) jobs.push(getDoc(fin.getAttribute('href')).then(function (d) { o.classes = evParseFinal(d); }));
       if (pts) jobs.push(getDoc(pts.getAttribute('href')).then(function (d) { o.points = evParsePoints(d); }, function () {}));
+      [].forEach.call(doc.querySelectorAll('a[href*="view_multi_main_result"]'), function (a) {
+        var cls = a.textContent.replace(/\s+/g, ' ').trim().replace(/\s*(double|triple|quad)?\s*a-?main results?$/i, '');
+        jobs.push(getDoc(a.getAttribute('href')).then(function (d) { var m = evParseMulti(d); if (m) o.multi[nmKey(cls)] = m; }, function () {}));
+      });
       return Promise.all(jobs).then(function () { return o; });
     }).then(function (o) {
       ev.data[id] = o; delete ev.loading[id];
-      var e = (ev.list || []).filter(function (x) { return x.id === id; })[0];
-      if (e && e.date && e.date < todayS()) evCachePut(id, o);   /* finished events never change */
+      if (evDone(id)) evCachePut(id, o);   /* finished events never change */
       if (cb) cb(o);
     }, function () { delete ev.loading[id]; if (cb) cb(null); });
   }
+  function evDone(id) { var e = (ev.list || []).filter(function (x) { return x.id === id; })[0]; return !!(e && e.date && e.date.slice(0, 10) < todayS()); }
+  /* the mains of one class (engine: A/B/C, 1/4 → 1/2 → final), top first; loads their results on demand */
+  function evClassMains(o, cls) {
+    var k = nmKey(cls);
+    return (o.mainRaces || []).filter(function (r) { return nmKey(r.name).indexOf(k) === 0; }).map(function (r) { return { id: r.id, label: r.name.slice(cls.length).replace(/^[\s\-:]+/, '') || r.name }; });
+  }
+  function evRacesLoad(id, o, list, cb) {
+    var need = list.filter(function (r) { return !o.races[r.id] && !ev.loading['r' + r.id]; }); if (!need.length) return false;
+    need.forEach(function (r) {
+      ev.loading['r' + r.id] = 1;
+      getDoc('/results/?p=view_race_result&id=' + r.id).then(function (d) { o.races[r.id] = evParseRace(d) || []; }, function () { o.races[r.id] = []; }).then(function () {
+        delete ev.loading['r' + r.id];
+        if (list.every(function (x) { return o.races[x.id]; })) { if (evDone(id)) evCachePut(id, o); cb(); }
+      });
+    });
+    return true;
+  }
+  /* legs that count in a Triple/Double A-Main total (the worse ones drop out) */
+  function multiUsed(m, row) {
+    var legs = row.legs.map(function (l, i) { return { i: i, l: l }; }).filter(function (x) { return x.l && x.l.L > 0; }), n = m.of || row.legs.length, k = n >= 3 ? n - 1 : n, used = {};
+    legs.sort(function (a, b) { return a.l.pts - b.l.pts; }).slice(0, k).forEach(function (x) { used[x.i] = 1; });
+    return used;
+  }
+  function fmtLegLT(l) { if (!l) return ''; var m = Math.floor(l.T / 60), r = l.T - m * 60; return l.L + '/' + m + ':' + (r < 10 ? '0' : '') + r.toFixed(3); }
+  function resNoBr(t) { return String(t || '').replace(/^\[\d+\]\s*/, ''); }
   function myName() { return Object.keys(cfg.sel || {}).filter(function (k) { return cfg.sel[k] && cfg.sel[k].on; })[0] || ''; }
   /* where a driver finished in one event: class, qualifying (points) place, the race he ended in, final place */
   /* every class a driver raced in one event: class, qualifying (points) place, the race he ended in, final place */
@@ -4231,12 +4297,14 @@
     if (!o || !nm) return []; var k = pKey(nm), out = [], seen = {};
     o.classes.forEach(function (c) { c.rows.forEach(function (r) { if (pKey(r.name) === k && !seen[nmKey(c.name)]) { seen[nmKey(c.name)] = 1; out.push({ cls: c.name, fin: r, car: splitName(r.name).c }); } }); });
     Object.keys(o.points || {}).forEach(function (ck) { var pr = o.points[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && pr) { seen[ck] = 1; out.push({ cls: ck, fin: null, car: splitName(pr.name).c }); } });
-    out.forEach(function (h) { var pt = (o.points || {})[nmKey(h.cls)]; h.q = pt ? pt.rows.filter(function (r) { return pKey(r.name) === k; })[0] : null; });
+    Object.keys(o.multi || {}).forEach(function (ck) { var mr = o.multi[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && mr) { seen[ck] = 1; out.push({ cls: ck, fin: null, car: splitName(mr.name).c }); } });
+    out.forEach(function (h) { var pt = (o.points || {})[nmKey(h.cls)], mu = (o.multi || {})[nmKey(h.cls)]; h.q = pt ? pt.rows.filter(function (r) { return pKey(r.name) === k; })[0] : null; h.mm = mu ? mu.rows.filter(function (r) { return pKey(r.name) === k; })[0] || null : null; });
     return out;
   }
   function evMine(o, nm) { return evMineAll(o, nm)[0] || null; }
   function evLine(m) {
     if (!m) return '';
+    if (m.mm) return (m.q ? '예선 ' + m.q.pos + '위 → ' : '') + 'A메인 ' + m.mm.legs.map(function (l) { return l && l.L > 0 ? l.pos : '-'; }).join('·') + '위(' + m.mm.points + '점) · 최종 <b>' + (m.fin ? m.fin.pos : m.mm.pos) + '위</b>';
     var race = m.fin ? m.fin.race : '', main = /main/i.test(race);
     return (m.q ? '예선 ' + m.q.pos + '위' : '') + (main ? (m.q ? ' → ' : '') + esc(race.replace(/\s*main/i, '메인')) + ' ' + ((m.fin.res.match(/^\[(\d+)\]/) || [])[1] ? (m.fin.res.match(/^\[(\d+)\]/) || [])[1] + '위' : '') : '') + (m.fin ? ' · 최종 <b>' + m.fin.pos + '위</b>' : '');
   }
@@ -4252,61 +4320,94 @@
     var me = myName(), cache = evCacheGet(), q = nmKey(ev.q);
     var per = ev.list.filter(function (e) { return resPerOk(e.date || ''); });
     /* the driver's cars in this period (events read so far) */
-    var cars = {}, joined = 0, msOf = {};
-    if (me) per.forEach(function (e) { var o = ev.data[e.id] || cache[e.id]; if (!o) return; var ms = evMineAll(o, me); msOf[e.id] = ms; if (!ms.length) return; joined++; var seen = {}; ms.forEach(function (m) { var k = (m.car || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; cars[k] = cars[k] || { d: m.car, n: 0 }; cars[k].n++; }); });
+    var cars = {}, joined = 0, msOf = {}, wait = 0;
+    if (me) per.forEach(function (e) { var o = evGet(e.id, cache); if (!o) { wait++; return; } var ms = evMineAll(o, me); msOf[e.id] = ms; if (!ms.length) return; joined++; var seen = {}; ms.forEach(function (m) { var k = (m.car || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; cars[k] = cars[k] || { d: m.car, n: 0 }; cars[k].n++; }); });
     var CAR = me && cfg.car && cars[cfg.car] ? cfg.car : '';
+    /* a driver picked: only the events he raced in (read so far) — none picked: every event */
     var lst = per.filter(function (e) { return !q || nmKey(e.name).indexOf(q) >= 0 || e.date.indexOf(ev.q) >= 0; })
-      .filter(function (e) { if (!CAR) return true; var ms = msOf[e.id]; return !ms || ms.some(function (m) { return (m.car || '').toLowerCase() === CAR; }); }).slice(0, 200);
+      .filter(function (e) { if (!me) return true; var ms = msOf[e.id]; return ms && ms.length && (!CAR || ms.some(function (m) { return (m.car || '').toLowerCase() === CAR; })); }).slice(0, 200);
     if (ev.sel && !lst.some(function (e) { return e.id === ev.sel; })) ev.sel = '';
     var top = '<div class="rs-top"><span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
       '<span class="lab sp">선수</span><button class="rs-who" data-dpk="1">' + (me ? '<span class="vl-mk">🏎</span>' + esc(me) : '선수 고르기') + ' ▾</button>' +
       (me && Object.keys(cars).length ? '<span class="lab sp">차</span><button class="rs-car' + (!CAR ? ' on' : '') + '" data-rcar="">전체 <small>' + joined + '</small></button>' + Object.keys(cars).map(function (k) { return '<button class="rs-car' + (CAR === k ? ' on' : '') + '" data-rcar="' + esc(k) + '" data-rcd="' + esc(cars[k].d) + '">' + esc(cars[k].d) + ' <small>' + cars[k].n + '</small></button>'; }).join('') : '') + '</div>';
     if (!ev.sel && lst.length) ev.sel = lst[0].id;
-    var left = '<div class="vl-lxc rs-l"><h5>대회 목록<small>' + RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1] + ' ' + per.length + '개' + (me ? ' · 참가 ' + joined : '') + '</small></h5><input id="vl_rsq" type="search" placeholder="대회 이름 · 날짜 찾기" value="' + esc(ev.q) + '">' +
+    var perN = RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1];
+    var left = '<div class="vl-lxc rs-l"><div class="rs-lh"><h5>대회 목록<small>' + perN + ' ' + per.length + '개' + (me ? ' 중 참가 ' + joined : '') + '</small></h5><input id="vl_rsq" type="search" placeholder="대회 이름 · 날짜 찾기" value="' + esc(ev.q) + '"></div>' +
       lst.map(function (e) {
-        var o = ev.data[e.id] || cache[e.id], ms = o && me ? evMineAll(o, me) : [], m = ms[0];
-        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + '</b><span>' + esc(e.date.replace(/-/g, '.')) + ' · ' + e.n + '명</span>' + (m ? '<em>' + MK() + esc(me) + (ms.length > 1 ? ' · ' + ms.length + '종목' : '') + '</em>' + ms.map(function (x) { return '<em class="cl">' + (ms.length > 1 ? esc(x.cls) + (x.car ? ' (' + esc(x.car) + ')' : '') + ' · ' : x.car ? '(' + esc(x.car) + ') ' : '') + evLine(x) + '</em>'; }).join('') : o && me ? '<em class="no">참가 안 함</em>' : '') + '</div>';
-      }).join('') + '</div>';
-    var o = ev.data[ev.sel], right;
-    if (!ev.sel) right = '<div class="vl-pnone">' + (lst.length ? '' : '이 기간에 ' + (CAR ? (cfg.carD || CAR) + '(으)로 참가한 ' : '') + '대회가 없어요') + '</div>';
-    else if (!o) { right = '<div class="vl-pnone">대회 결과를 읽는 중…</div>'; evLoad(ev.sel, function () { if (cfg.tab === 'res') renderRes(); }); }
+        var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0];
+        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + '</b><span>' + esc(e.date.replace(/-/g, '.').slice(0, 10)) + ' · ' + e.n + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
+      }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (!lst.length && !(me && wait) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
+    var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); };
+    if (!ev.sel) right = '<div class="vl-pnone">' + (me && wait ? '참가한 대회를 찾는 중…' : '') + '</div>';
+    else if (!o) { right = '<div class="vl-pnone">대회 결과를 읽는 중…</div>'; evLoad(ev.sel, again); }
     else {
       var ms = me ? evMineAll(o, me) : [], m = ms[0] || null, names = o.classes.map(function (c) { return c.name; });
-      Object.keys(o.points || {}).forEach(function (k) { if (!names.some(function (n) { return nmKey(n) === k; })) names.push(k); });
+      Object.keys(o.multi || {}).concat(Object.keys(o.points || {})).forEach(function (k) { if (!names.some(function (n) { return nmKey(n) === k; })) names.push(k); });
       if (!ev.cls || !names.some(function (n) { return nmKey(n) === nmKey(ev.cls); })) ev.cls = m ? m.cls : names[0] || '';
-      var cl = o.classes.filter(function (c) { return nmKey(c.name) === nmKey(ev.cls); })[0], pt = (o.points || {})[nmKey(ev.cls)], mk = pKey(me);
+      var ck = nmKey(ev.cls), cl = o.classes.filter(function (c) { return nmKey(c.name) === ck; })[0], pt = (o.points || {})[ck], mu = (o.multi || {})[ck], mk = pKey(me);
       var meta = (ev.list.filter(function (e) { return e.id === ev.sel; })[0] || {});
-      right = '<div class="rs-h"><b>' + esc(meta.name || o.name) + '</b><span>' + esc((meta.date || '').replace(/-/g, '.')) + '</span><a href="/results/?p=view_event&id=' + esc(ev.sel) + '" target="_blank" rel="noopener">LiveRC ↗</a></div>' +
-        '<div class="rs-chips">' + names.map(function (n) { return '<button class="rs-c' + (nmKey(n) === nmKey(ev.cls) ? ' on' : '') + '" data-cls="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
+      /* engine: the mains this driver ran (results read on demand) */
+      var mains = !mu && me ? evClassMains(o, ev.cls) : [], waitR = mains.length && evRacesLoad(ev.sel, o, mains, again);
+      var mine = mains.filter(function (r) { return (o.races[r.id] || []).some(function (x) { return pKey(x.name) === mk; }); });
+      var upOf = function (r) { var i = mains.indexOf(r), up = {}; mains.slice(0, i).forEach(function (u) { (o.races[u.id] || []).forEach(function (x) { up[pKey(x.name)] = 1; }); }); return up; };
+      right = '<div class="rs-h"><b>' + esc(meta.name || o.name) + '</b><span>' + esc((meta.date || '').replace(/-/g, '.').slice(0, 10)) + '</span><a href="/results/?p=view_event&id=' + esc(ev.sel) + '" target="_blank" rel="noopener">LiveRC ↗</a></div>' +
+        '<div class="rs-chips">' + names.map(function (n) { return '<button class="rs-c' + (nmKey(n) === ck ? ' on' : '') + '" data-cls="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
       if (me) {
         var flow = function (mm) {
-          return '<div class="rs-flow">' + (mm.q ? '<span><small>예선 포인트</small>' + mm.q.pos + '위</span>' : '') +
-            (mm.fin && /main/i.test(mm.fin.race) ? '<span><small>' + esc(mm.fin.race) + '</small>' + (((mm.fin.res.match(/^\[(\d+)\]/) || [])[1]) || '-') + '위</span>' : '') +
-            (mm.fin ? '<span class="fin"><small>최종</small>' + mm.fin.pos + '위</span><span><small>기록</small>' + esc(mm.fin.res.replace(/^\[\d+\]\s*/, '')) + '</span>' : '') + '</div>';
+          var on = nmKey(mm.cls) === ck, h = '<div class="rs-flow">' + (mm.q ? '<span><small>예선 포인트</small>' + mm.q.pos + '위</span><i class="ar">→</i>' : '');
+          if (mm.mm) {   /* Triple / Double A-Main: every leg, then the total */
+            var M = (o.multi || {})[nmKey(mm.cls)], used = multiUsed(M, mm.mm), drop = [];
+            h += mm.mm.legs.map(function (l, i) { var nm = M.legN[i] || 'A' + (i + 1); if (l && l.L > 0 && !used[i]) drop.push(nm); return '<span class="' + (l && l.L > 0 && !used[i] ? 'dr' : '') + '"><small>' + esc(nm) + '</small>' + (l && l.L > 0 ? l.pos + '위' : '-') + (l && l.L > 0 ? '<i>' + l.pts + '점 · ' + fmtLegLT(l) + '</i>' : '') + '</span>'; }).join('') +
+              '<span class="tot"><small>' + (drop.length ? esc(drop.join('·')) + ' 빠짐' : '합계') + '</small>' + mm.mm.points + '점</span><i class="ar">→</i>';
+          } else if (on && mine.length) {   /* engine: mains from the lowest up, bump-ups in green */
+            h += mine.slice().reverse().map(function (r) { var x = (o.races[r.id] || []).filter(function (y) { return pKey(y.name) === mk; })[0], up = upOf(r)[mk]; return '<span><small>' + esc(r.label) + '</small>' + x.pos + '위<i' + (up ? ' class="g">⬆ 범프 업' : '>' + esc(x.lt)) + '</i></span><i class="ar">→</i>'; }).join('');
+          } else if (mm.fin && /main/i.test(mm.fin.race)) h += '<span><small>' + esc(mm.fin.race) + '</small>' + (((mm.fin.res.match(/^\[(\d+)\]/) || [])[1]) || '-') + '위</span><i class="ar">→</i>';
+          h += mm.fin ? '<span class="fin"><small>최종</small>' + mm.fin.pos + '위</span>' + (mm.mm ? '' : '<span><small>기록</small>' + esc(resNoBr(mm.fin.res)) + '</span>') : (mm.mm ? '<span class="fin"><small>최종</small>' + mm.mm.pos + '위</span>' : '');
+          return h.replace(/<i class="ar">→<\/i>$/, '') + '</div>';
         };
         right += ms.length ? '<div class="rs-me"><b>' + MK() + esc(me) + '</b>' + (ms.length > 1 ? ' <span class="rs-n">' + ms.length + '종목 참가</span>' : '') +
-          ms.map(function (mm) { var on = nmKey(mm.cls) === nmKey(ev.cls); return '<div class="rs-mc' + (on ? ' on' : '') + '" data-cls="' + esc(mm.cls) + '"><div class="rs-mn">' + esc(mm.cls) + (mm.car ? ' <span class="vl-car">(' + esc(mm.car) + ')</span>' : '') + (on ? '' : ' <small>눌러서 표 보기</small>') + '</div>' + flow(mm) + '</div>'; }).join('') + '</div>'
+          ms.map(function (mm) { var on = nmKey(mm.cls) === ck; return '<div class="rs-mc' + (on ? ' on' : '') + '" data-cls="' + esc(mm.cls) + '"><div class="rs-mn">' + esc(mm.cls) + (mm.car ? ' <span class="vl-car">(' + esc(mm.car) + ')</span>' : '') + (on ? '' : ' <small>눌러서 표 보기</small>') + '</div>' + flow(mm) + '</div>'; }).join('') + '</div>'
           : '<div class="rs-me no">' + MK() + esc(me) + ' — 이 대회 기록 없음</div>';
       }
-      var mark = function (n) { return me && pKey(n) === mk ? ' class="me"' : ''; };
-      var ptsT = pt ? '<div class="vl-lxc"><h5>예선 포인트<small>굵게 = 합계에 들어감 · 회색 취소선 = 빠짐</small></h5><table class="vl-lt rs-t"><thead><tr><th>#</th><th>선수</th><th>합계</th>' + pt.rounds.map(function (r) { return '<th>' + r + '</th>'; }).join('') + '</tr></thead><tbody>' +
-        pt.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + (me && pKey(r.name) === mk ? MK() : '') + nmH(r.name) + '</td><td><b>' + esc(r.tot) + '</b></td>' + r.r.map(function (x) { return !x || x.none ? '<td class="x">-</td>' : '<td' + (x.u ? ' style="font-weight:800;color:#fff"' : ' class="x"') + ' title="' + esc(x.lt) + '">' + esc(x.p) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>' : '';
-      var finT = cl ? '<div class="vl-lxc"><h5>최종 결과<small>' + (o.mains.length ? '메인 ' + o.mains.length + '개' : '') + '</small></h5><table class="vl-lt rs-t"><thead><tr><th>#</th><th>선수</th><th>기록</th><th>레이스</th></tr></thead><tbody>' +
-        cl.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + (me && pKey(r.name) === mk ? MK() : '') + nmH(r.name) + '</td><td>' + esc(r.res) + '</td><td>' + esc(r.race) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '';
-      right += '<div class="rs-tabs">' + (ptsT + finT || '<div class="vl-pnone">이 클래스의 결과가 아직 없어요</div>') + '</div>';
+      var isMe = function (n) { return me && pKey(n) === mk; }, mark = function (n) { return isMe(n) ? ' class="me"' : ''; }, who = function (n) { return (isMe(n) ? MK() : '') + nmH(n); };
+      var finT = '';
+      if (mu) {   /* electric: each A-Main leg (points · laps/time), dropped legs struck through */
+        finT = '<div class="vl-lxc"><h5>최종 결과<small>A메인 ' + mu.legN.length + '레그' + (mu.legN.length >= 3 ? ' · 좋은 ' + (mu.legN.length - 1) + ' 합계' : ' · 합계') + (mu.of > mu.done ? ' · ' + mu.done + '/' + mu.of + ' 끝남' : '') + '</small></h5><div class="px-sw"><table class="vl-lt rs-t rs-m"><thead><tr><th>#</th><th>선수</th>' + mu.legN.map(function (n) { return '<th>' + esc(n) + '</th>'; }).join('') + '<th>합계</th><th>기록</th></tr></thead><tbody>' +
+          mu.rows.map(function (r) {
+            var used = multiUsed(mu, r), f = cl ? cl.rows.filter(function (x) { return pKey(x.name) === pKey(r.name); })[0] : null;
+            return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td>' + r.legs.map(function (l, i) { return !l || !(l.L > 0) ? '<td class="x">' + (l ? '<b>' + l.pts + '</b><small>0랩</small>' : '-') + '</td>' : '<td' + (used[i] ? ' class="u"' : ' class="x"') + '><b>' + l.pts + '</b><small>' + fmtLegLT(l) + '</small></td>'; }).join('') +
+              '<td><b>' + r.points + '</b></td><td>' + (f ? esc(resNoBr(f.res)) : '') + '</td></tr>';
+          }).join('') + '</tbody></table></div></div>';
+      } else if (cl) finT = '<div class="vl-lxc"><h5>최종 결과<small>' + (o.mains.length ? '메인 ' + o.mains.length + '개' : '') + '</small></h5><table class="vl-lt rs-t"><thead><tr><th>#</th><th>선수</th><th>기록</th><th>레이스</th></tr></thead><tbody>' +
+        cl.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td><td>' + esc(resNoBr(r.res)) + '</td><td>' + esc(r.race) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      /* engine + a driver: the mains he ran, top main first; who moved up from a main is marked in that main */
+      var mainT = mine.map(function (r) {
+        var up = upOf(r), isTop = mains.indexOf(r) === 0;
+        return '<div class="vl-lxc"><h5>' + esc(r.label) + '<small>' + esc(ev.cls) + '</small></h5><table class="vl-lt rs-t rs-mn2"><thead><tr><th>#</th><th>선수</th><th>랩/시간</th><th>베스트</th></tr></thead><tbody>' +
+          (o.races[r.id] || []).map(function (x) { var b = !isTop && up[pKey(x.name)]; return '<tr' + (isMe(x.name) ? ' class="me"' : b ? ' class="bu"' : '') + '><td>' + x.pos + '</td><td>' + who(x.name) + (b ? ' <span class="rs-bu">⬆ 범프 업</span>' : '') + '</td><td>' + esc(x.lt) + '</td><td>' + esc(x.fast) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      }).join('') + (waitR ? '<div class="vl-pnone">메인 결과를 읽는 중…</div>' : '');
+      var ptsT = pt ? '<div class="vl-lxc"><h5>예선 포인트<small>초록 = 합계에 들어감 · 회색 취소선 = 빠짐</small></h5><div class="px-sw"><table class="vl-lt rs-t rs-m"><thead><tr><th>#</th><th>선수</th><th>합계</th>' + pt.rounds.map(function (r) { return '<th>' + r + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        pt.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td><td><b>' + esc(r.tot) + '</b></td>' + r.r.map(function (x) { return !x || x.none ? '<td class="x">-</td>' : '<td' + (x.u ? ' class="u"' : ' class="x"') + '><b>' + esc(x.p) + '</b><small>' + esc(x.lt) + '</small></td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div></div>' : '';
+      right += '<div class="rs-tabs">' + (finT + mainT + ptsT || '<div class="vl-pnone">이 클래스의 결과가 아직 없어요</div>') + '</div>';
     }
     var foc = document.activeElement && document.activeElement.id === 'vl_rsq', ss = foc ? document.activeElement.selectionStart : 0;
+    var ol = box.querySelector('.rs-l'), st = ol ? ol.scrollTop : 0;
     box.innerHTML = top + '<div class="vl-res">' + left + '<div class="rs-r">' + right + '</div></div>';
+    var nl = box.querySelector('.rs-l');
+    if (nl) {   /* keep the list where it was; a clicked event goes to the top of the list */
+      nl.scrollTop = st;
+      if (ev.jump) { var it = nl.querySelector('.rs-e.on'), lh = nl.querySelector('.rs-lh'); if (it) nl.scrollTop = Math.max(0, it.offsetTop - (lh ? lh.offsetHeight : 0) - 4); ev.jump = false; }
+    }
     if (foc) { var qi = $('vl_rsq'); qi.focus(); try { qi.setSelectionRange(ss, ss); } catch (e) {} }
-    /* my line on the list: load a few recent events in the background (finished ones are kept on this device) */
-    if (me) { var todo = per.filter(function (e) { return !ev.data[e.id] && !cache[e.id] && !ev.loading[e.id]; }).slice(0, 2); todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'res') renderRes(); }); }); }
+    /* which events the driver raced in: read the period's events in the background, 4 at a time (finished ones are kept on this device) */
+    if (me) { var todo = per.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, Math.max(0, 4 - Object.keys(ev.loading).filter(function (k) { return k.charAt(0) !== 'r'; }).length)); todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'res') renderRes(); }); }); }
   }
   $('vl_res').addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('[data-ev]'), c = e.target.closest && e.target.closest('[data-cls]');
     var rp = e.target.closest && e.target.closest('[data-rper]'), rc = e.target.closest && e.target.closest('[data-rcar]');
     if (rp) { cfg.resPer = rp.getAttribute('data-rper'); save(); renderRes(); }
     else if (rc) setCar(rc.getAttribute('data-rcar'), rc.getAttribute('data-rcd') || '');
-    else if (a) { ev.sel = a.getAttribute('data-ev'); ev.cls = ''; renderRes(); }
+    else if (a) { ev.sel = a.getAttribute('data-ev'); ev.cls = ''; ev.jump = true; renderRes(); }
     else if (c) { ev.cls = c.getAttribute('data-cls'); renderRes(); }
   });
   $('vl_res').addEventListener('input', function (e) { if (e.target.id === 'vl_rsq') { ev.q = e.target.value; renderRes(); } });
@@ -4327,7 +4428,7 @@
     var cache = evCacheGet(), lst = ev.list.slice(0, myMore), found = 0, wait = 0;
     h += '<div class="my-sec">지난 대회</div>';
     lst.forEach(function (e) {
-      var o = ev.data[e.id] || cache[e.id];
+      var o = evGet(e.id, cache);
       if (!o) { wait++; return; }
       var ms = evMineAll(o, me); if (!ms.length) return; found++;
       h += '<div class="vl-lxc my-ev"><div class="my-eh"><b>' + esc(e.name) + '</b><span>' + esc(e.date.slice(5).replace('-', '/')) + '</span></div>' + ms.map(function (m) { return '<div class="my-ec">' + esc(m.cls) + (m.car ? ' (' + esc(m.car) + ')' : '') + '</div><div class="my-el">' + evLine(m) + (m.fin ? ' <small>' + esc(m.fin.res.replace(/^\[\d+\]\s*/, '')) + '</small>' : '') + '</div>'; }).join('') + '</div>';
@@ -4336,7 +4437,7 @@
     else if (!found) h += '<div class="vl-pnone">최근 ' + lst.length + '개 대회에 ' + esc(me) + ' 선수 기록이 없어요.</div>';
     if (!wait && ev.list.length > myMore) h += '<button class="pb my-more" id="vl_mymore">더 찾아보기 (' + myMore + ' → ' + (myMore + 12) + '개 대회)</button>';
     box.innerHTML = h;
-    var todo = lst.filter(function (e) { return !ev.data[e.id] && !cache[e.id] && !ev.loading[e.id]; }).slice(0, 2);
+    var todo = lst.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, 2);
     todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'my') renderMy(); }); });
   }
   $('vl_my').addEventListener('click', function (e) { if (e.target.id === 'vl_mymore') { myMore += 12; renderMy(); } });
