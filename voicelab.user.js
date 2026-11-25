@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.14
+// @version      3.2.15
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 98;   /* = VER below */
-  /* var VER = 98; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 99;   /* = VER below */
+  /* var VER = 99; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.14';
+  var VERSION = '3.2.15';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -631,7 +631,9 @@ window.__vlAuto = true;
   css.textContent +=
     '#vl_clpop .cp-m{background:#1d1430;border:1px solid #ff2bd6;border-radius:10px;padding:8px 10px;margin:8px 0;font-size:14px}#vl_clpop .cp-m small{color:#b8c0d0}#vl_clpop .cp-mc{display:inline-flex;align-items:center;gap:5px;border:1px solid #ff7a1a;border-radius:999px;padding:2px 4px;margin:0 4px}#vl_clpop .cp-mc button{width:28px;height:28px;border-radius:50%;border:0;background:#2a2f44;color:#fff;font-size:16px;cursor:pointer}#vl_clpop .cp-mc b{font-size:16px}' +
     /* qualifier standings: left and bigger than the graph (no driver), under the board above the graphs (driver picked); the picked driver orange */
-    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_qual,#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxm{grid-column:1;order:2}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxg{grid-column:2;order:3}' +
+    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_qual,#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxm{grid-column:1/-1;order:2}#vl_root.vl-lx #vl_rb.vl-nosel #vl_lxL>#vl_lxg{grid-column:1/-1;order:3}' +
+    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_qual .vl-qpair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;align-items:start}#vl_root.vl-lx #vl_rb.vl-nosel #vl_qual .vl-qs{margin:0 !important;min-width:0}' +
+    '#vl_root.vl-lx #vl_rb.vl-nosel #vl_qual .vl-qsc{--qh:none !important;max-height:none !important}#vl_root.vl-lx #vl_rb.vl-nosel #vl_qual .vl-qmore{display:none}' +
     '#vl_root.vl-lx #vl_qual table td{font-size:18px !important;padding-top:8px !important;padding-bottom:8px !important}#vl_root.vl-lx #vl_qual table th{font-size:14px !important}#vl_root.vl-lx #vl_rb.vl-lxsel #vl_qual table td{font-size:16px !important;padding-top:6px !important;padding-bottom:6px !important}' +
     '#vl_root.vl-lx #vl_rb.vl-lxsel:not(.vl-lxst) #vl_lxL>.tw{order:1}#vl_root.vl-lx #vl_rb.vl-lxsel.vl-hasq #vl_qual{display:block !important;order:2}#vl_root.vl-lx #vl_rb.vl-lxsel:not(.vl-lxst) #vl_lxL>#vl_lxg{order:3}' +
     '#vl_root.vl-lx #vl_qual tr.vl-qv td,#vl_root.vl-lx #vl_qual tr.vl-qv .vl-qn{color:#ff7a1a !important;font-weight:800}#vl_root.vl-lx #vl_qual tr.vl-qv td:first-child{box-shadow:inset 4px 0 0 #ff7a1a}';
@@ -3030,7 +3032,7 @@ window.__vlAuto = true;
       var nm = nameOf(d); if (!nm) return;
       var e = get(nm); e.live = true; e.voice = !!match(d); e.name = nm;
       if (!withLive) { if (running) delete e.r[R]; return; }
-      var lt = projLT(d) || (+d.laps > 0 ? ltParse(d.laps + '/' + short(d.elapsedTime)) : null);
+      var lt = projLT(d) || (+d.laps > 0 && secs(d.elapsedTime) / +d.laps >= 3 ? ltParse(d.laps + '/' + short(d.elapsedTime)) : null);   /* start-line crossing only (1 lap, 2 s) → waiting */
       if (lt && (running || !e.r[R])) { e.r[R] = lt; e.est[R] = true; }
     });
     return Object.keys(by).map(function (k) { return by[k]; });
