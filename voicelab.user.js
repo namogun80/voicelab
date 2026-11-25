@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.6
+// @version      3.2.7
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 90;   /* = VER below */
-  /* var VER = 90; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 91;   /* = VER below */
+  /* var VER = 91; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.6';
+  var VERSION = '3.2.7';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -2498,11 +2498,10 @@ window.__vlAuto = true;
         '<div class="vl-bc mine">' +
         '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
-        '<div class="bc-row">' +
-          cell('진행 중', '-', 'lt', ' data-lt="' + esc(r.key) + '"') +
+        '<div class="bc-row">' + (!nbOn ? cell('베스트', esc(r.fast)) + cell('랩', (+r.l || 0) + '') + cell('Top 3', esc(r.t3)) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
           cell('베스트', esc(r.fast)) +
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
-          cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
+          cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '')) +
         '</div>' + (r.pj ? '<div class="bc-pj">예상 기록 <b>' + esc(r.pj) + '</b>' + (raceDur() ? '<small>' + fmtClock(raceDur()) + ' 기준</small>' : '') + '</div>' : '') + '</div>' +
         (nbOn && back ? rival(back, 'bh' + (back.closeTo ? ' cl' : ''), '▼ 뒤차', gapLab(back.bhd, '뒤'), bhdSt[back.key], false) : '') +
         '</div>';
@@ -2815,7 +2814,7 @@ window.__vlAuto = true;
         /* LAPS = laps completed · race time that lap was completed at (not in open practice, hidden when narrow) · time on the lap in progress (live) */
         if (c.k === 'l') return '<td class="c-l"' + cs + '><span class="ln">' + (+r.l || 0) + '랩</span>' +
           (cfg.raceOn !== false && cfg.lapPass !== false && !prc ? '<span class="ps">' + (+r.l > 0 ? esc(r.el) : '-') + '</span>' : '') +
-          (cfg.raceOn !== false && cfg.lapLive !== false ? '<span class="lt" data-lt="' + esc(r.key) + '">-</span>' : '') + '</td>';
+          (cfg.raceOn !== false && cfg.lapLive !== false && !prc ? liveSpan(r.key, 'span') : '') + '</td>';
         if (c.k === 'bhd') return '<td class="c-bhd' + (r.bhd.charAt(0) === '+' ? ' lapgap' : ' ' + r.bhdCls) + '"' + cs + '>' + esc(r.bhd) + dtx + '</td>';
         return '<td class="c-' + c.k + '"' + cs + '>' + esc(r[c.k]) + '</td>';
       }).join('') + '</tr>';
@@ -3604,6 +3603,14 @@ window.__vlAuto = true;
     }
   }
   /* running time of the lap in progress: green, orange within liveSec of the driver's best, red past the best; stops when the race is over */
+  function liveOf(k) {
+    if (rs && rs.fin && rs.fin[k]) return { t: '🏁', c: '' };
+    var t0 = lastCross[k], sc = SC(), d = null; if (!t0 || !sc) return { t: '', c: '' };
+    list(sc.driverData).some(function (x) { if (keyOf(x) === k) { d = x; return true; } return false; }); if (!d) return { t: '', c: '' };
+    var t = (Date.now() - t0) / 1000, best = siteFast(d), ns = +cfg.liveSec; if (!(ns >= 0)) ns = 2;
+    return { t: fmtRun(t), c: best > 0 && t > best ? (cfg.liveOver || '#ff5252') : best > 0 && t >= best - ns ? (cfg.liveNear || '#ffa94d') : (cfg.liveOk || '#3ddc84') };
+  }
+  function liveSpan(k, tag) { var v = liveOf(k); return '<' + tag + ' class="lt" data-lt="' + esc(k) + '"' + (v.c ? ' style="color:' + v.c + '"' : '') + '>' + v.t + '</' + tag + '>'; }
   function fmtRun(t) { var m = Math.floor(t / 60), r = t - m * 60; return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1); }
   function updLive() {
     if (cfg.raceOn === false || cfg.lapLive === false || cfg.tab !== 'board') return;
@@ -3614,7 +3621,7 @@ window.__vlAuto = true;
     var now = Date.now(), ns = +cfg.liveSec; if (!(ns >= 0)) ns = 2;
     els.forEach(function (el) {
       var k = el.getAttribute('data-lt'), t0 = lastCross[k], d = byKey[k];
-      if (!t0 || !d || (rs && rs.fin[k])) { el.textContent = rs && rs.fin[k] ? '🏁' : '-'; el.style.color = ''; return; }   /* finished: the clock stops */
+      if (!t0 || !d || (rs && rs.fin[k])) { el.textContent = rs && rs.fin[k] ? '🏁' : ''; el.style.color = ''; return; }   /* finished: the clock stops; not known yet: blank */
       var t = (now - t0) / 1000, best = siteFast(d);
       el.textContent = fmtRun(t);
       el.style.color = best > 0 && t > best ? (cfg.liveOver || '#ff5252') : best > 0 && t >= best - ns ? (cfg.liveNear || '#ffa94d') : (cfg.liveOk || '#3ddc84');
