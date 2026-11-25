@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.7
+// @version      3.2.8
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 91;   /* = VER below */
-  /* var VER = 91; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 92;   /* = VER below */
+  /* var VER = 92; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.7';
+  var VERSION = '3.2.8';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -602,6 +602,14 @@ window.__vlAuto = true;
     '#vl_pitin .pc.pq{border-style:dashed;color:#ffd8b8}#vl_pitin .pc.pq small{color:#b8c0d0;font-weight:500}' +
     '#vl_pitin .pi-lh{color:#ffb070;font-size:13px;font-weight:700;margin:10px 2px 6px}#vl_pitin .pi-lv{display:flex;align-items:baseline;gap:8px;background:#141a2a;border:1px solid #2b3550;border-radius:10px;padding:11px 12px;margin-bottom:6px;font-size:17px;cursor:pointer}' +
     '#vl_pitin .pi-lv .p{color:#b8c0d0;font-weight:800;min-width:30px}#vl_pitin .pi-lv b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#vl_pitin .pi-lv .r{margin-left:auto;color:#b8c0d0;font-size:14px;white-space:nowrap}#vl_pitin .pi-lv .r i{font-style:normal;color:#3ddc84}';
+
+  css.textContent +=
+    /* LiveRC's Bootstrap input styles were hiding the number */
+    '#vl_root input.rminin,#vl_root input.pjin{padding:0 !important;height:auto !important;min-height:0 !important;width:2.6ch !important;box-shadow:none !important;border:0 !important;background:none !important;color:#fff !important;font:800 15px/1.2 inherit !important;font-family:inherit !important;text-align:right !important;margin:0 !important;display:inline-block !important}' +
+    '.pjc.auto{border-color:#3ddc84;padding:4px 10px}' +
+    '.rg-h{font-size:22px;font-weight:800;margin:0 0 10px}.rg-h small{font-size:13px;color:#b8c0d0;font-weight:500}.rg-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}.rg-k div{background:#111729;border:1px solid #1f2740;border-radius:12px;padding:10px}.rg-k small{display:block;color:#b8c0d0;font-size:13px}.rg-k b{font-size:22px}' +
+    '.rg-lg{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;margin:4px 0 6px}.rg-lg i{display:inline-block;width:18px;height:4px;border-radius:2px;margin-right:6px;vertical-align:3px}.rg-svg g:hover circle{stroke:#fff}' +
+    '.vl-gap{max-height:none !important}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -809,7 +817,7 @@ window.__vlAuto = true;
     '<div id="vl_pdrv"></div></div></div>' +
     '<div id="vl_pres"></div>' +
     '</div>' +
-    '</div><div id="vl_clpop"></div><div id="vl_dpk"></div><div id="vl_pitbar"><button data-tab="board"><i>🔊</i>라이브</button><button data-tab="my"><i>🏆</i>내 대회</button><button data-tab="prac"><i>📊</i>연습 기록</button><button data-tab="set"><i>⚙</i>설정</button></div></div>' +
+    '</div><div id="vl_clpop"></div><div id="vl_dpk"></div><div id="vl_pitbar"><button data-tab="board"><i>🔊</i>라이브</button><button data-tab="my"><i>🏆</i>결과</button><button data-tab="prac"><i>📊</i>연습 기록</button><button data-tab="set"><i>⚙</i>설정</button></div></div>' +
     '<button id="vl_fab" title="LAP X">🎙<span class="dot"></span></button>';
   document.body.appendChild(root);
   var $ = function (id) { return root.querySelector('#' + id); };
@@ -2690,7 +2698,7 @@ window.__vlAuto = true;
     var pit = root.classList.contains('vl-pit');
     if (!root.classList.contains('vl-lx') && !pit) { if ($('vl_lxg').innerHTML) $('vl_lxg').innerHTML = ''; if ($('vl_lxl').innerHTML) $('vl_lxl').innerHTML = ''; lxSig = ''; return; }
     var D = prc ? 0 : raceDur(), hOf = function (k) { return lapHist[k] || []; };
-    var sig = JSON.stringify([pit, mine && mine.key, rows.map(function (r) { var h = hOf(r.key); return [r.key, h.length, h.length ? h[h.length - 1].p : 0]; }), D, prc, cfg.lapDev, cfg.lapBest, cfg.lapNear, cfg.lapFar, $('vl_qual').innerHTML ? 1 : 0, !!mainLive, rows.map(function (r) { return r.bhd; })]);
+    var sig = JSON.stringify([+cfg.projMin || 5, pit, mine && mine.key, rows.map(function (r) { var h = hOf(r.key); return [r.key, h.length, h.length ? h[h.length - 1].p : 0]; }), D, prc, cfg.lapDev, cfg.lapBest, cfg.lapNear, cfg.lapFar, $('vl_qual').innerHTML ? 1 : 0, !!mainLive, rows.map(function (r) { return r.bhd; })]);
     if (sig === lxSig) return; lxSig = sig;
     var mb = ''; if (!mine && mainLive) try { mb = lxMainBox(rows); } catch (e) {}
     if ($('vl_lxm').innerHTML !== mb) $('vl_lxm').innerHTML = mb;
@@ -2706,9 +2714,12 @@ window.__vlAuto = true;
       if (B) s1.push({ name: '뒤차 ' + B.nm, color: '#c9a0ff', dash: 1, dot: false, pts: lapPts(B.key) });
       s1.push({ name: pName(mine.nm), color: '#ff7a1a', v: true, pts: lapPts(mine.key) });
       var s2 = rows.map(function (r) { return { name: r.nm, color: r === mine ? '#ff7a1a' : '#5b6680', v: r === mine, dot: r === mine, pts: posPts(r.key) }; });
-      g = card('📈 랩 그래프', '위쪽이 빠름', lg(s1.slice().reverse()) + lapChart(s1, 'lap', 380, 190)) +
-          card('📊 순위 그래프', '위 = 1등 · 랩마다', lapChart(s2, 'pos', 380, 190));
-    } else if (rows.length) {
+      var toL = function (k) { return hOf(k).filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t }; }); }, ml = toL(mine.key); ml.best = mine.bn > 0 ? mine.bn : NaN;
+      var oth = []; if (!prc) { if (A) oth.push({ color: '#8fa0c0', list: toL(A.key) }); if (B) oth.push({ color: '#c9a0ff', list: toL(B.key) }); }
+      var bl = lapBest(ml), key = '<div class="vl-lxlg"><span><i style="height:0;border-top:2px dashed #d27cff;background:none"></i>베스트 ' + (bl > 0 ? fmtS(bl) : '-') + '</span>' + (oth.length ? (A ? '<span><i style="height:0;border-top:2px dashed #8fa0c0;background:none"></i>앞차</span>' : '') + (B ? '<span><i style="height:0;border-top:2px dashed #c9a0ff;background:none"></i>뒤차</span>' : '') : '') + '<span>▼ 베스트 +5초 넘는 랩</span></div>';
+      g = card('📈 랩 그래프', '위 = 베스트 · 아래로 갈수록 느림', key + lapGapSvg(ml, oth, prc ? 760 : 380, prc ? 220 : 190)) +
+          (prc ? '' : card('📊 순위 그래프', '위 = 1등 · 랩마다', lapChart(s2, 'pos', 380, 190)));   /* practice: no rank graph */
+    } else if (rows.length && !prc) {
       var s3 = rows.map(function (r, k) { return { name: r.nm, color: PCOL[k % PCOL.length], dot: false, pts: posPts(r.key) }; });
       g = card('📊 순위 그래프', '위 = 1등 · 랩마다 · 이름을 누르면 그 선수 화면', lg(s3) + lapChart(s3, 'pos', 560, 330));
     }
@@ -2717,7 +2728,7 @@ window.__vlAuto = true;
       var lst = hOf(mine.key).filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t, p: e.p, e: e.e }; });
       lst.best = mine.bn > 0 ? mine.bn : NaN;
       if (!(lst.best > 0)) for (var q = lst.length - 1, hh = hOf(mine.key); q >= 0; q--) if (hh[q] && hh[q].b > 0) { lst.best = hh[q].b; break; }
-      $('vl_lxl').innerHTML = card('📋 랩 타임', '최신 랩 위' + (D ? ' · 예상 = ' + fmtClock(D) + ' 기준' : ''), lst.length ? lapSum(lst) + lapTbl(lst, !prc, true, { D: D }) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>');
+      $('vl_lxl').innerHTML = card('📋 랩 타임', '최신 랩 위', lst.length ? lapSum(lst) + liveLapTbl(lst, !prc, prc ? (+cfg.projMin || 5) * 60 : D, prc) : '<div style="color:#999;padding:10px 2px">라인을 지나면 랩이 쌓여요</div>');
     } else $('vl_lxl').innerHTML = '';
   }
   function renderRaceBoard(force) {
@@ -3960,6 +3971,41 @@ window.__vlAuto = true;
     return h + rows.join('') + '</tbody></table>';
   }
   /* summary above a lap list: best lap, how many laps within the set seconds / beyond (count + % of valid laps), invalid, and a bar */
+  /* live lap table: newest on top, projected laps/time as in 연습 기록 (practice: minutes from the table, race: the race time) */
+  function liveLapTbl(list, pos, D, prc) {
+    var C = lapCols(), best = lapBest(list), pj = D > 0 ? pracProj(list.slice().map(function (x) { return { n: x.n, v: x.v }; }), D) : null;
+    var chip = prc ? '<div class="px-pj">예상 기록 <span class="pjc"><button data-pjm="-1">−</button><input type="number" class="pjin" min="1" max="60" step="1" value="' + (+cfg.projMin || 5) + '">분<button data-pjm="1">+</button></span><small>연습 기록과 같은 값</small></div>'
+      : D > 0 ? '<div class="px-pj">예상 기록 <span class="pjc auto">' + fmtClock(D) + ' · 대회 시간</span></div>' : '';
+    var rows = list.map(function (x, i) {
+      var t = Math.abs(x.v), c = lapCol(x.v, best, C), d = t - best, sh = x.v > 0 && d < -0.0005, gap = x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3);
+      var pv = i > 0 ? list[i - 1].p : NaN, pp = pos ? '<td' + (x.p > 0 && pv > 0 && x.p !== pv ? ' style="color:' + (x.p < pv ? '#3ddc84' : '#ff6b6b') + ';font-weight:700"' : '') + '>' + (x.p > 0 ? x.p : '-') + '</td>' : '';
+      var p = pj ? pj[i] : null, pc = !p ? '' : p.x ? '<span class="px-no">제외</span>' : p.fin ? '<b>🏁 ' + fmtLT(p) + '</b>' : fmtLT(p) + (p.from ? ' <small>' + p.from + '~' + x.n + '랩</small>' : '');
+      return '<tr' + (p && p.fin ? ' class="px-fin"' : '') + '><td>' + x.n + '</td><td class="lt-d" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')</td>' + (pj ? '<td class="lt-p">' + pc + '</td>' : '') + pp + '</tr>';
+    });
+    rows.reverse();
+    return chip + '<table class="vl-lt px-lt"><thead><tr><th>랩</th><th>랩타임 (베스트 차)</th>' + (pj ? '<th>예상 랩/시간</th>' : '') + (pos ? '<th>순위</th>' : '') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+  }
+  /* lap graph like 연습 기록: gap to the best lap (top = best, dashed), dots in the lap-table colours, very slow laps parked at the bottom (▼) */
+  function lapGapSvg(mineL, others, W, H) {
+    var C = lapCols(), best = lapBest(mineL), cap = 5, L = 44, T = 14, R = 12, B = 26, all = mineL.concat.apply(mineL, others.map(function (o) { return o.list; }));
+    var nMax = Math.max.apply(null, all.map(function (x) { return x.n; }).concat([2])), nMin = Math.min.apply(null, all.map(function (x) { return x.n; }).concat([1]));
+    if (!(best > 0)) return '';
+    var X = function (n) { return L + (W - L - R) * (n - nMin) / Math.max(1, nMax - nMin); }, Y = function (d) { return T + (H - T - B) * Math.max(0, Math.min(d, cap)) / cap; };
+    var h = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" class="vl-gap">';
+    for (var g = 0; g <= cap; g++) h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(g) + '" y2="' + Y(g) + '" stroke="#1f2740"/><text x="' + (L - 6) + '" y="' + (Y(g) + 4) + '" fill="#9aa4b8" font-size="11" text-anchor="end">' + (g ? '+' + g : '베스트') + '</text>';
+    h += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="#d27cff" stroke-dasharray="5 4" stroke-width="1.5"/>';
+    others.forEach(function (o) { var pts = o.list.filter(function (x) { return x.v > 0 && x.v - best <= cap; }).map(function (x) { return X(x.n).toFixed(1) + ',' + Y(x.v - best).toFixed(1); }); if (pts.length > 1) h += '<polyline fill="none" stroke="' + o.color + '" stroke-opacity=".55" stroke-dasharray="4 4" stroke-width="1.5" points="' + pts.join(' ') + '"/>'; });
+    var mp = mineL.filter(function (x) { return x.v > 0 && x.v - best <= cap; }).map(function (x) { return X(x.n).toFixed(1) + ',' + Y(x.v - best).toFixed(1); });
+    if (mp.length > 1) h += '<polyline fill="none" stroke="#ff7a1a" stroke-opacity=".5" stroke-width="2" points="' + mp.join(' ') + '"/>';
+    mineL.forEach(function (x) {
+      if (!(x.v > 0)) return;
+      if (x.v - best > cap) { h += '<text x="' + X(x.n).toFixed(1) + '" y="' + (H - B + 2) + '" fill="#7d8698" font-size="12" text-anchor="middle">▼<title>' + x.n + '랩 ' + fmtS(x.v) + '</title></text>'; return; }
+      h += '<circle cx="' + X(x.n).toFixed(1) + '" cy="' + Y(x.v - best).toFixed(1) + '" r="4.5" fill="' + lapCol(x.v, best, C) + '"><title>' + x.n + '랩 ' + fmtS(x.v) + '</title></circle>';
+    });
+    var step = Math.max(1, Math.ceil((nMax - nMin) / 8));
+    for (var n = nMin; n <= nMax; n += step) h += '<text x="' + X(n).toFixed(1) + '" y="' + (H - 6) + '" fill="#9aa4b8" font-size="11" text-anchor="middle">' + n + '</text>';
+    return h + '</svg>';
+  }
   function lapSum(list) {
     var C = lapCols(), best = lapBest(list), nb = 0, nn = 0, nf = 0, nx = 0, ns = 0, bn = 0;
     list.forEach(function (x) {
@@ -4225,7 +4271,9 @@ window.__vlAuto = true;
     if (i < 0) { if (!prac.rows.some(function (r) { return r[1] === n; })) return; cfg.pracSel.push(n); } else cfg.pracSel.splice(i, 1);
     save(); renderDrivers(); pracAnalyze();
   });
-  function setPjm(v) { v = Math.round(+v); if (!(v >= 1 && v <= 60)) return; cfg.projMin = v; save(); try { $('vl_pjm').value = v; } catch (e) {} rePrac(); }
+  function setPjm(v) { v = Math.round(+v); if (!(v >= 1 && v <= 60)) return; cfg.projMin = v; save(); try { $('vl_pjm').value = v; } catch (e) {} lxSig = ''; try { renderRaceBoard(true); } catch (e) {} rePrac(); }
+  $('vl_lxl').addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-pjm]'); if (b) setPjm((+cfg.projMin || 5) + (+b.getAttribute('data-pjm'))); });
+  $('vl_lxl').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('pjin')) setPjm(e.target.value); });
   $('vl_tab_prac').addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-pjm]'); if (b) setPjm((+cfg.projMin || 5) + (+b.getAttribute('data-pjm'))); });
   $('vl_tab_prac').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('pjin')) setPjm(e.target.value); });
   $('vl_pdrv').addEventListener('click', function (e) {
@@ -4450,7 +4498,7 @@ window.__vlAuto = true;
     var top = '<div class="rs-top"><span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
       '<span class="lab sp">선수</span><button class="rs-who" data-dpk="1">' + (me ? '<span class="vl-mk">🏎</span>' + esc(me) : '선수 고르기') + ' ▾</button>' +
       (me && Object.keys(cars).length ? '<span class="lab sp">차</span><button class="rs-car' + (!CAR ? ' on' : '') + '" data-rcar="">전체 <small>' + joined + '</small></button>' + Object.keys(cars).map(function (k) { return '<button class="rs-car' + (CAR === k ? ' on' : '') + '" data-rcar="' + esc(k) + '" data-rcd="' + esc(cars[k].d) + '">' + esc(cars[k].d) + ' <small>' + cars[k].n + '</small></button>'; }).join('') : '') + '</div>';
-    if (!ev.sel && lst.length) ev.sel = lst[0].id;
+    if (!ev.sel && lst.length && !me) ev.sel = lst[0].id;   /* a driver picked: nothing selected = his graph */
     var perN = RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1];
     var left = '<div class="vl-lxc rs-l"><div class="rs-lh"><h5>대회 목록<small>' + perN + ' ' + perAll + '개 중 ' + per.length + '개' + (me ? ' · 참가 ' + joined : '') + '</small></h5>' +
       '<div class="rs-min">참가 <span class="pjc"><button data-rmin="-1">−</button><input type="number" class="rminin" min="0" max="99" value="' + mn + '">명<button data-rmin="1">+</button></span> 이상만</div>' +
@@ -4460,7 +4508,7 @@ window.__vlAuto = true;
         return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? '오늘 ' : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
       }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (!lst.length && !(me && wait) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
     var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); }, live = !!(todayE && ev.sel === todayE.id);
-    if (!ev.sel) right = '<div class="vl-pnone">' + (me && wait ? '참가한 대회를 찾는 중…' : '') + '</div>';
+    if (!ev.sel) right = me ? resGraph(per, cache, CAR, joined, wait) : '<div class="vl-pnone"></div>';
     else if (!o) { right = '<div class="vl-pnone">대회 결과를 읽는 중…</div>'; evLoad(ev.sel, again); }
     else {
       var ms = me ? evMineAll(o, me) : [], m = ms[0] || null, names = o.classes.map(function (c) { return c.name; });
@@ -4589,6 +4637,37 @@ window.__vlAuto = true;
       if (Date.now() - ev.at > 120000) { ev.at = 0; evListLoad(function () { if (cfg.tab === 'res') renderRes(); }); }
     } catch (e) {}
   }, 30000);
+  /* the driver's final position in every event he raced in (this period), one line per class; a dot opens that event */
+  function resGraph(per, cache, CAR, joined, wait) {
+    var me = myName(), pts = {}, evs = [], nWin = 0, nPod = 0, sum = 0, cnt = 0;
+    per.slice().reverse().forEach(function (e) {
+      var o = evGet(e.id, cache); if (!o) return;
+      var ms = evMineAll(o, me).filter(function (m) { return !CAR || (m.car || '').toLowerCase() === CAR; }), any = false;
+      ms.forEach(function (m) {
+        var p = m.fin ? +m.fin.pos : m.mm ? +m.mm.pos : 0; if (!(p > 0)) return;
+        var k = nmKey(m.cls); (pts[k] = pts[k] || { name: m.cls, list: [] }).list.push({ e: e, p: p, cls: m.cls }); any = true;
+        if (p === 1) nWin++; if (p <= 3) nPod++; sum += p; cnt++;
+      });
+      if (any) evs.push(e);
+    });
+    var head = '<div class="rg-h">' + MK() + esc(me) + ' · ' + RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1] + ' 참가 대회 ' + joined + '개' + (wait ? ' <small>(확인 중 ' + wait + '개)</small>' : '') + '</div>' +
+      '<div class="rg-k"><div><small>대회</small><b>' + evs.length + '</b></div><div><small>우승</small><b style="color:#ffd54a">' + nWin + '</b></div><div><small>포디움(3위 안 · 종목)</small><b>' + nPod + '</b></div><div><small>평균 최종 순위</small><b>' + (cnt ? (sum / cnt).toFixed(1) + '위' : '-') + '</b></div></div>';
+    if (!evs.length) return head + '<div class="vl-pnone">' + (wait ? '참가한 대회를 찾는 중…' : '이 기간에 최종 순위가 있는 대회가 없어요') + '</div>';
+    var COLS = ['#4fc3f7', '#ff7a1a', '#3ddc84', '#d27cff', '#ffd54a', '#f06292'], ks = Object.keys(pts), maxP = 3;
+    ks.forEach(function (k) { pts[k].list.forEach(function (x) { if (x.p > maxP) maxP = x.p; }); });
+    var W = 820, H = 310, L = 50, T = 24, R = 30, B = 58, n = evs.length;
+    var X = function (e) { var i = evs.indexOf(e); return n === 1 ? (L + W - R) / 2 : L + (W - L - R) * i / (n - 1); }, Y = function (p) { return T + (H - T - B) * (p - 1) / Math.max(1, maxP - 1); };
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" class="rg-svg">', st = Math.max(1, Math.ceil(maxP / 8));
+    for (var p = 1; p <= maxP; p += st) svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(p) + '" y2="' + Y(p) + '" stroke="#1f2740"/><text x="' + (L - 8) + '" y="' + (Y(p) + 4) + '" fill="#9aa4b8" font-size="12" text-anchor="end">' + p + '위</text>';
+    evs.forEach(function (e) { svg += '<text x="' + X(e) + '" y="' + (H - 26) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + esc(e.date.slice(5, 10).replace('-', '.')) + '</text><text x="' + X(e) + '" y="' + (H - 10) + '" fill="#7d8698" font-size="11" text-anchor="middle">' + esc(e.name.length > 12 ? e.name.slice(0, 11) + '…' : e.name) + '</text>'; });
+    ks.forEach(function (k, ci) {
+      var c = COLS[ci % COLS.length], l = pts[k].list;
+      if (l.length > 1) svg += '<polyline fill="none" stroke="' + c + '" stroke-width="3" points="' + l.map(function (x) { return X(x.e).toFixed(1) + ',' + Y(x.p).toFixed(1); }).join(' ') + '"/>';
+      l.forEach(function (x) { svg += '<g data-ev="' + esc(x.e.id) + '" data-evc="' + esc(x.cls) + '" style="cursor:pointer"><circle cx="' + X(x.e).toFixed(1) + '" cy="' + Y(x.p).toFixed(1) + '" r="7" fill="' + c + '" stroke="#0b0f1a" stroke-width="2"/><text x="' + X(x.e).toFixed(1) + '" y="' + (Y(x.p) - 11).toFixed(1) + '" fill="' + c + '" font-size="13" font-weight="800" text-anchor="middle">' + x.p + '</text><title>' + esc(x.e.name + ' · ' + x.cls + ' · 최종 ' + x.p + '위') + '</title></g>'; });
+    });
+    svg += '</svg>';
+    return head + '<div class="vl-lxc"><h5>클래스별 최종 순위<small>위쪽이 좋은 순위 · 점을 누르면 그 대회 열기</small></h5><div class="rg-lg">' + ks.map(function (k, ci) { return '<span><i style="background:' + COLS[ci % COLS.length] + '"></i>' + esc(pts[k].name) + ' · ' + pts[k].list.length + '개</span>'; }).join('') + '</div>' + svg + '</div>';
+  }
   function setRmin(v) { v = Math.round(+v); if (!(v >= 0 && v <= 99)) return; cfg.resMin = v; save(); renderRes(); }
   $('vl_res').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('rminin')) setRmin(e.target.value); });
   $('vl_res').addEventListener('click', function (e) {
@@ -4597,7 +4676,7 @@ window.__vlAuto = true;
     if (rm) setRmin((+cfg.resMin || 0) + (+rm.getAttribute('data-rmin')));
     else if (rp) { cfg.resPer = rp.getAttribute('data-rper'); save(); renderRes(); }
     else if (rc) setCar(rc.getAttribute('data-rcar'), rc.getAttribute('data-rcd') || '');
-    else if (a) { ev.sel = a.getAttribute('data-ev'); ev.cls = ''; ev.jump = true; ev.picked = true; renderRes(); }
+    else if (a) { var id = a.getAttribute('data-ev'); ev.picked = true; if (ev.sel === id && !a.hasAttribute('data-evc')) { ev.sel = ''; ev.cls = ''; } else { ev.sel = id; ev.cls = a.getAttribute('data-evc') || ''; ev.jump = true; } renderRes(); }   /* click the selected event again = back to the graph */
     else if (c) { ev.cls = c.getAttribute('data-cls'); renderRes(); }
   });
   $('vl_res').addEventListener('input', function (e) { if (e.target.id === 'vl_rsq') { ev.q = e.target.value; renderRes(); } });
