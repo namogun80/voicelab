@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.5
+// @version      3.2.6
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 89;   /* = VER below */
-  /* var VER = 89; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 90;   /* = VER below */
+  /* var VER = 90; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.5';
+  var VERSION = '3.2.6';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -72,7 +72,7 @@ window.__vlAuto = true;
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
-    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl' };
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl', pracStart: true, pracStartWord: '스타트', selQ: '' };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
@@ -596,6 +596,12 @@ window.__vlAuto = true;
     '.rs-mc{container-type:inline-size}#vl_root .rs-flow{flex-wrap:nowrap;gap:.6cqw}#vl_root .rs-flow>span{flex:1 1 auto;min-width:0;padding:.5cqw .8cqw;font-size:clamp(15px,2.1cqw,26px);overflow:hidden}' +
     '#vl_root .rs-flow>span small{font-size:clamp(11px,1.05cqw,13px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vl_root .rs-flow>span b{display:block;white-space:nowrap;font-weight:800}' +
     '#vl_root .rs-flow>span i{font-size:clamp(11px,.95cqw,12px);overflow:hidden;text-overflow:ellipsis}.rs-flow span.bl{border-color:#3a2f55 !important}.rs-flow span.gb i{color:#3ddc84;font-weight:800}';
+
+  css.textContent +=
+    '.vl-vstat{font-size:14px;color:#dfe4ee;margin:8px 0;padding:8px 10px;border:1px solid #2b3550;border-radius:8px;background:#141a2a}.vl-vstat b{color:#3ddc84}.vl-vstat small{color:#b8c0d0}' +
+    '#vl_pitin .pc.pq{border-style:dashed;color:#ffd8b8}#vl_pitin .pc.pq small{color:#b8c0d0;font-weight:500}' +
+    '#vl_pitin .pi-lh{color:#ffb070;font-size:13px;font-weight:700;margin:10px 2px 6px}#vl_pitin .pi-lv{display:flex;align-items:baseline;gap:8px;background:#141a2a;border:1px solid #2b3550;border-radius:10px;padding:11px 12px;margin-bottom:6px;font-size:17px;cursor:pointer}' +
+    '#vl_pitin .pi-lv .p{color:#b8c0d0;font-weight:800;min-width:30px}#vl_pitin .pi-lv b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#vl_pitin .pi-lv .r{margin-left:auto;color:#b8c0d0;font-size:14px;white-space:nowrap}#vl_pitin .pi-lv .r i{font-style:normal;color:#3ddc84}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -674,6 +680,8 @@ window.__vlAuto = true;
     '<div class="lim"><span style="color:#999">같은 선수의 안내가 기다리는 중에 다음 랩이 오면 새 랩으로 바꿈</span></div></div>' +
     '<button id="vl_test">🗣 음성 테스트</button>' +
     '<div id="vl_hint"></div>' +
+    '<div class="gap"><label><input type="checkbox" id="vl_pst">🏁 연습에서 처음 찍히면 말하기</label> <input type="text" id="vl_pstw" maxlength="12" style="width:90px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px"></div>' +
+    '<div id="vl_vstat" class="vl-vstat"></div>' +
     '<div id="vl_vlog" class="vl-vlog"></div>' +
     '</div></div>' +
     '<div class="sec grp" data-g="race"><div class="gh"><span class="ar"></span><span class="sech">🏎 레이스 기능</span><span class="gs" id="vl_gs_race"></span><label class="gsw" title="이 그룹 기능 전체 켜기/끄기"><input type="checkbox" id="vl_raceOn"><i></i></label></div><div class="gb">' +
@@ -945,6 +953,8 @@ window.__vlAuto = true;
   bind('vl_llive', 'lapLive', function () { renderRaceBoard(true); });
   $('vl_clpct').value = +cfg.closePct || 21;
   $('vl_clpct').onchange = function () { var v = Math.round(+this.value); if (v >= 5 && v <= 50) { cfg.closePct = v; save(); clAt = 0; renderRaceBoard(true); } else this.value = cfg.closePct; };
+  $('vl_pst').checked = cfg.pracStart !== false; $('vl_pst').onchange = function () { cfg.pracStart = this.checked; save(); };
+  $('vl_pstw').value = cfg.pracStartWord || '스타트'; $('vl_pstw').onchange = function () { cfg.pracStartWord = this.value.trim() || '스타트'; this.value = cfg.pracStartWord; save(); };
   bind('vl_lxall', 'lxAll', function () { root.classList.toggle('vl-lxall', !!cfg.lxAll); renderRaceBoard(true); });
   /* 🔍 zoom of everything inside the panel (this device only) */
   var ZPRE = [80, 90, 100, 110, 125, 150, 175];
@@ -1742,8 +1752,8 @@ window.__vlAuto = true;
   /* iOS Safari can get stuck "speaking" with nothing coming out (after a failed voice, a phone call, going to the background):
      words queued but not started for 8 s → clear the queue so the next announcement plays */
   function speechUnstick() {
-    if (!spk.q || Date.now() - spk.q < 8000) return false;
-    spk.q = 0; spk.err = '멈춤 → 초기화';
+    if (!spk.q || Date.now() - spk.q < 5000) return false;
+    spk.q = 0; spk.err = '멈춤 → 초기화'; vstatMiss('엔진 멈춤');
     try { spCancel(); } catch (e) {}
     spkInfo(); return true;
   }
@@ -1761,7 +1771,7 @@ window.__vlAuto = true;
     if (!IOS) audioOn();   /* the keep-alive hum is for Bluetooth/HDMI on computers; on iOS it only fights speech for the audio session */
     try { if (speechSynthesis.paused) speechSynthesis.resume(); } catch (e) {}
     /* silent lead-in / tail: not on iOS (it may ignore volume 0, and every extra utterance is another chance to stall) */
-    var n = IOS ? 0 : Math.max(0, Math.min(3, cfg.pad === undefined ? 2 : +cfg.pad));
+    var n = IOS ? 0 : Math.min(1, Math.max(0, cfg.pad === undefined ? 1 : +cfg.pad));   /* one silent lead-in (as Lite), no tail */
     if (n) speechSynthesis.speak(silent(n));
     var u = new SpeechSynthesisUtterance(text);
     var vf = voiceFor(), v = null;
@@ -1785,7 +1795,6 @@ window.__vlAuto = true;
     if (!tryN) spk.n++;
     if (!spk.q) spk.q = Date.now();
     speechSynthesis.speak(u);
-    if (n) speechSynthesis.speak(silent(n));
   }
 
   /* ---------- announcement queue ----------
@@ -1802,14 +1811,26 @@ window.__vlAuto = true;
     el.style.display = 'block';
   }
   function vqClear() { vq.forEach(function (it) { vlogAdd(it.text, 'cut'); }); vq = []; clearTimeout(vqT); vqT = null; vqGen++; vqBusy = false; }
-  function say(key, text, ti, hold) {
+  function say(key, text, ti, hold, lap) {
     if (!voiceOK()) return;
     if (!text && !(ti >= 0)) return;
     if (cfg.voiceLatest !== false && key) {
-      for (var i = 0; i < vq.length; i++) if (vq[i].key === key) { vlogAdd(vq[i].text, 'skip'); vq.splice(i, 1); break; }
+      for (var i = 0; i < vq.length; i++) if (vq[i].key === key) { vlogAdd(vq[i].text, 'skip'); if (vq[i].lap) vstatMiss('다음 랩에 밀림'); vq.splice(i, 1); break; }
     }
-    vq.push({ key: key, text: text || '', ti: ti >= 0 ? ti : -1, at: Date.now(), hold: hold || 0 });
+    var it = { key: key, text: text || '', ti: ti >= 0 ? ti : -1, at: Date.now(), hold: hold || 0, lap: !!lap };
+    if (lap) {   /* a lap call goes ahead of everything but other lap calls; waiting extras (close-battle calls …) are dropped */
+      vq = vq.filter(function (x) { if (x.lap) return true; vlogAdd(x.text, 'skip'); return false; });
+      vq.push(it);
+    } else vq.push(it);
     vqPump();
+  }
+  /* voice health of this session (Pit settings): loops = the driver's line crossings, ok = lap calls heard, miss = lap calls lost (why) */
+  var vstat = { sid: '', loops: 0, ok: 0, miss: 0, why: {} };
+  function vstatMiss(w) { vstat.miss++; vstat.why[w] = (vstat.why[w] || 0) + 1; vstatShow(); }
+  function vstatShow() {
+    var el = $('vl_vstat'); if (!el) return;
+    var w = Object.keys(vstat.why).map(function (k) { return k + ' ' + vstat.why[k]; }).join(' · ');
+    el.innerHTML = '이번 세션: 루프 <b>' + vstat.loops + '</b>번 · 안내 <b>' + vstat.ok + '</b>번 · 빠짐 <b' + (vstat.miss ? ' style="color:#ff6b6b"' : '') + '>' + vstat.miss + '</b>' + (w ? ' <small>(' + esc(w) + ')</small>' : '');
   }
   function vqPump() {
     if (vqBusy || !vq.length) return;
@@ -1824,7 +1845,7 @@ window.__vlAuto = true;
     tones.forEach(function (it, k) { setTimeout(function () { if (gen === vqGen) playTone(it.ti); }, wait); wait += (k < tones.length - 1 ? 260 : 0); });
     if (tones.length) wait += playToneLen(tones[tones.length - 1].ti) + 120;
     var text = take.map(function (it) { return it.text; }).filter(Boolean).join(', ');
-    var fin = function (st) { if (gen !== vqGen) return; take.forEach(function (it) { if (it.text) vlogAdd(it.text, st); }); vqBusy = false; setTimeout(vqPump, 120); };
+    var fin = function (st) { if (gen !== vqGen) return; take.forEach(function (it) { if (it.text) vlogAdd(it.text, st); if (it.lap && !/:st$/.test(it.key)) { if (st === 'ok' || st === 'retry') { vstat.ok++; vstatShow(); } else vstatMiss(st === 'cut' ? '끊김' : '소리 없음'); } }); vqBusy = false; setTimeout(vqPump, 120); };
     setTimeout(function () { if (gen !== vqGen) return; if (!text) { fin('ok'); return; } speak(text, 0, fin); }, wait);
   }
   /* ---------- matching ---------- */
@@ -2544,7 +2565,7 @@ window.__vlAuto = true;
     var b = $('vl_sdrv'); if (!b) return;
     var cd = '';
     if (nm) { if (cfg.car) cd = cfg.carD || cfg.car; else { var sc = SC(), d = sc ? list(sc.driverData).filter(function (x) { return pKey(nameOf(x)) === pKey(nm); })[0] : null; if (d) cd = splitName(nameOf(d)).c; } }
-    var h2 = '<small>선수 · 모든 탭 같이</small><b>' + (nm ? '<span class="vl-mk">🏎</span>' + esc(nm) + (cd ? ' <span class="vl-car">(' + esc(cd) + ')</span>' : '') : '선수 고르기') + ' ▾</b>';
+    var h2 = '<small>선수 · 모든 탭 같이</small><b>' + (!nm && cfg.selQ ? '🔎 ' + esc(cfg.selQ) + ' <span class="vl-car">찾는 중</span>' : nm ? '<span class="vl-mk">🏎</span>' + esc(nm) + (cd ? ' <span class="vl-car">(' + esc(cd) + ')</span>' : '') : '선수 고르기') + ' ▾</b>';
     if (b.innerHTML !== h2) b.innerHTML = h2;
   }
   /* the one driver changed (any tab): every view follows */
@@ -2559,8 +2580,12 @@ window.__vlAuto = true;
   }
   function setPerson(n) {
     var me = myName(); n = n ? pName(n) : '';
+    if (n && !dpkPeople().some(function (o) { return o.k === pKey(n); }) && !(SC() && list(SC().driverData).some(function (d) { return pKey(nameOf(d)) === pKey(n); }))) {
+      cfg.selQ = n; cfg.car = ''; cfg.carD = ''; cfg.pracSel = []; if (me) setSel(me, { on: false }); save(); clearTimeout(selT); selT = setTimeout(function () { try { selSync(); } catch (e) {} }, 0); return;
+    }
+    cfg.selQ = '';
     if (pKey(n) !== pKey(me)) { cfg.car = ''; cfg.carD = ''; }
-    if (!n) { if (me) setSel(me, { on: false }); }
+    if (!n) { cfg.selQ = ''; if (me) setSel(me, { on: false }); else { save(); clearTimeout(selT); selT = setTimeout(function () { try { selSync(); } catch (e) {} }, 0); } }
     else setSel(n, { on: true });
     cfg.pracSel = n ? [n] : []; save();
   }
@@ -3766,6 +3791,7 @@ window.__vlAuto = true;
     var sel = cfg.pracSel.filter(function (n) { return prac.rows.some(function (r) { return inSel(r, n); }); });
     if (lxm) sel = myName() ? [myName()] : [];   /* LAP X: the driver picked anywhere */
     pchip(sel[0]);
+    if (!sel.length && root.classList.contains('vl-pit') && prac.rows.length) { $('vl_tab_prac').classList.add('vl-popen'); $('vl_pres').innerHTML = '<div class="vl-pnone">이 기간 선수 목록에서 눌러 고르세요.</div>'; return; }
     if (!sel.length) { $('vl_pres').innerHTML = prac.rows.length ? '<div style="color:#888;font-size:13px;padding:8px 2px">위에서 선수 버튼을 누르면 기록을 정리해서 보여줍니다.</div>' : ''; return; }
     var seq = ++prac.aseq, rows = prac.rows.filter(function (r) { return sel.some(function (n) { return inSel(r, n); }); });
     var need = rows.filter(function (r) { return pc.t3[r[0]] === undefined || pc.cons[r[0]] === undefined || pc.laps[r[0]] === undefined; }).map(function (r) { return r[0]; });
@@ -4636,11 +4662,13 @@ window.__vlAuto = true;
       (!prc && clChipTxt(true) ? '<span class="pi-cl" data-clp="1">' + clChipTxt(true) + '</span>' : '') + (!prc && rem > 0 ? '<span class="tm">남은 <b>' + esc(pageText('#time_remaining .value')) + '</b></span>' : pageText('#time_elapsed .value') ? '<span class="tm">경과 <b>' + esc(pageText('#time_elapsed .value')) + '</b></span>' : '');
     if ($('vl_picls').innerHTML !== cls) $('vl_picls').innerHTML = cls;
     var me = myName(), r = rows.filter(function (x) { return x.mine; })[0];
-    var chip = me ? '<span class="pc">🔊 ' + (r ? nmH(r.nm) : esc(me)) + (r && r.car ? ' <small>#' + esc(r.car) + '</small>' : '') + (r ? '' : ' <small>· 코스에 없음</small>') + '<button id="vl_pix" title="지우기">✕</button></span>' : '';
+    var chip = !me && cfg.selQ ? '<span class="pc pq">🔊 ' + esc(cfg.selQ) + ' <small>코스에 나오면 자동 연결</small><button id="vl_pix" title="지우기">✕</button></span>' : me ? '<span class="pc">🔊 ' + (r ? nmH(r.nm) : esc(me)) + (r && r.car ? ' <small>#' + esc(r.car) + '</small>' : '') + (r ? '' : ' <small>· 코스에 없음</small>') + '<button id="vl_pix" title="지우기">✕</button></span>' : '';
     var cb = $('vl_pichip'); if (cb.innerHTML !== chip) { cb.innerHTML = chip; cb.classList.toggle('off', !!me && !r); }
     $('vl_piadd').textContent = me ? '바꾸기' : '등록';
     $('vl_piq').placeholder = me ? '선수 바꾸기 · 이름 또는 초성' : '선수 한 명 · 이름 또는 초성 (예: ㄴㅎ)';
-    var em = !me ? '<div class="pi-e">위 칸에 선수 이름이나 초성을 입력해 등록하세요<small>예: 남호 · ㄴㅎ · NAMO — 대소문자 상관없음</small></div>' : !r ? '<div class="pi-e">' + esc(me) + ' 선수가 코스에 나오면 여기 크게 보여요</div>' : '';
+    var sess = (sc ? list(sc.driverData) : []).filter(function (d) { return nameOf(d); }).sort(function (a, b) { return nmSort(pName(nameOf(a)), pName(nameOf(b))); });
+    var em = !me && !cfg.selQ && sess.length ? '<div class="pi-lh">지금 코스 ' + sess.length + '명 · 눌러서 선택</div>' + sess.map(function (d) { return '<div class="pi-lv" data-pn="' + esc(pName(nameOf(d))) + '"><span class="p">P' + esc(d.position || '-') + '</span><b>' + nmH(nameOf(d)) + '</b><span class="r">' + (+d.laps || 0) + '랩' + (secs(d.lapTime) > 0 ? ' · <i>' + esc(d.lapTime) + '</i>' : '') + '</span></div>'; }).join('') :
+      !me ? '<div class="pi-e">위 칸에 선수 이름이나 초성을 입력해 등록하세요<small>예: 남호 · ㄴㅎ · NAMO — 대소문자 상관없음 · 코스에 나오면 자동 연결</small></div>' : !r ? '<div class="pi-e">' + esc(me) + ' 선수가 코스에 나오면 여기 크게 보여요</div>' : '';
     if ($('vl_piempty').innerHTML !== em) $('vl_piempty').innerHTML = em;
     if ($('vl_piq').value) piSug();
   }
@@ -4654,12 +4682,13 @@ window.__vlAuto = true;
   });
   $('vl_piadd').onclick = function () { var q = ($('vl_piq').value || '').trim(), o = q ? piList[piSel] : null; piPick(o && !o.x ? o.p : q); };
   $('vl_pisug').addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-pn]'); if (t) piPick(t.getAttribute('data-pn'), true); });
-  $('vl_pichip').addEventListener('click', function (e) { if (e.target.id === 'vl_pix') { var n = myName(); if (n) { setSel(n, { on: false }); count(); renderRaceBoard(true); } } });
+  $('vl_pichip').addEventListener('click', function (e) { if (e.target.id === 'vl_pix') { setPerson(''); count(); renderRaceBoard(true); } });
+  $('vl_piempty').addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('[data-pn]'); if (t) piPick(t.getAttribute('data-pn'), true); });
   /* ---------- LAP X practice records (wide screens): days · summary · trend · sessions · laps of one session ---------- */
   var pxs = { day: '', sid: '' };
   function pchip(n) {
     var b = $('vl_pchip'); if (!b) return;
-    b.innerHTML = (n ? '<span class="vl-mk">🏎</span>' + esc(pName(n)) : '선수 고르기') + ' ▾';
+    b.innerHTML = (n ? MK() + esc(pName(n)) : '선수 고르기') + ' ▾';
   }
   $('vl_pchip').onclick = function () { $('vl_tab_prac').classList.toggle('vl-popen'); };
   function pdate(d) { var t = new Date(d + 'T12:00:00'); return d.slice(5, 7) + '/' + d.slice(8, 10) + ' (' + '일월화수목금토'.charAt(t.getDay()) + ')'; }
@@ -4677,7 +4706,7 @@ window.__vlAuto = true;
   }
   function renderPracLx(name, rows) {
     var box = $('vl_pres');
-    if (!name) { box.innerHTML = prac.rows.length ? '<div class="vl-pnone">위의 <b>🔊 선수 고르기</b>를 눌러 선수를 고르세요.</div>' : ''; return; }
+    if (!name) { if (root.classList.contains('vl-pit') && prac.rows.length) { $('vl_tab_prac').classList.add('vl-popen'); box.innerHTML = '<div class="vl-pnone">이 기간 선수 목록에서 눌러 고르세요.</div>'; return; } box.innerHTML = prac.rows.length ? '<div class="vl-pnone">위의 <b>선수 고르기</b>를 눌러 선수를 고르세요.</div>' : ''; return; }
     var pit = root.classList.contains('vl-pit'), pk0 = pKey(name);
     var mine0 = rows.filter(function (r) { return pKey(r[1]) === pk0; }), cars = {}, carN = {};
     mine0.forEach(function (r) { var c = splitName(r[1]).c, ck = c.toLowerCase(); if (!c) return; cars[ck] = cars[ck] || c; carN[ck] = (carN[ck] || 0) + 1; });
@@ -4927,7 +4956,7 @@ window.__vlAuto = true;
     if (!guard()) return;
     var sc = SC(); var dd = sc && sc.driverData; if (!dd) return;
     var all = list(dd);
-    all.forEach(record);
+    all.forEach(function (d) { try { record(d); } catch (e) {} });
     var aheadKeys = {}, dingNow = false;
     autoRun();
     var sid = sessId(sc), prcNow = isPractice(sc), remNow = remSecs();
@@ -4969,18 +4998,18 @@ window.__vlAuto = true;
       var prevFast = prev && laps >= prev.laps ? prev.fast : NaN, curFast = siteFast(d);
       state[key] = { laps: laps, fast: curFast };
       if (prev && laps > prev.laps) { lastCross[key] = Date.now(); if (aheadKeys[key]) dingNow = true; }
-      trackPace(d, key, !!(prev && laps < prev.laps));
-      recLap(d, key, !!(prev && laps < prev.laps));
+      try { trackPace(d, key, !!(prev && laps < prev.laps)); } catch (e) {}
+      try { recLap(d, key, !!(prev && laps < prev.laps)); } catch (e) {}
       var t = match(d), crossed = !!(prev && laps > prev.laps), E = secs(d.elapsedTime) || 0, extra = [];
       if (prev && laps < prev.laps) { delete runDone[key]; delete rs.fin[key]; delete rs.pos[key]; }
       var pos = +d.position || 0, prevPos = rs.pos[key], finNow = false;
       if (crossed && over && !rs.fin[key]) { rs.fin[key] = pos || 1; finNow = true; }
       if (pos && (crossed || prevPos === undefined)) rs.pos[key] = pos;
-      if (t && cfg.fuelOn && cfg.raceOn !== false) { var fw = fuelStep(d, key, crossed, !!(prev && laps < prev.laps), E, lapS); if (fw) extra.push(fw); }
+      if (t && cfg.fuelOn && cfg.raceOn !== false) try { var fw = fuelStep(d, key, crossed, !!(prev && laps < prev.laps), E, lapS); if (fw) extra.push(fw); } catch (e) {}
       /* practice run time: once, at the first line crossing after the set time — Open Practice only */
       if (t && crossed && cfg.runOn && cfg.voiceOn !== false && !runDone[key] && isPractice(sc)) {
         var RT = (+cfg.runMin || 0) * 60 + (+cfg.runSec || 0);
-        if (RT > 0 && E >= RT) { runDone[key] = 1; extra.push(cfg.runWord || '주행 완료'); if (cfg.runSum !== false) { var rsum = runSummary(d, key); if (rsum) extra.push(rsum); } }
+        if (RT > 0 && E >= RT) { runDone[key] = 1; extra.push(cfg.runWord || '주행 완료'); if (cfg.runSum !== false) try { var rsum = runSummary(d, key); if (rsum) extra.push(rsum); } catch (e) {} }
       }
       if (!running || !prev || laps === prev.laps || laps < 1) return;
       if (!t || cfg.voiceOn === false) return;
@@ -4988,7 +5017,7 @@ window.__vlAuto = true;
       /* best lap = the site's F: got faster on this lap and it is this lap's time */
       var isBest = curFast > 0 && prevFast > 0 && curFast < prevFast - 0.0005 && lapS > 0 && Math.abs(lapS - curFast) < 0.0005;
       var name = t.alias || nameOf(d);
-      var gap = gapFor(d, all);
+      var gap = ''; try { gap = gapFor(d, all); } catch (e) {}
       var parts = [];
       var race = cfg.raceOn !== false && !prcNow;
       var many = !cfg.nameMulti || nVoice > 1;   /* one voice driver on track: the name is obvious, leave it out */
@@ -5000,15 +5029,16 @@ window.__vlAuto = true;
       else if (cfg.sayDelta && cfg.sayTime && curFast > 0 && lapS - curFast >= 0.005) parts.push('플러스 ' + fixD(lapS - curFast));
       if (moved) parts.push(moved);
       if (gap) parts.push(gap);
-      if (race && cfg.gapBehind && pos >= 2 && !finNow) {   /* the car behind is close (pos 1 already hears the gap to 2nd) */
+      if (race && cfg.gapBehind && pos >= 2 && !finNow) try {   /* the car behind is close (pos 1 already hears the gap to 2nd) */
         var bc = all.filter(function (x) { return +x.position === pos + 1; })[0], bg = bc ? gapInfo(bc, d, raceClock(all)) : null;
         if (bg && bg.laps === 0 && bg.time >= 0 && bg.time <= closeSecNow() + 0.0005) parts.push('뒤차 ' + bg.time.toFixed(1) + '초');
-      }
+      } catch (e) {}
       if (finNow && race && cfg.finSay !== false) extra.push((cfg.finWord || '레이스 종료') + (cfg.finPos !== false ? ', ' + (pos || rs.fin[key]) + '등' : ''));
       extra.forEach(function (x) { parts.push(x); });
       if (extra.length && !(t.nm === undefined ? cfg.sayName : t.nm) && parts.indexOf(name) < 0 && nVoice > 1) parts.unshift(name);   /* several drivers: say whose pit / run it is */
       var msg = parts.filter(Boolean).join(', ');
-      say(key, msg, t.tone ? +t.ti || 0 : -1, holdFor(key));   /* tone first, then the words — through the queue */
+      var hf = 0; try { hf = holdFor(key); } catch (e) {}
+      vsaid[key] = laps; say(key, msg, t.tone ? +t.ti || 0 : -1, hf, true);   /* tone first, then the words — through the queue, ahead of extras */
     });
     if (dingNow) ding();
     if (remMsg && cfg.tqSay !== false && cfg.tqWord && !prcNow && qd && qd.pred) {   /* 🏆 qualifier: a voice driver heading for TQ → “1분 남음, TQ 예상” */
@@ -5019,9 +5049,9 @@ window.__vlAuto = true;
     try { teamTick(all, sc, sid, prcNow, over); } catch (e) {}
     if (Date.now() - md.at > 60000 && !md.busy) mainFetch();   /* also during Open Practice: the 🏆 tab shows as soon as the line-up is up */
     try { mainTick(sc, all, rs.fin); mainStrip(); if (cfg.tab === 'main') renderMain(); } catch (e) {}
-    trackBhd(all);
+    try { trackBhd(all); } catch (e) {}
     /* 💬 close battle: the gap to the car ahead / behind moved at the last crossing → a short call after the lap time */
-    if (running && cfg.gcSay !== false && cfg.voiceOn !== false && cfg.raceOn !== false && cfg.closeOn && !prcNow) {
+    if (running && cfg.gcSay !== false && cfg.voiceOn !== false && cfg.raceOn !== false && cfg.closeOn && !prcNow) try {
       var gOrd = all.slice().sort(function (a, b) { return (+a.position || 999) - (+b.position || 999); }), gLead = gOrd.length ? (+gOrd[0].laps || 0) : 0;
       var gMin = Math.max(gcMinNow(), 0.0005), gSec = closeSecNow();
       var gTxt = function (v) { var t = Math.abs(v).toFixed(1); return t === '0.0' ? '0.1' : t; };
@@ -5031,7 +5061,7 @@ window.__vlAuto = true;
         if (me && me.fr && i > 0 && me.v >= 0 && me.v <= gSec && me.dl === me.dl && Math.abs(me.dl) >= gMin) say(keyOf(d) + ':ga', '앞차 ' + gTxt(me.dl) + (me.dl < 0 ? ' 줄임' : ' 벌어짐'), -1, holdFor(keyOf(d)));
         if (bs && bs.fr && bs.v >= 0 && bs.v <= gSec && bs.dl === bs.dl && Math.abs(bs.dl) >= gMin) say(keyOf(d) + ':gb', '뒤차 ' + gTxt(bs.dl) + (bs.dl < 0 ? ' 다가옴' : ' 벌림'), -1);
       });
-    }
+    } catch (e) {}
     Object.keys(bhdSt).forEach(function (k) { if (bhdSt[k]) bhdSt[k].fr = 0; });
     updFuel(all);
     backfill(); lhSave();
@@ -5040,8 +5070,37 @@ window.__vlAuto = true;
   seed();
   renderColList();
   setTab(trkOnly ? 'trk' : pracOnly ? 'prac' : cfg.tab === 'trk' ? 'board' : cfg.tab);
-  var timer = setInterval(tick, 250), timerL = setInterval(updLive, 200);
+  var vsaid = {}, vseen = {}, vsid = '';
+  function voiceTick() {
+    var sc = SC(); if (!sc || !sc.driverData) return;
+    var all = list(sc.driverData), sid = sessId(sc), prc = isPractice(sc);
+    if (sid !== vsid) { vsid = sid; vseen = {}; vsaid = {}; vstat = { sid: sid, loops: 0, ok: 0, miss: 0, why: {} }; vstatShow(); }
+    /* registered by a few letters / 초성: the first driver on the course they fit becomes the driver */
+    if (cfg.selQ && !myName()) { var hit = all.filter(function (d) { return kmatch(pName(nameOf(d)), cfg.selQ); })[0]; if (hit) { setPerson(nameOf(hit)); } }
+    all.forEach(function (d) {
+      if (!match(d)) return;
+      var key = keyOf(d), L = +d.laps || 0, prev = vseen[key]; vseen[key] = L;
+      if (prev === undefined) {   /* 🏁 practice: the first time the transponder is read this session → "스타트" */
+        if (prc && L === 0 && !(secs(d.lapTime) > 0) && cfg.pracStart !== false && cfg.voiceOn !== false && !muted && voiceOK()) say(key + ':st', cfg.pracStartWord || '스타트', -1, 0, true);
+        return;
+      }
+      if (L < prev) { delete vsaid[key]; return; }
+      if (L <= prev || L < 1) return;
+      vstat.loops++; vstatShow();
+      /* safety net: the main loop should have called this lap within 1.5 s — if it did not (an error, a stall), say the lap time itself */
+      setTimeout(function () {
+        try {
+          if (vsaid[key] >= L || !running || muted || cfg.voiceOn === false || (rs.fin && rs.fin[key])) return;
+          vsaid[key] = L;
+          var parts = []; if (cfg.sayLap) parts.push(L + '랩'); if (cfg.sayTime) parts.push(sayTime(d.lapTime));
+          say(key, parts.filter(Boolean).join(', ') || sayTime(d.lapTime), -1, 0, true); vstat.why['보완'] = (vstat.why['보완'] || 0) + 1;
+        } catch (e) {}
+      }, 1500);
+    });
+  }
+  var timer = setInterval(tick, 250), timerL = setInterval(updLive, 200), timerV = setInterval(function () { try { voiceTick(); } catch (e) {} }, 250);
   function stopAll() {
+    clearInterval(timerV);
     clearInterval(timer); clearInterval(timer2); clearInterval(timerL); try { vq = []; clearTimeout(vqT); vqGen++; } catch (e) {}
     if (running) { running = false; try { if (NB) native({ type: 'stop' }); else if (hasSpeech) spCancel(); } catch (e) {} wakeOff(); audioOff(); }
     try { css.remove(); } catch (e) {}
