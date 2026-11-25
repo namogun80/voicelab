@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.8
+// @version      3.2.9
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 92;   /* = VER below */
-  /* var VER = 92; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 93;   /* = VER below */
+  /* var VER = 93; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.8';
+  var VERSION = '3.2.9';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -3929,8 +3929,9 @@ window.__vlAuto = true;
   }
   /* practice: a race of D seconds from the start of the session; LiveRC's invalid laps and laps of twice the middle lap or more (a lap lost) don't count */
   function pracSlow(list) { var g = list.filter(function (x) { return x.v > 0; }).map(function (x) { return x.v; }).sort(function (a, b) { return a - b; }); return g.length ? g[Math.floor((g.length - 1) / 2)] * 2 : Infinity; }
-  function pracProj(list, D) {
-    var lim = pracSlow(list), best = lapBest(list), out = [], ok = [], T = 0, done = false;
+  /* race (B): only LiveRC's invalid laps are left out — every other lap's time counts; the average that fills the rest still skips laps over best + 2 s */
+  function pracProj(list, D, race) {
+    var lim = race ? Infinity : pracSlow(list), best = lapBest(list), out = [], ok = [], T = 0, done = false;
     list.forEach(function (x, i) {
       if (!(x.v > 0) || x.v >= lim) { out.push({ x: 1 }); return; }
       ok.push({ v: x.v, n: x.n }); T += x.v;
@@ -3973,7 +3974,7 @@ window.__vlAuto = true;
   /* summary above a lap list: best lap, how many laps within the set seconds / beyond (count + % of valid laps), invalid, and a bar */
   /* live lap table: newest on top, projected laps/time as in 연습 기록 (practice: minutes from the table, race: the race time) */
   function liveLapTbl(list, pos, D, prc) {
-    var C = lapCols(), best = lapBest(list), pj = D > 0 ? pracProj(list.slice().map(function (x) { return { n: x.n, v: x.v }; }), D) : null;
+    var C = lapCols(), best = lapBest(list), pj = D > 0 ? pracProj(list.slice().map(function (x) { return { n: x.n, v: x.v }; }), D, !prc) : null;
     var chip = prc ? '<div class="px-pj">예상 기록 <span class="pjc"><button data-pjm="-1">−</button><input type="number" class="pjin" min="1" max="60" step="1" value="' + (+cfg.projMin || 5) + '">분<button data-pjm="1">+</button></span><small>연습 기록과 같은 값</small></div>'
       : D > 0 ? '<div class="px-pj">예상 기록 <span class="pjc auto">' + fmtClock(D) + ' · 대회 시간</span></div>' : '';
     var rows = list.map(function (x, i) {
