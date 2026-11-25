@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.15
+// @version      3.2.16
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 99;   /* = VER below */
-  /* var VER = 99; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 100;   /* = VER below */
+  /* var VER = 100; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.15';
+  var VERSION = '3.2.16';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -459,7 +459,7 @@ window.__vlAuto = true;
     '#vl_root.vl-lx #vl_rbb td{font-size:19px !important;padding-top:9px !important;padding-bottom:9px !important}#vl_root.vl-lx #vl_rbh th{font-size:13px !important}' +
     '#vl_root.vl-lx #vl_rbb td small{font-size:.72em !important}#vl_root.vl-lx #vl_rbb td .lt{font-size:.75em}' +
     '#vl_root.vl-lx.vl-lxmd #vl_rbb td{font-size:17px !important;padding-top:7px !important;padding-bottom:7px !important}#vl_root.vl-lx.vl-lxmd #vl_rbb td small{display:none !important}' +
-    '#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-avg,#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-t3{display:none !important}#vl_root.vl-lx.vl-lxall #vl_rb .c-el,#vl_root.vl-lx.vl-lxall #vl_rb .c-l .ps{display:table-cell !important}#vl_root.vl-lx.vl-lxall #vl_rb .c-l .ps{display:inline !important}' +
+    '#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-avg,#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-t3{display:none !important}#vl_root.vl-lx.vl-lxall #vl_rb .c-l .ps{display:table-cell !important}#vl_root.vl-lx.vl-lxall #vl_rb .c-l .ps{display:inline !important}' +
     '#vl_root.vl-lx #vl_lxg .vl-lxc{flex:1 1 0}#vl_root.vl-lx #vl_lxg{gap:12px}' +
     '#vl_root.vl-lx #vl_big .bcol{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}#vl_root.vl-lx #vl_big .bcol>.rv.ah{grid-column:1;grid-row:1}#vl_root.vl-lx #vl_big .bcol>.rv.bh{grid-column:2;grid-row:1}#vl_root.vl-lx #vl_big .bcol>.mine{grid-column:1/-1;grid-row:2}' +
     '#vl_root.vl-lx #vl_big .rv{padding:6px 10px}#vl_root.vl-lx #vl_big .rv .rv-h{flex-wrap:wrap;gap:2px 6px}#vl_root.vl-lx #vl_big .rv .rv-t{font-size:18px}#vl_root.vl-lx #vl_big .rv .rv-g{font-size:20px}#vl_root.vl-lx #vl_big .rv-x{font-size:16px;padding-left:0;margin-left:0;align-items:flex-start}#vl_root.vl-lx #vl_big .rv-x small{font-size:12px}' +
@@ -637,6 +637,11 @@ window.__vlAuto = true;
     '#vl_root.vl-lx #vl_qual table td{font-size:18px !important;padding-top:8px !important;padding-bottom:8px !important}#vl_root.vl-lx #vl_qual table th{font-size:14px !important}#vl_root.vl-lx #vl_rb.vl-lxsel #vl_qual table td{font-size:16px !important;padding-top:6px !important;padding-bottom:6px !important}' +
     '#vl_root.vl-lx #vl_rb.vl-lxsel:not(.vl-lxst) #vl_lxL>.tw{order:1}#vl_root.vl-lx #vl_rb.vl-lxsel.vl-hasq #vl_qual{display:block !important;order:2}#vl_root.vl-lx #vl_rb.vl-lxsel:not(.vl-lxst) #vl_lxL>#vl_lxg{order:3}' +
     '#vl_root.vl-lx #vl_qual tr.vl-qv td,#vl_root.vl-lx #vl_qual tr.vl-qv .vl-qn{color:#ff7a1a !important;font-weight:800}#vl_root.vl-lx #vl_qual tr.vl-qv td:first-child{box-shadow:inset 4px 0 0 #ff7a1a}';
+
+  css.textContent +=
+    '#vl_root.vl-lx #vl_rb th.c-lps,#vl_root.vl-lx #vl_rb th.c-llv{text-align:right;white-space:nowrap;line-height:1.2}#vl_root.vl-lx #vl_rb th.c-lps small,#vl_root.vl-lx #vl_rb th.c-llv small{display:block;color:#7d8698;font-weight:500;font-size:11px;text-transform:none;letter-spacing:0}' +
+    '#vl_root.vl-lx #vl_rb td.c-lps{text-align:right;color:#b8c0d0;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}#vl_root.vl-lx #vl_rb td.c-llv{text-align:right;white-space:nowrap}#vl_root.vl-lx #vl_rb td.c-llv .lt{min-width:0;font-size:inherit !important;font-weight:700}#vl_root.vl-lx #vl_rb td.c-llv .lt:empty::before{content:"-";color:#8b93a6;font-family:inherit}' +
+    '#vl_root.vl-lx:not(.vl-lxall) #vl_rb .c-lps{display:none}#vl_root.vl-lx #vl_rb .c-el{display:none !important}#vl_root.vl-lx #vl_rb td.c-l .ln{min-width:0}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -2832,12 +2837,15 @@ window.__vlAuto = true;
     $('vl_lgfin').style.display = rowsData.some(function (r) { return r.fin; }) ? '' : 'none'; $('vl_lgpc').style.display = cfg.paceColor !== false ? '' : 'none'; $('vl_lgpc').innerHTML = cfg.trendSrc === 'best' ? (function () { var C = lapCols(); return 'Last Lap 베스트와 차이 <b style="color:' + C.B + '">베스트</b>/<b style="color:' + C.N + '">' + C.dev + '초 이하</b>/<b style="color:' + C.F + '">그 이상</b>'; })() : cfg.trendSrc === 'avg' ? 'Last Lap 평균보다 <b class="pu">빠름</b>/<b class="pd">느림</b>' : 'Pace <b class="pu">빨라짐</b>/<b class="pd">느려짐</b>'; $('vl_lgbd').style.display = cfg.raceOn !== false && cfg.bhdColor !== false ? '' : 'none'; $('vl_lgclc').style.setProperty('--cc', closeCol);
     $('vl_clk').textContent = hdr.ela || '';
     $('vl_elab').style.display = hdr.ela ? '' : 'none';
+    /* wide screens: LAPS · 통과 시각 · 진행 중 in their own columns (with a short note in the head) */
+    var LXS = root.classList.contains('vl-lx'), lxPs = LXS && cfg.raceOn !== false && cfg.lapPass !== false && !prc, lxLv = LXS && cfg.raceOn !== false && cfg.lapLive !== false && !prc;
     $('vl_rbh').innerHTML = '<tr>' + cols.map(function (c) {
       if (c.k === 'sel') return '<th class="c-sel" title="체크한 선수를 아래 그래프에 표시">📈</th>';
       var on = (cfg.sortK || 'p') === c.k;
-      return '<th class="c-' + c.k + (on ? ' sorted' : '') + '" data-k="' + c.k + '" title="눌러서 정렬"><span class="lg">' + c.lg + '</span><span class="sm">' + c.sm + '</span>' + (on ? '<span class="ar">' + ((cfg.sortD || 1) > 0 ? '▲' : '▼') + '</span>' : '') + '</th>';
+      return '<th class="c-' + c.k + (on ? ' sorted' : '') + '" data-k="' + c.k + '" title="눌러서 정렬"><span class="lg">' + c.lg + '</span><span class="sm">' + c.sm + '</span>' + (on ? '<span class="ar">' + ((cfg.sortD || 1) > 0 ? '▲' : '▼') + '</span>' : '') + '</th>' +
+        (c.k === 'l' && lxPs ? '<th class="c-lps">통과 시각<small>그 랩을 지난 경과</small></th>' : '') + (c.k === 'l' && lxLv ? '<th class="c-llv">진행 중<small>이번 랩 흐른 시간</small></th>' : '');
     }).join('') + '</tr>';
-    if (!rowsData.length) { $('vl_rbb').innerHTML = '<tr><td class="empty" colspan="' + cols.length + '">코스에 나온 선수가 없습니다.<br>주행이 시작되면 자동으로 표시됩니다.</td></tr>'; renderQual(); fitWidths(); return; }
+    if (!rowsData.length) { $('vl_rbb').innerHTML = '<tr><td class="empty" colspan="' + (cols.length + 2) + '">코스에 나온 선수가 없습니다.<br>주행이 시작되면 자동으로 표시됩니다.</td></tr>'; renderQual(); fitWidths(); return; }
     $('vl_rbb').innerHTML = rowsData.map(function (r, ri) {
       var cs = '';   /* close battles: no row colour any more (it clashed with the lap-update colours) → neon arrow in the P cell */
       var prv = rowsData[ri - 1], chase = r.closeTo && prv && +prv.p === +r.p - 1;
@@ -2855,6 +2863,8 @@ window.__vlAuto = true;
         if (c.k === 'fast') return '<td class="c-fast ' + r.fastCls + '"' + cs + '>' + esc(r.fast) + '</td>';
         /* LAPS: laps completed (same number as 통과, 0 before the first crossing) + time since the line (live, see updLive) */
         /* LAPS = laps completed · race time that lap was completed at (not in open practice, hidden when narrow) · time on the lap in progress (live) */
+        if (c.k === 'l' && LXS) return '<td class="c-l"' + cs + '><span class="ln">' + (+r.l || 0) + '랩</span></td>' +
+          (lxPs ? '<td class="c-lps"' + cs + '>' + (+r.l > 0 ? esc(r.el) : '-') + '</td>' : '') + (lxLv ? '<td class="c-llv"' + cs + '>' + liveSpan(r.key, 'span') + '</td>' : '');
         if (c.k === 'l') return '<td class="c-l"' + cs + '><span class="ln">' + (+r.l || 0) + '랩</span>' +
           (cfg.raceOn !== false && cfg.lapPass !== false && !prc ? '<span class="ps">' + (+r.l > 0 ? esc(r.el) : '-') + '</span>' : '') +
           (cfg.raceOn !== false && cfg.lapLive !== false && !prc ? liveSpan(r.key, 'span') : '') + '</td>';
