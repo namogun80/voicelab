@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 94;   /* = VER below */
-  /* var VER = 94; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 95;   /* = VER below */
+  /* var VER = 95; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.10';
+  var VERSION = '3.2.11';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -600,6 +600,12 @@
     'table.sr-t td.sr-sc b{color:#3ddc84;font-size:17px}table.sr-t td.sr-sc small{display:block;color:#9aa4b8;font-size:12px}table.sr-t th.sr-sc .sr-n{margin-top:4px}table.sr-t th.sr-sc .sr-n small{color:#b8c0d0;font-weight:600;padding-left:4px}.sr-hs{display:block;color:#9aa4b8;font-size:12px;font-weight:500}' +
     '#vl_root table.sr-t td.u b{color:#fff}#vl_root table.sr-t td.u small{color:#3ddc84;font-weight:800;font-size:13px}#vl_root table.sr-t td.sr-w b{color:#ffd54a}#vl_root table.sr-t td.x.sr-w b{color:#7d8698}table.sr-t td.na{color:#4a5266}.sr-wn{color:#ffd54a}table.sr-t tr.sr-o td{color:#8b93a6}table.sr-t tr.sr-sep td{color:#9aa4b8;font-size:13px;text-align:left !important;background:#0e1322}' +
     '.rs-min{white-space:nowrap}.sr-lg{color:#b8c0d0;font-size:13px;margin-top:8px;line-height:1.6}.rs-e em b.sr-me{display:inline;color:#ff7a1a}';
+
+  css.textContent +=
+    '#vl_root .vl-lt td.lt-d.t3{position:relative;padding-right:20px !important}#vl_root .vl-lt td.t3::after{content:"";position:absolute;right:5px;top:0;bottom:0;border-right:3px solid #d27cff}' +
+    '#vl_root .vl-lt td.t3a::after{top:50%;width:9px;border-top:3px solid #d27cff;border-top-right-radius:4px}#vl_root .vl-lt td.t3b::after{bottom:50%;width:9px;border-bottom:3px solid #d27cff;border-bottom-right-radius:4px}' +
+    '.t3l{display:block;color:#d27cff;font-size:13px;font-weight:800;line-height:1.2;white-space:nowrap}' +
+    '#vl_root.vl-pit .vl-lt td.lt-d.t3{padding-right:11px !important}#vl_root.vl-pit .vl-lt td.t3::after{right:1px;width:7px}#vl_root.vl-pit .vl-lt td.t3:not(.t3a):not(.t3b)::after{width:0}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -3936,13 +3942,23 @@
     });
     return out;
   }
+  /* Top 3 consecutive: the 3 laps in a row (no invalid lap between) with the smallest sum → {s: first index, sum}, or null */
+  function top3Of(list) {
+    var b = null;
+    for (var i = 0; i + 2 < list.length; i++) { var a = list[i].v, c = list[i + 1].v, d = list[i + 2].v; if (a > 0 && c > 0 && d > 0 && (!b || a + c + d < b.sum - 1e-9)) b = { s: i, sum: a + c + d }; }
+    return b;
+  }
+  /* bracket class on the lap-time cell (rev: newest on top) and the label in the middle lap */
+  function t3Cls(t3, i, rev) { if (!t3 || i < t3.s || i > t3.s + 2) return ''; var k = i - t3.s; return ' t3' + (k === (rev ? 2 : 0) ? ' t3a' : k === (rev ? 0 : 2) ? ' t3b' : ''); }
+  function t3Lab(t3, i) { return t3 && i === t3.s + 1 ? '<span class="t3l">Top 3 ' + fmtS(t3.sum) + '</span>' : ''; }
+  function t3Ring(t3, list, i, cx, cy, r) { return t3 && i >= t3.s && i <= t3.s + 2 ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#d27cff" stroke-width="2.2"><title>Top 3 ' + fmtS(t3.sum) + '</title></circle>' : ''; }
   function pracLapTbl(list) {
-    var C = lapCols(), best = lapBest(list), D = (+cfg.projMin || 5) * 60, pj = pracProj(list, D);
+    var C = lapCols(), best = lapBest(list), D = (+cfg.projMin || 5) * 60, pj = pracProj(list, D), t3 = top3Of(list);
     return '<div class="px-pj">예상 기록 <span class="pjc"><button data-pjm="-1">−</button><input type="number" class="pjin" min="1" max="60" step="1" value="' + (+cfg.projMin || 5) + '">분<button data-pjm="1">+</button></span><small>세션 표도 같이</small></div>' +
       '<table class="vl-lt px-lt"><thead><tr><th>랩</th><th>랩타임 (베스트 차)</th><th>예상 랩/시간</th></tr></thead><tbody>' + list.map(function (x, i) {
         var t = Math.abs(x.v), c = lapCol(x.v, best, C), d = t - best, sh = x.v > 0 && d < -0.0005, gap = x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3), p = pj[i];
         var pc = p.x ? '<span class="px-no">제외</span>' : p.fin ? '<b>🏁 ' + fmtLT(p) + '</b>' : fmtLT(p) + (p.from ? ' <small>' + p.from + '~' + x.n + '랩</small>' : '');
-        return '<tr' + (p.fin ? ' class="px-fin"' : '') + '><td>' + x.n + '</td><td class="lt-d" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')</td><td class="lt-p">' + pc + '</td></tr>';
+        return '<tr' + (p.fin ? ' class="px-fin"' : '') + '><td>' + x.n + '</td><td class="lt-d' + t3Cls(t3, i, false) + '" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')' + t3Lab(t3, i) + '</td><td class="lt-p">' + pc + '</td></tr>';
       }).join('') + '</tbody></table>';
   }
   function fmtLT(p) { var m = Math.floor(p.T / 60), r = p.T - m * 60; return p.L + '/' + m + ':' + (r < 10 ? '0' : '') + r.toFixed(3); }
@@ -3964,14 +3980,14 @@
   /* summary above a lap list: best lap, how many laps within the set seconds / beyond (count + % of valid laps), invalid, and a bar */
   /* live lap table: newest on top, projected laps/time as in 연습 기록 (practice: minutes from the table, race: the race time) */
   function liveLapTbl(list, pos, D, prc) {
-    var C = lapCols(), best = lapBest(list), pj = D > 0 ? pracProj(list.slice().map(function (x) { return { n: x.n, v: x.v }; }), D, !prc) : null;
+    var C = lapCols(), best = lapBest(list), pj = D > 0 ? pracProj(list.slice().map(function (x) { return { n: x.n, v: x.v }; }), D, !prc) : null, t3 = top3Of(list);
     var chip = prc ? '<div class="px-pj">예상 기록 <span class="pjc"><button data-pjm="-1">−</button><input type="number" class="pjin" min="1" max="60" step="1" value="' + (+cfg.projMin || 5) + '">분<button data-pjm="1">+</button></span><small>연습 기록과 같은 값</small></div>'
       : D > 0 ? '<div class="px-pj">예상 기록 <span class="pjc auto">' + fmtClock(D) + ' · 대회 시간</span></div>' : '';
     var rows = list.map(function (x, i) {
       var t = Math.abs(x.v), c = lapCol(x.v, best, C), d = t - best, sh = x.v > 0 && d < -0.0005, gap = x.v < 0 ? '무효' : sh ? '제외' : d < 0.0005 ? '베스트' : '+' + d.toFixed(3);
       var pv = i > 0 ? list[i - 1].p : NaN, pp = pos ? '<td' + (x.p > 0 && pv > 0 && x.p !== pv ? ' style="color:' + (x.p < pv ? '#3ddc84' : '#ff6b6b') + ';font-weight:700"' : '') + '>' + (x.p > 0 ? x.p : '-') + '</td>' : '';
       var p = pj ? pj[i] : null, pc = !p ? '' : p.x ? '<span class="px-no">제외</span>' : p.fin ? '<b>🏁 ' + fmtLT(p) + '</b>' : fmtLT(p) + (p.from ? ' <small>' + p.from + '~' + x.n + '랩</small>' : '');
-      return '<tr' + (p && p.fin ? ' class="px-fin"' : '') + '><td>' + x.n + '</td><td class="lt-d" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')</td>' + (pj ? '<td class="lt-p">' + pc + '</td>' : '') + pp + '</tr>';
+      return '<tr' + (p && p.fin ? ' class="px-fin"' : '') + '><td>' + x.n + '</td><td class="lt-d' + t3Cls(t3, i, true) + '" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')' + t3Lab(t3, i) + '</td>' + (pj ? '<td class="lt-p">' + pc + '</td>' : '') + pp + '</tr>';
     });
     rows.reverse();
     return chip + '<table class="vl-lt px-lt"><thead><tr><th>랩</th><th>랩타임 (베스트 차)</th>' + (pj ? '<th>예상 랩/시간</th>' : '') + (pos ? '<th>순위</th>' : '') + '</tr></thead><tbody>' + rows.join('') + '</tbody></table>';
@@ -3988,10 +4004,11 @@
     others.forEach(function (o) { var pts = o.list.filter(function (x) { return x.v > 0 && x.v - best <= cap; }).map(function (x) { return X(x.n).toFixed(1) + ',' + Y(x.v - best).toFixed(1); }); if (pts.length > 1) h += '<polyline fill="none" stroke="' + o.color + '" stroke-opacity=".55" stroke-dasharray="4 4" stroke-width="1.5" points="' + pts.join(' ') + '"/>'; });
     var mp = mineL.filter(function (x) { return x.v > 0 && x.v - best <= cap; }).map(function (x) { return X(x.n).toFixed(1) + ',' + Y(x.v - best).toFixed(1); });
     if (mp.length > 1) h += '<polyline fill="none" stroke="#ff7a1a" stroke-opacity=".5" stroke-width="2" points="' + mp.join(' ') + '"/>';
-    mineL.forEach(function (x) {
+    var t3 = top3Of(mineL);
+    mineL.forEach(function (x, i) {
       if (!(x.v > 0)) return;
       if (x.v - best > cap) { h += '<text x="' + X(x.n).toFixed(1) + '" y="' + (H - B + 2) + '" fill="#7d8698" font-size="12" text-anchor="middle">▼<title>' + x.n + '랩 ' + fmtS(x.v) + '</title></text>'; return; }
-      h += '<circle cx="' + X(x.n).toFixed(1) + '" cy="' + Y(x.v - best).toFixed(1) + '" r="4.5" fill="' + lapCol(x.v, best, C) + '"><title>' + x.n + '랩 ' + fmtS(x.v) + '</title></circle>';
+      h += '<circle cx="' + X(x.n).toFixed(1) + '" cy="' + Y(x.v - best).toFixed(1) + '" r="4.5" fill="' + lapCol(x.v, best, C) + '"><title>' + x.n + '랩 ' + fmtS(x.v) + '</title></circle>' + t3Ring(t3, mineL, i, X(x.n).toFixed(1), Y(x.v - best).toFixed(1), 8);
     });
     var step = Math.max(1, Math.ceil((nMax - nMin) / 8));
     for (var n = nMin; n <= nMax; n += step) h += '<text x="' + X(n).toFixed(1) + '" y="' + (H - 6) + '" fill="#9aa4b8" font-size="11" text-anchor="middle">' + n + '</text>';
@@ -4032,16 +4049,17 @@
     for (k = 0; k < nx; k++) { var ln = Math.round(n0 + (n1 - n0) * k / Math.max(1, nx - 1)); g += '<text x="' + X(ln) + '" y="' + (H - 7) + '" fill="#888" font-size="10" text-anchor="middle">' + ln + '</text>'; }
     var pts = list.filter(function (x) { return x.v > 0; }).map(function (x) { return [X(x.n), Y(x.v)]; });
     if (pts.length > 1) g += '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' ') + '" fill="none" stroke="#666" stroke-width="1.4"/>';
-    list.forEach(function (x) {
+    var t3 = top3Of(list);
+    list.forEach(function (x, i) {
       var t = Math.abs(x.v), c = lapCol(x.v, best, C), out = t > y1 || t < y0;
-      g += '<circle cx="' + X(x.n).toFixed(1) + '" cy="' + Y(t).toFixed(1) + '" r="3.2" fill="' + (out || x.v < 0 ? '#0f0f12' : c) + '" stroke="' + c + '"><title>' + x.n + '랩 · ' + fmtS(t) + (x.v < 0 ? ' (무효)' : '') + '</title></circle>';
+      g += '<circle cx="' + X(x.n).toFixed(1) + '" cy="' + Y(t).toFixed(1) + '" r="3.2" fill="' + (out || x.v < 0 ? '#0f0f12' : c) + '" stroke="' + c + '"><title>' + x.n + '랩 · ' + fmtS(t) + (x.v < 0 ? ' (무효)' : '') + '</title></circle>' + t3Ring(t3, list, i, X(x.n).toFixed(1), Y(t).toFixed(1), 6.5);
     });
     return '<svg viewBox="0 0 ' + W2 + ' ' + H + '">' + g + '</svg>';
   }
   function lapKey(link, noDash) {
     var C = lapCols();
     return '<div class="lk"><b style="color:' + C.B + '">■</b> 베스트 · <b style="color:' + C.N + '">■</b> ' + C.dev + '초 이하 · <b style="color:' + C.F + '">■</b> 그 이상' + (noDash ? '' : ' · 점선 = 베스트 + ' + C.dev + '초') +
-      (link ? ' · <a href="' + link + '" target="_blank" rel="noopener">LiveRC 원본 ↗</a>' : '') + '</div>';
+      ' · <b style="color:#d27cff">◯ ]</b> Top 3 연속' + (link ? ' · <a href="' + link + '" target="_blank" rel="noopener">LiveRC 원본 ↗</a>' : '') + '</div>';
   }
   /* one session's laps, top to bottom, with the chart beside them. laps: signed numbers (negative = invalid on LiveRC) */
   function lapDetail(laps, link) {
