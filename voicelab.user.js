@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.3
+// @version      3.2.4
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 87;   /* = VER below */
-  /* var VER = 87; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 88;   /* = VER below */
+  /* var VER = 88; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.3';
+  var VERSION = '3.2.4';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -503,7 +503,7 @@ window.__vlAuto = true;
     '#vl_root.vl-pit #vl_pittk{display:block;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:3px 9px;font-size:13px;margin:0 4px;cursor:pointer}' +
     '#vl_root.vl-pit #vl_head .tab,#vl_root.vl-pit #vl_zm,#vl_root.vl-pit #vl_head .vl-tsep,#vl_root.vl-pit #vl_bigb{display:none !important}#vl_root.vl-pit #vl_go{margin-left:auto}' +
     '#vl_root.vl-pit #vl_pitbar{display:flex;flex:none;border-top:1px solid #232b40;background:#0f1424;padding-bottom:env(safe-area-inset-bottom)}' +
-    '#vl_pitbar button{flex:1;background:none;border:0;color:#c9d0dd;font:700 13px/1.2 inherit;font-family:inherit;padding:7px 0 9px;cursor:pointer}#vl_pitbar button i{display:block;font-style:normal;font-size:20px;margin-bottom:2px}#vl_pitbar button.on{color:#ff7a1a}' +
+    '#vl_pitbar button{flex:1;min-width:0;background:none;border:0;color:#c9d0dd;font:700 13px/1 inherit;font-family:inherit;height:40px;padding:0 2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}#vl_pitbar button i{display:inline;font-style:normal;font-size:15px;margin:0}#vl_pitbar button.on{color:#ff7a1a;box-shadow:inset 0 2px 0 #ff7a1a}' +
     '#vl_root.vl-pit #vl_rb.vl-lxsel #vl_lxl{display:block;margin-top:10px}#vl_root.vl-pit #vl_rb.vl-lxsel #vl_qual,#vl_root.vl-pit #vl_rb .lgd,#vl_root.vl-pit #vl_gbar,#vl_root.vl-pit #vl_gsel,#vl_root.vl-pit #vl_glg,#vl_root.vl-pit #vl_graphs,#vl_root.vl-pit #vl_glaps{display:none !important}' +
     '#vl_root.vl-pit .vl-lxc table.vl-lt th,#vl_root.vl-pit .vl-lxc table.vl-lt td{padding:5px 4px}#vl_root.vl-pit .vl-lxc table.vl-lt td{font-size:15px}' +
     '#vl_root.vl-pit #vl_rb.vl-nosel .tw:before{content:"👆 이름을 누르면 그 선수를 크게 보고 음성으로 안내해요";display:block;padding:8px 10px;color:#ffb070;font-size:14px;background:#1d1a17;border-radius:8px;margin-bottom:6px}';
