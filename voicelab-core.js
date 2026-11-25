@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 97;   /* = VER below */
-  /* var VER = 97; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 98;   /* = VER below */
+  /* var VER = 98; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.13';
+  var VERSION = '3.2.14';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -46,7 +46,7 @@
     if (!ov) warnOld = true;   /* copies before v1.9 keep running in the background and can't be stopped from here */
   }
   var LS = 'voiceLapCfg';
-  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 0, gapAhead: true, gapAheadLaps: 0, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'best', qualOpen: true, zoom: 100,
+  var cfg = { sel: {}, targets: '', all: false, sayName: true, sayLap: true, dec: 2, unit: false, pad: 2, sayTime: true, sayPos: false, sayBest: true, gapLead: true, gapLeadLaps: 0, gapAhead: true, gapAheadLaps: 0, rate: 1.1, wake: true, open: true, tab: 'set', colEl: true, colPace: true, colTop3: true, sortK: 'p', sortD: 1, pracFrom: '', pracTo: '', pracSel: [], closeOn: true, closeSec: 1, closeColor: '#ff2bd6', closeV2: 1, dingAhead: false, dingTone: 0, colOrder: null, colHide: null, trendSrc: 'best', graphSel: [], gShow: { pos: true, lap: true, avg: true, list: true }, gBackfill: true, paceColor: true, bhdColor: true, avgMode: 'top10', avgOut: 15, lastDiff: false, psK: 'd', psD: -1, pcUp: '#3ddc84', pcDown: '#ff7a7a', pcTop: '#d27cff', consOn: true, consPct: 90, consCol: '#4fc3f7', pgShow: { best: true, t3: true }, pdrvHide: false, full: null, pcolOrder: null, pcolHide: {}, projMin: 5, projOut: 0, lapDev: 0.5, lapNear: '#3ddc84', lapFar: '#ffa94d', lapBest: '#d27cff', trkRecent: [], trkHide: false, voice: 'def', runOn: false, runMin: 5, runSec: 0, fuelOn: false, fuelMin: 7, fuelSec: 0, pitWord: '피트 인', pitTarget: 10, pitFast: '#3ddc84', pitSlow: '#ff5252', favs: [], lineAfterPit: false, voiceOn: true, raceOn: true, runWord: '주행 완료', gOpen: {}, syncUrl: '', syncKey: '', _ts: 0, closeAfter: 3, lapLive: true, liveSec: 2, liveOk: '#3ddc84', liveNear: '#ffa94d', liveOver: '#ff5252', lapPass: true, qualOn: true, qualMode: 'auto', qualOpen: true, zoom: 100,
     teamOn: false, teams: [], teamOf: {}, ptsMode: 'fixed', ptsFixed: [10, 8, 6, 5, 4, 3, 2, 1], ptsCustom: [10, 8, 6, 5, 4, 3, 2, 1], bonusBest: false, bonusFin: false, teamAuto: true, teamSay: true, teamSayLive: false,
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
@@ -77,6 +77,7 @@
   /* v3.2.0: one driver, voice = lap time only — the one-driver options are fixed; gaps only on the same lap */
   cfg.voiceMerge = false; cfg.voiceLatest = true; cfg.selKeep = true; cfg.toneAuto = false; cfg.all = false; cfg.targets = ''; cfg.gapLeadLaps = 0; cfg.gapAheadLaps = 0;
   if (!(+cfg.closePct > 0)) cfg.closePct = 21;
+  if (!cfg.v3214) { cfg.v3214 = 1; cfg.qualMode = 'auto'; }   /* qualifier standings follow the event's own rule (LiveRC "Qual Points" → points) */
   if (cfg.pracCar && !cfg.car) cfg.car = cfg.pracCar; delete cfg.pracCar;
   /* v3.2.0: the voice driver is kept by the person's name (LiveRC "name car" → name) */
   if (!cfg.v320) {
@@ -746,7 +747,7 @@
     '<details class="inf"><summary>ⓘ 설명</summary><div>안내 중인 선수의 남은 주유 시간을 레이스 보드 남은 시간 옆에 줄여 가며 보여줍니다(0초 아래는 마이너스). <b>피트보다 앞</b>: 알림 뒤 라인 통과 = 주유 시작, 그다음 통과 = 주유 끝 — 그 랩 − 보통 랩 = 피트 타임, 주유 시간에서 (그 랩 − 피트 타임)을 뺀 값부터 다시 줄어듦. <b>피트보다 뒤</b>: 알림 뒤 첫 통과 랩에 피트가 들어 있음 — 그 랩 − 보통 랩 = 피트 타임, 주유 시간 그대로 다시 시작. ↺ 버튼 = 지금 주유(수동 리셋), 다음 통과 때 피트 타임 계산</div></details></div>' +
     '<div class="sub"><span>🏆 예선 순위</span></div>' +
     '<div class="gap"><label><input type="checkbox" id="vl_qon">예선 레이스에서 레이스 보드 아래 예선 순위 표시 <small style="color:#999">(LiveRC 결과 + 지금 레이스 페이스로 예상)</small></label>' +
-    '<div class="lim" style="flex-wrap:wrap">TQ·순위 방식 <select id="vl_qmode" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px;max-width:100%"><option value="best">베스트 랩/시간 — 모든 예선 중 가장 좋은 랩/시간</option><option value="points">포인트 — 대회 규칙 자동(그 전엔 1등 0 · 2등 2 · 3등 3 …, 적은 순)</option></select></div>' +
+    '<div class="lim" style="flex-wrap:wrap">TQ·순위 방식 <select id="vl_qmode" style="background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:4px;font-size:15px;max-width:100%"><option value="auto">자동 — 대회에 LiveRC “Qual Points” 표가 있으면 포인트, 없으면 베스트</option><option value="best">베스트 랩/시간 — 모든 예선 중 가장 좋은 랩/시간</option><option value="points">포인트 — 대회 규칙 자동(그 전엔 1등 0 · 2등 2 · 3등 3 …, 적은 순)</option></select></div>' +
     '<details class="inf"><summary>ⓘ 설명</summary><div><b>베스트 랩/시간</b>: 모든 예선 라운드 중 각자 가장 좋은 기록(랩 많은 순 → 시간 짧은 순)으로 순위. <b>포인트</b>: 라운드마다 그 클래스 모든 선수를 랩/시간으로 줄 세워 등수별 포인트, 합계로 순위 · 동점이면 모든 예선 중 최고 랩/시간. 1라운드 결과가 올라오면 LiveRC의 이 대회 “Qual Points” 표에서 등수별 포인트, 많은/적은 쪽이 이기는지, 좋은 N라운드만 합산하는지를 읽어 자동으로 적용(그 전엔 기본 1등 0 · 2등 2 · 3등 3 … 적은 순). 지금 레이스 중인 선수는 LiveRC 페이스(예상 랩/시간)로 넣어 랩마다 다시 계산. 결과는 이 트랙 LiveRC 결과 페이지(오늘 대회)에서 1분마다 읽음 · 예선(Qualifier) 레이스에서만 보임</div></details></div>' +
     '</div></div>' +
     '<div class="sec grp" data-g="team"><div class="gh"><span class="ar"></span><span class="sech">👥 팀전</span><span class="gs" id="vl_gs_team"></span><label class="gsw" title="팀전 켜기/끄기"><input type="checkbox" id="vl_teamOn"><i></i></label></div><div class="gb">' +
@@ -986,7 +987,7 @@
   document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('#vl_zm')) { try { $('vl_zl').classList.remove('on'); } catch (x) {} } }, true);
   zoomSet(cfg.zoom || 100);
   bind('vl_qon', 'qualOn', function () { qd.html = ''; renderQual(); });
-  $('vl_qmode').value = cfg.qualMode === 'points' ? 'points' : 'best'; $('vl_qmode').onchange = function () { cfg.qualMode = this.value; save(); qd.html = ''; renderQual(); };
+  $('vl_qmode').value = cfg.qualMode === 'points' || cfg.qualMode === 'best' ? cfg.qualMode : 'auto'; $('vl_qmode').onchange = function () { cfg.qualMode = this.value; save(); qd.html = ''; renderQual(); };
   $('vl_qual').addEventListener('click', function (e) { if (e.target.closest('[data-qt]')) { cfg.qualOpen = cfg.qualOpen === false; save(); qd.html = ''; renderQual(); } });
   bind('vl_lpass', 'lapPass', function () { renderRaceBoard(true); });
   $('vl_lvs').value = cfg.liveSec; $('vl_lvs').oninput = function () { var v = parseFloat(this.value); if (v >= 0) { cfg.liveSec = v; save(); updLive(); } };
@@ -2995,7 +2996,7 @@
       var ns = Object.keys(links).map(Number).filter(function (n) { return n <= round; }), got = {}, pts = null;
       var jobs = ns.map(function (n) { return fetch(links[n], { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (t) { got[n] = parseRanking(t, cls); }); });
       if (pl) jobs.push(fetch(pl.getAttribute('href'), { credentials: 'same-origin' }).then(function (r) { return r.text(); }).then(function (t) { pts = parsePoints(t, cls); }, function () {}));
-      return Promise.all(jobs).then(function () { if (qd.key === key) { qd.rounds = got; qd.points = pts; qd.bestN = bm ? +bm[1] : 0; qd.ofN = bm ? +bm[2] : 0; qd.ok = true; } });
+      return Promise.all(jobs).then(function () { if (qd.key === key) { qd.rounds = got; qd.points = pts; qd.hasPts = !!pl; qd.bestN = bm ? +bm[1] : 0; qd.ofN = bm ? +bm[2] : 0; qd.ok = true; } });
     }).then(function () { qd.busy = false; qd.at = Date.now(); qd.err = ''; qd.html = ''; renderQual(); },
       function () { qd.busy = false; qd.at = Date.now(); qd.err = 'LiveRC 결과 페이지를 읽지 못했습니다'; qd.html = ''; renderQual(); });
   }
@@ -3558,7 +3559,7 @@
     if (qd.key !== key) { qd = { key: key, at: 0, busy: false, ok: false, err: '', rounds: {}, html: '' }; }
     if (!qd.busy && Date.now() - qd.at > 60000) qualFetch(cls, R, key);
     if (!qd.ok) { if (box.innerHTML) box.innerHTML = ''; qd.html = ''; qd.pred = {}; qd.tq = ''; return; }
-    var mode = cfg.qualMode === 'points' ? 'points' : 'best';
+    var mode = cfg.qualMode === 'points' || cfg.qualMode === 'best' ? cfg.qualMode : (qd.hasPts ? 'points' : 'best');   /* auto: the event's own rule */
     var now = qualRank(qualEntries(sc, R, true), R, mode), before = qualRank(qualEntries(sc, R, false), R, mode), pos0 = {};
     before.forEach(function (e, i) { pos0[nmKey(e.name)] = i + 1; });
     /* for the 👤 big cards: predicted standing (and change) per driver, predicted TQ */
