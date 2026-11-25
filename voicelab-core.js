@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 86;   /* = VER below */
-  /* var VER = 86; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 87;   /* = VER below */
+  /* var VER = 87; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.2';
+  var VERSION = '3.2.3';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -51,7 +51,7 @@
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
-    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', pitPv: 'tbl' };
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl' };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
@@ -563,6 +563,17 @@
     '.rs-flow span.dr{opacity:.55;text-decoration:line-through}.rs-flow span.tot{border-color:#ff7a1a !important}' +
     '.rs-mn2 tr.bu td:first-child{box-shadow:inset 3px 0 0 #3ddc84}.rs-bu{display:inline-block;background:#3ddc84;color:#0b0f1a;font-size:12px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:1px}' +
     '#vl_root .rs-tabs{display:flex !important;flex-direction:column !important;align-items:stretch !important;gap:12px}#vl_root .rs-tabs>*{min-width:0}';
+
+  css.textContent +=
+    '#vl_dpk .dp-sec{color:#ffb070;font-size:12px;font-weight:700;margin:8px 6px 2px}' +
+    '.rs-min{display:flex;align-items:center;gap:6px;color:#b8c0d0;font-size:13px;margin:6px 0}.rs-min .pjc .rminin{width:30px;background:none;border:0;color:#fff;font:800 14px/1 inherit;font-family:inherit;text-align:right;-moz-appearance:textfield}.rs-min .rminin::-webkit-inner-spin-button{display:none}' +
+    '.rs-live i{color:#ff5252;font-style:normal}.rs-lv{color:#ff5252;font-size:12px;font-weight:800;margin-left:4px;white-space:nowrap}.rs-live{border:1px solid #ff5252;color:#ffb0b0;border-radius:999px;padding:2px 10px;font-size:13px;margin-left:10px;white-space:nowrap}' +
+    '.rs-strip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.rs-strip span{border:1px solid #2b3550;border-radius:8px;padding:5px 10px;font-size:13px;color:#b8c0d0}.rs-strip span.ok{border-color:#3ddc84;color:#3ddc84}.rs-strip span.now{border-color:#ff5252;color:#fff;background:#2a1418}' +
+    '.rs-t td.mn{color:#ffd8b8;font-weight:700;white-space:nowrap}' +
+    /* summary: one line, sizes follow the card width */
+    '.rs-mc{container-type:inline-size}#vl_root .rs-flow{flex-wrap:nowrap;gap:.6cqw}#vl_root .rs-flow>span{flex:1 1 auto;min-width:0;padding:.5cqw .8cqw;font-size:clamp(15px,2.1cqw,26px);overflow:hidden}' +
+    '#vl_root .rs-flow>span small{font-size:clamp(11px,1.05cqw,13px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#vl_root .rs-flow>span b{display:block;white-space:nowrap;font-weight:800}' +
+    '#vl_root .rs-flow>span i{font-size:clamp(11px,.95cqw,12px);overflow:hidden;text-overflow:ellipsis}.rs-flow span.bl{border-color:#3a2f55 !important}.rs-flow span.gb i{color:#3ddc84;font-weight:800}';
   document.head.appendChild(css);
 
   /* ---------- UI ---------- */
@@ -1961,7 +1972,7 @@
       var d = dd[k]; if (!d || typeof d !== 'object') return;
       var n = nameOf(d); if (n) present[n] = +d.position || 999;
     });
-    var names = Object.keys(present).sort(function (a, b) { return present[a] - present[b]; });
+    var names = Object.keys(present).sort(nmSort);
     Object.keys(cfg.sel).forEach(function (n) { if (cfg.sel[n].on && !(n in present)) names.push(n); });
     (cfg.favs || []).forEach(function (n) { if (names.indexOf(n) < 0) names.push(n); });   /* favourites can be chosen before they are on track */
     var box = $('vl_drv');
@@ -2543,9 +2554,9 @@
   }
   function dpkList() {
     var q = ($('vl_dpq') || {}).value || '', me = myName(), mk = pKey(me);
-    var ps = dpkPeople().filter(function (o) { return kmatch(o.p, q); }).slice(0, 40);
+    var ps = dpkPeople().filter(function (o) { return kmatch(o.p, q); }).sort(function (a, b) { return (b.live ? 1 : 0) - (a.live ? 1 : 0) || nmSort(a.p, b.p); }).slice(0, 80), nLive = ps.filter(function (o) { return o.live; }).length;
     $('vl_dpl').innerHTML = (me && !q ? '<div class="dp-r dp-x" data-dpn="">✕ 선택 해제 (' + esc(me) + ')</div>' : '') +
-      ps.map(function (o) { var cs = Object.keys(o.cars).map(function (c) { return o.cars[c]; }); return '<div class="dp-r' + (o.k === mk ? ' on' : '') + '" data-dpn="' + esc(o.p) + '"><b>' + esc(o.p) + '</b>' + (cs.length ? ' <span class="vl-car">(' + esc(cs.slice(0, 3).join(' · ')) + (cs.length > 3 ? ' …' : '') + ')</span>' : '') + (o.live ? '<em>코스</em>' : '') + '</div>'; }).join('') +
+      ps.map(function (o) { var cs = Object.keys(o.cars).map(function (c) { return o.cars[c]; }); return '<div class="dp-r' + (o.k === mk ? ' on' : '') + '" data-dpn="' + esc(o.p) + '"><b>' + esc(o.p) + '</b>' + (cs.length ? ' <span class="vl-car">(' + esc(cs.slice(0, 3).join(' · ')) + (cs.length > 3 ? ' …' : '') + ')</span>' : '') + (o.live ? '<em>코스</em>' : '') + '</div>'; }).map(function (h, i) { return (nLive && i === 0 ? '<div class="dp-sec">지금 코스</div>' : '') + (i === nLive ? '<div class="dp-sec">전체</div>' : '') + h; }).join('') +
       (q && !ps.length ? '<div class="dp-r" data-dpn="' + esc(q.trim()) + '">“' + esc(q.trim()) + '” 으로 고르기</div>' : '');
   }
   function dpkOpen(anchor) {
@@ -3715,7 +3726,7 @@
     prac.rows.forEach(function (r) { var x = splitName(r[1]), k = nmKey(x.p); if (!P[k]) { P[k] = { p: x.p, n: 0, cars: {} }; order.push(k); } P[k].n++; if (x.c) P[k].cars[x.c.toLowerCase()] = P[k].cars[x.c.toLowerCase()] || x.c; });
     $('vl_pselbox').style.display = order.length ? '' : 'none';
     var cur = myName() ? pKey(myName()) : '';
-    order.sort(function (a, b) { return P[b].n - P[a].n; });
+    order.sort(function (a, b) { return nmSort(P[a].p, P[b].p); });
     $('vl_pdrv').innerHTML = order.filter(function (k) { return !q || kmatch(P[k].p, q); }).map(function (k) {
       var x = P[k], cs = Object.keys(x.cars).map(function (c) { return x.cars[c]; });
       return '<button class="dch' + (k === cur ? ' on' : '') + '" data-n="' + esc(x.p) + '"><span class="sw" style="background:' + (k === cur ? '#ff7a1a' : 'transparent') + ';border:1px solid ' + (k === cur ? 'transparent' : '#44444c') + '"></span><span class="nm">' + esc(x.p) + '</span><span class="tp">' + (cs.length > 1 ? '차 ' + cs.length + '대' : esc(cs[0] || '')) + '</span><small>세션 ' + x.n + '</small></button>';
@@ -4183,7 +4194,7 @@
       ev.list = [].map.call(doc.querySelectorAll('#events tbody tr, table tbody tr'), function (tr) {
         var a = tr.querySelector('a[href*="view_event"]'); if (!a) return null;
         var id = (a.getAttribute('href').match(/id=(\d+)/) || [])[1], h = tr.querySelector('.hidden'), td = tr.querySelectorAll('td');
-        return id ? { id: id, name: a.textContent.trim(), date: h ? h.textContent.trim().slice(0, 10) : '', n: td[2] ? +td[2].textContent.trim() || 0 : 0 } : null;
+        return id ? { id: id, name: a.textContent.trim(), date: h ? h.textContent.trim().slice(0, 10) : '', n: td[2] ? +td[2].textContent.trim() || 0 : 0, d: td[3] ? +td[3].textContent.trim() || 0 : 0 } : null;
       }).filter(Boolean).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
       ev.err = '';
     }).catch(function () { ev.err = 'LiveRC 대회 목록을 읽지 못했어요'; }).then(function () { ev.busy = false; ev.at = Date.now(); if (cb) cb(); });
@@ -4206,7 +4217,7 @@
       var hr = [].filter.call(t.querySelectorAll('thead tr'), function (tr) { return /driver/i.test(tr.textContent); })[0]; if (!hr) return;
       var hs = [].map.call(hr.children, function (c) { return c.textContent.trim(); }), iD = hs.map(function (x) { return x.toLowerCase(); }).indexOf('driver'), iT = hs.map(function (x) { return x.toLowerCase(); }).indexOf('result'), rc = [];
       hs.forEach(function (x, i) { if (/^round\s*\d+/i.test(x)) rc.push(i); });
-      out[nmKey(h.textContent.replace(/\s+/g, ' '))] = { rounds: rc.map(function (i) { return 'R' + hs[i].replace(/\D/g, ''); }), rows: [].map.call(t.querySelectorAll('tbody tr'), function (tr) {
+      out[nmKey(h.textContent.replace(/\s+/g, ' '))] = { name: h.textContent.replace(/\s+/g, ' ').trim(), rounds: rc.map(function (i) { return 'R' + hs[i].replace(/\D/g, ''); }), rows: [].map.call(t.querySelectorAll('tbody tr'), function (tr) {
         var td = tr.querySelectorAll('td'); if (td.length <= iD) return null;
         return { pos: +td[0].textContent.trim() || 0, name: cellTxt(td[iD]), tot: iT >= 0 ? td[iT].textContent.trim() : '', r: rc.map(function (i) {
           var c = td[i], m = c && c.textContent.replace(/\s+/g, ' ').match(/(-?\d+(?:\.\d+)?)\s*:\s*(\d+)\/([\d:.]+)/);
@@ -4216,6 +4227,52 @@
     });
     return out;
   }
+  /* names: Korean (가나다) first, then English A–Z (case ignored), then digits / signs */
+  function nmGrp(s) { var c = String(s || '').trim().charAt(0); return /[가-힣ㄱ-ㅎ]/.test(c) ? 0 : /[a-z]/i.test(c) ? 1 : 2; }
+  function nmSort(a, b) { var g = nmGrp(a) - nmGrp(b); return g || String(a).localeCompare(String(b), 'ko', { sensitivity: 'base' }); }
+  /* a heat sheet (qualifier round or the mains): every heat, its drivers and whether it has run */
+  function evParseSheet(doc) {
+    var out = [], cur = null;
+    [].forEach.call(doc.querySelectorAll('table.heat_sheet tr'), function (tr) {
+      var h = tr.querySelector('.class_header');
+      if (h) { var st = tr.querySelector('.race_status'); cur = { label: h.textContent.replace(/\s+/g, ' ').trim(), num: +((tr.querySelector('.race_num') || {}).textContent || 0) || out.length + 1, done: !!(st && /complete/i.test(st.textContent)), rows: [] }; out.push(cur); return; }
+      var td = tr.querySelectorAll('td'); if (!cur || td.length < 2) return;
+      var nc = td[1].cloneNode(true); [].forEach.call(nc.querySelectorAll('.car_num'), function (x) { x.remove(); });
+      var nm = nc.textContent.replace(/\s+/g, ' ').trim(); if (nm && !/bump/i.test(nm)) cur.rows.push({ pos: +td[0].textContent.trim() || cur.rows.length + 1, name: nm });
+    });
+    return out;
+  }
+  /* round rankings (one qualifier round): best laps/time, top 3, fastest lap and the heat of every driver */
+  function evParseRank(doc) {
+    var out = [];
+    [].forEach.call(doc.querySelectorAll('table.round_rankings'), function (t) {
+      var hr = [].filter.call(t.querySelectorAll('thead tr'), function (tr) { return /driver/i.test(tr.textContent) && /pos/i.test(tr.textContent); })[0]; if (!hr) return;
+      var hs = [].map.call(hr.children, function (c) { return c.textContent.replace(/\s+/g, ' ').trim().toLowerCase(); });
+      var I = function (k) { return hs.indexOf(k); }, iD = I('driver'), iL = I('laps/time'), iT = I('top 3 consecutive'), iF = I('fastest lap'), iH = I('heat');
+      var cls = ((t.querySelector('thead th') || {}).textContent || '').replace(/\s+/g, ' ').trim();
+      [].forEach.call(t.querySelectorAll('tbody tr'), function (tr) {
+        var td = tr.children; if (iD < 0 || td.length <= iD) return;
+        var g = function (i) { return i >= 0 && td[i] ? cellTxt(td[i]) : ''; };
+        out.push({ cls: cls, name: g(iD), lt: g(iL), t3: g(iT), fast: g(iF), heat: (g(iH).match(/^(\d+)/) || [])[1] || '' });
+      });
+    });
+    return out;
+  }
+  function rndKo(n) { return String(n || '').replace(/qualifier round\s*/i, '예선 ').replace(/seeding round\s*/i, '시딩 ').replace(/main events/i, '메인').replace(/\s*rankings?$/i, ''); }
+  function timeKo(t) { var m = String(t || '').match(/(\d+):(\d+)\s*(am|pm)/i); if (!m) return ''; var h = +m[1] % 12 + (/pm/i.test(m[3]) ? 12 : 0); return h + ':' + m[2]; }
+  function toSec(v) { v = String(v || '').trim(); if (!v) return NaN; var p = v.split(':'); return p.length > 1 ? (+p[0]) * 60 + parseFloat(p[1]) : parseFloat(v); }
+  /* extra pages of one event, read when needed (heat sheets, round rankings, mains) and kept with it */
+  function evX(id, o, key, url, parse, cb) {
+    o.x = o.x || {}; if (o.x[key] !== undefined) return o.x[key];
+    if (ev.loading['x' + id + key]) return undefined; ev.loading['x' + id + key] = 1;
+    getDoc(url).then(function (d) { o.x[key] = parse(d) || null; }, function () { o.x[key] = null; }).then(function () {
+      delete ev.loading['x' + id + key];
+      if (evDone(id) && ev.data[id] === o) evCachePut(id, o);
+      cb();
+    });
+    return undefined;
+  }
+  function evIsToday(e) { return !!(e && e.date && e.date.slice(0, 10) === todayS()); }
   /* Triple / Double A-Main standings page: legs per driver (place · points · laps/time) */
   function evParseMulti(doc) {
     var r = mainParseMulti(doc); if (!r) return null;
@@ -4228,35 +4285,38 @@
     var t = doc.querySelector('table.race_result'); if (!t) return null;
     var hr = [].filter.call(t.querySelectorAll('thead tr'), function (tr) { return /pos/i.test(tr.textContent) && /driver/i.test(tr.textContent); })[0]; if (!hr) return null;
     var hs = [].map.call(hr.children, function (c) { return c.textContent.replace(/\s+/g, ' ').trim().toLowerCase(); });
-    var iL = hs.indexOf('laps/time'), iF = hs.indexOf('fastest lap'), iD = hs.indexOf('driver');
+    var iL = hs.indexOf('laps/time'), iF = hs.indexOf('fastest lap'), iD = hs.indexOf('driver'), iT = hs.indexOf('top 3 consecutive');
     return [].map.call(t.querySelectorAll('tbody tr'), function (tr) {
       var td = tr.children; if (td.length <= iD) return null;
       var nm = td[iD].querySelector('.driver_name'), f = iF >= 0 && td[iF] ? td[iF].cloneNode(true) : null; if (f) [].forEach.call(f.querySelectorAll('sup'), function (x) { x.remove(); });
-      return { pos: +td[0].textContent.trim() || 0, name: (nm ? nm.textContent : cellTxt(td[iD]).replace(/view laps/i, '')).replace(/\s+/g, ' ').trim(), lt: iL >= 0 && td[iL] ? td[iL].textContent.trim() : '', fast: f ? f.textContent.trim() : '' };
+      return { pos: +td[0].textContent.trim() || 0, name: (nm ? nm.textContent : cellTxt(td[iD]).replace(/view laps/i, '')).replace(/\s+/g, ' ').trim(), lt: iL >= 0 && td[iL] ? td[iL].textContent.trim() : '', fast: f ? f.textContent.trim() : '', t3: iT >= 0 && td[iT] ? cellTxt(td[iT]) : '' };
     }).filter(function (r) { return r && r.name; });
   }
-  function evGet(id, cache) { return ev.data[id] || (cache && cache[id] && cache[id].v === 2 ? cache[id] : null); }
-  function evLoad(id, cb) {
-    if (ev.data[id]) { if (cb) cb(ev.data[id]); return; }
-    var c = evCacheGet()[id]; if (c && c.v === 2) { ev.data[id] = c; if (cb) cb(c); return; }
+  function evGet(id, cache) { return ev.data[id] || (cache && cache[id] && cache[id].v === 3 ? cache[id] : null); }
+  function evLoad(id, cb, force) {
+    if (!force && ev.data[id]) { if (cb) cb(ev.data[id]); return; }
+    var c = force ? null : evCacheGet()[id]; if (c && c.v === 3) { ev.data[id] = c; if (cb) cb(c); return; }
     if (ev.loading[id]) return; ev.loading[id] = 1;
     getDoc('/results/?p=view_event&id=' + id).then(function (doc) {
       var fin = doc.querySelector('a[href*="event_overall_ranking"]'), pts = doc.querySelector('a[href*="view_points"]');
-      var o = { v: 2, t: Date.now(), name: ((doc.querySelectorAll('h2,h3')[1] || {}).textContent || '').trim(), classes: [], points: {}, multi: {}, races: {}, mainRaces: [],
+      var o = { v: 3, t: Date.now(), name: ((doc.querySelectorAll('h2,h3')[1] || {}).textContent || '').trim(), classes: [], points: {}, multi: {}, races: {}, mainRaces: [], rows: [], lineups: [], ranks: [],
         mains: [].map.call(doc.querySelectorAll('a[href*="view_race_result"]'), function (a) { return a.textContent.replace(/\s+/g, ' ').trim(); }).filter(function (x) { return /main/i.test(x); }) };
-      /* the "Main Events" block of the race list: every main of every class, top (latest) first */
+      /* the race list: every race with its round ("Main Events", "Qualifier Round 3" …) and time; mains top (latest) first */
       var sec = '';
       [].forEach.call(doc.querySelectorAll('table.entry_list_data tr'), function (tr) {
-        var a = tr.querySelector('a[href*="view_race_result"]');
-        if (!a) { var tx = tr.textContent.replace(/\s+/g, ' ').trim(); if (/time completed/i.test(tx)) sec = tx; return; }
-        if (/main events/i.test(sec)) o.mainRaces.push({ id: (a.getAttribute('href').match(/id=(\d+)/) || [])[1], name: a.textContent.replace(/\s+/g, ' ').trim().replace(/^race\s*\d+\s*:\s*/i, '') });
+        var a = tr.querySelector('a[href*="view_race_result"]'), tx = tr.textContent.replace(/\s+/g, ' ').trim();
+        if (!a) { if (/time completed/i.test(tx)) sec = tx.replace(/\s*time completed.*$/i, '').trim(); return; }
+        var r = { id: (a.getAttribute('href').match(/id=(\d+)/) || [])[1], name: a.textContent.replace(/\s+/g, ' ').trim().replace(/^race\s*\d+\s*:\s*/i, ''), sec: sec, at: timeKo((tx.match(/at\s+(\d+:\d+\s*[ap]m)/i) || [])[1]) };
+        o.rows.push(r); if (/main events/i.test(sec)) o.mainRaces.push(r);
       });
+      [].forEach.call(doc.querySelectorAll('a[href*="view_heat_sheet"]'), function (a) { o.lineups.push({ name: a.textContent.replace(/\s+/g, ' ').trim(), id: (a.getAttribute('href').match(/id=(\d+)/) || [])[1] }); });
+      [].forEach.call(doc.querySelectorAll('a[href*="view_round_ranking"]'), function (a) { o.ranks.push({ name: a.textContent.replace(/\s+/g, ' ').trim().replace(/\s*rankings?$/i, ''), href: a.getAttribute('href') }); });
       var jobs = [];
       if (fin) jobs.push(getDoc(fin.getAttribute('href')).then(function (d) { o.classes = evParseFinal(d); }));
-      if (pts) jobs.push(getDoc(pts.getAttribute('href')).then(function (d) { o.points = evParsePoints(d); }, function () {}));
+      if (pts) { o.ptsName = pts.textContent.replace(/\s+/g, ' ').trim(); jobs.push(getDoc(pts.getAttribute('href')).then(function (d) { o.points = evParsePoints(d); }, function () {})); }
       [].forEach.call(doc.querySelectorAll('a[href*="view_multi_main_result"]'), function (a) {
         var cls = a.textContent.replace(/\s+/g, ' ').trim().replace(/\s*(double|triple|quad)?\s*a-?main results?$/i, '');
-        jobs.push(getDoc(a.getAttribute('href')).then(function (d) { var m = evParseMulti(d); if (m) o.multi[nmKey(cls)] = m; }, function () {}));
+        jobs.push(getDoc(a.getAttribute('href')).then(function (d) { var m = evParseMulti(d); if (m) { m.name = cls; o.multi[nmKey(cls)] = m; } }, function () {}));
       });
       return Promise.all(jobs).then(function () { return o; });
     }).then(function (o) {
@@ -4296,8 +4356,8 @@
   function evMineAll(o, nm) {
     if (!o || !nm) return []; var k = pKey(nm), out = [], seen = {};
     o.classes.forEach(function (c) { c.rows.forEach(function (r) { if (pKey(r.name) === k && !seen[nmKey(c.name)]) { seen[nmKey(c.name)] = 1; out.push({ cls: c.name, fin: r, car: splitName(r.name).c }); } }); });
-    Object.keys(o.points || {}).forEach(function (ck) { var pr = o.points[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && pr) { seen[ck] = 1; out.push({ cls: ck, fin: null, car: splitName(pr.name).c }); } });
-    Object.keys(o.multi || {}).forEach(function (ck) { var mr = o.multi[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && mr) { seen[ck] = 1; out.push({ cls: ck, fin: null, car: splitName(mr.name).c }); } });
+    Object.keys(o.points || {}).forEach(function (ck) { var pr = o.points[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && pr) { seen[ck] = 1; out.push({ cls: o.points[ck].name || ck, fin: null, car: splitName(pr.name).c }); } });
+    Object.keys(o.multi || {}).forEach(function (ck) { var mr = o.multi[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && mr) { seen[ck] = 1; out.push({ cls: o.multi[ck].name || ck, fin: null, car: splitName(mr.name).c }); } });
     out.forEach(function (h) { var pt = (o.points || {})[nmKey(h.cls)], mu = (o.multi || {})[nmKey(h.cls)]; h.q = pt ? pt.rows.filter(function (r) { return pKey(r.name) === k; })[0] : null; h.mm = mu ? mu.rows.filter(function (r) { return pKey(r.name) === k; })[0] || null : null; });
     return out;
   }
@@ -4317,56 +4377,118 @@
   function renderRes() {
     var box = $('vl_res'); if (!box) return;
     if (!ev.list) { box.innerHTML = '<div class="vl-pnone">' + (ev.err ? '⚠ ' + esc(ev.err) : '대회 목록을 읽는 중…') + '</div>'; evListLoad(renderRes); return; }
-    var me = myName(), cache = evCacheGet(), q = nmKey(ev.q);
-    var per = ev.list.filter(function (e) { return resPerOk(e.date || ''); });
+    var me = myName(), cache = evCacheGet(), q = nmKey(ev.q), mn = +cfg.resMin || 0;
+    /* period + at least N drivers (today's event always) */
+    var per = ev.list.filter(function (e) { return resPerOk(e.date || '') && (evIsToday(e) || !mn || (e.d || e.n || 0) >= mn); });
+    var perAll = ev.list.filter(function (e) { return resPerOk(e.date || ''); }).length;
+    var todayE = ev.list.filter(evIsToday)[0] || null;
+    if (todayE && per.indexOf(todayE) < 0) per.unshift(todayE);
     /* the driver's cars in this period (events read so far) */
     var cars = {}, joined = 0, msOf = {}, wait = 0;
     if (me) per.forEach(function (e) { var o = evGet(e.id, cache); if (!o) { wait++; return; } var ms = evMineAll(o, me); msOf[e.id] = ms; if (!ms.length) return; joined++; var seen = {}; ms.forEach(function (m) { var k = (m.car || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; cars[k] = cars[k] || { d: m.car, n: 0 }; cars[k].n++; }); });
     var CAR = me && cfg.car && cars[cfg.car] ? cfg.car : '';
-    /* a driver picked: only the events he raced in (read so far) — none picked: every event */
+    /* a driver picked: only the events he raced in (read so far) — none picked: every event; today's event always on top */
     var lst = per.filter(function (e) { return !q || nmKey(e.name).indexOf(q) >= 0 || e.date.indexOf(ev.q) >= 0; })
-      .filter(function (e) { if (!me) return true; var ms = msOf[e.id]; return ms && ms.length && (!CAR || ms.some(function (m) { return (m.car || '').toLowerCase() === CAR; })); }).slice(0, 200);
+      .filter(function (e) { if (!me || e === todayE) return true; var ms = msOf[e.id]; return ms && ms.length && (!CAR || ms.some(function (m) { return (m.car || '').toLowerCase() === CAR; })); }).slice(0, 200);
+    if (!ev.picked && todayE && lst.indexOf(todayE) >= 0) ev.sel = todayE.id;   /* today's event opens by itself */
     if (ev.sel && !lst.some(function (e) { return e.id === ev.sel; })) ev.sel = '';
     var top = '<div class="rs-top"><span class="lab">기간</span>' + RPER.map(function (x) { return '<button class="rs-p' + ((cfg.resPer || 'year') === x[0] ? ' on' : '') + '" data-rper="' + x[0] + '">' + x[1] + '</button>'; }).join('') +
       '<span class="lab sp">선수</span><button class="rs-who" data-dpk="1">' + (me ? '<span class="vl-mk">🏎</span>' + esc(me) : '선수 고르기') + ' ▾</button>' +
       (me && Object.keys(cars).length ? '<span class="lab sp">차</span><button class="rs-car' + (!CAR ? ' on' : '') + '" data-rcar="">전체 <small>' + joined + '</small></button>' + Object.keys(cars).map(function (k) { return '<button class="rs-car' + (CAR === k ? ' on' : '') + '" data-rcar="' + esc(k) + '" data-rcd="' + esc(cars[k].d) + '">' + esc(cars[k].d) + ' <small>' + cars[k].n + '</small></button>'; }).join('') : '') + '</div>';
     if (!ev.sel && lst.length) ev.sel = lst[0].id;
     var perN = RPER.filter(function (x) { return x[0] === (cfg.resPer || 'year'); })[0][1];
-    var left = '<div class="vl-lxc rs-l"><div class="rs-lh"><h5>대회 목록<small>' + perN + ' ' + per.length + '개' + (me ? ' 중 참가 ' + joined : '') + '</small></h5><input id="vl_rsq" type="search" placeholder="대회 이름 · 날짜 찾기" value="' + esc(ev.q) + '"></div>' +
+    var left = '<div class="vl-lxc rs-l"><div class="rs-lh"><h5>대회 목록<small>' + perN + ' ' + perAll + '개 중 ' + per.length + '개' + (me ? ' · 참가 ' + joined : '') + '</small></h5>' +
+      '<div class="rs-min">참가 <span class="pjc"><button data-rmin="-1">−</button><input type="number" class="rminin" min="0" max="99" value="' + mn + '">명<button data-rmin="1">+</button></span> 이상만</div>' +
+      '<input id="vl_rsq" type="search" placeholder="대회 이름 · 날짜 찾기" value="' + esc(ev.q) + '"></div>' +
       lst.map(function (e) {
-        var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0];
-        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + '</b><span>' + esc(e.date.replace(/-/g, '.').slice(0, 10)) + ' · ' + e.n + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
+        var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0], td = e === todayE;
+        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? '오늘 ' : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
       }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (!lst.length && !(me && wait) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
-    var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); };
+    var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); }, live = !!(todayE && ev.sel === todayE.id);
     if (!ev.sel) right = '<div class="vl-pnone">' + (me && wait ? '참가한 대회를 찾는 중…' : '') + '</div>';
     else if (!o) { right = '<div class="vl-pnone">대회 결과를 읽는 중…</div>'; evLoad(ev.sel, again); }
     else {
       var ms = me ? evMineAll(o, me) : [], m = ms[0] || null, names = o.classes.map(function (c) { return c.name; });
-      Object.keys(o.multi || {}).concat(Object.keys(o.points || {})).forEach(function (k) { if (!names.some(function (n) { return nmKey(n) === k; })) names.push(k); });
+      Object.keys(o.multi || {}).concat(Object.keys(o.points || {})).forEach(function (k) { if (!names.some(function (n) { return nmKey(n) === k; })) names.push(((o.multi || {})[k] || {}).name || ((o.points || {})[k] || {}).name || k); });
       if (!ev.cls || !names.some(function (n) { return nmKey(n) === nmKey(ev.cls); })) ev.cls = m ? m.cls : names[0] || '';
       var ck = nmKey(ev.cls), cl = o.classes.filter(function (c) { return nmKey(c.name) === ck; })[0], pt = (o.points || {})[ck], mu = (o.multi || {})[ck], mk = pKey(me);
       var meta = (ev.list.filter(function (e) { return e.id === ev.sel; })[0] || {});
-      /* engine: the mains this driver ran (results read on demand) */
-      var mains = !mu && me ? evClassMains(o, ev.cls) : [], waitR = mains.length && evRacesLoad(ev.sel, o, mains, again);
+      /* mains of this class (engine: the ones the driver ran; any class: his best laps) */
+      var mains = me ? evClassMains(o, ev.cls) : [], waitR = mains.length && evRacesLoad(ev.sel, o, mains, again);
       var mine = mains.filter(function (r) { return (o.races[r.id] || []).some(function (x) { return pKey(x.name) === mk; }); });
       var upOf = function (r) { var i = mains.indexOf(r), up = {}; mains.slice(0, i).forEach(function (u) { (o.races[u.id] || []).forEach(function (x) { up[pKey(x.name)] = 1; }); }); return up; };
-      right = '<div class="rs-h"><b>' + esc(meta.name || o.name) + '</b><span>' + esc((meta.date || '').replace(/-/g, '.').slice(0, 10)) + '</span><a href="/results/?p=view_event&id=' + esc(ev.sel) + '" target="_blank" rel="noopener">LiveRC ↗</a></div>' +
-        '<div class="rs-chips">' + names.map(function (n) { return '<button class="rs-c' + (nmKey(n) === ck ? ' on' : '') + '" data-cls="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
+      /* main entry (main · grid) from the Main Events heat sheet */
+      var msh = (o.lineups || []).filter(function (l) { return /main/i.test(l.name); })[0], sheet = msh ? evX(ev.sel, o, 'sh' + msh.id, '/results/?p=view_heat_sheet&id=' + msh.id, evParseSheet, again) : null, entry = {};
+      if (sheet) sheet.filter(function (h) { return nmKey(h.label).indexOf(ck) === 0; }).sort(function (a, b) { return a.num - b.num; }).forEach(function (h) {
+        var lab = h.label.slice(ev.cls.length).replace(/^[\s\-:]+/, '').replace(/-?\s*main$/i, '') || h.label;
+        h.rows.forEach(function (r) { var k = pKey(r.name); if (!entry[k]) entry[k] = lab + ' · ' + r.pos + '번'; });
+      });
+      var hasEntry = Object.keys(entry).length > 0;
+      /* today: rounds so far (heat sheets) and the driver's next heat */
+      var strip = '', nextH = '';
+      if (live) {
+        var rs = (o.lineups || []).filter(function (l) { return !/entry/i.test(l.name); }).map(function (l) { return { l: l, s: evX(ev.sel, o, 'sh' + l.id, '/results/?p=view_heat_sheet&id=' + l.id, evParseSheet, again) }; });
+        rs.sort(function (a, b) { var r = function (n) { return /seed/i.test(n) ? 0 : /qual/i.test(n) ? 1 : 2; }; return r(a.l.name) - r(b.l.name) || (+(a.l.name.match(/\d+/) || [0])[0]) - (+(b.l.name.match(/\d+/) || [0])[0]); });
+        var nowSet = false;
+        strip = '<div class="rs-strip">' + rs.map(function (x) {
+          var hs = (x.s || []).filter(function (h) { return nmKey(h.label).indexOf(ck) === 0; }), dn = hs.filter(function (h) { return h.done; }).length, cls2 = 'w', tx = rndKo(x.l.name);
+          if (x.s === undefined) tx += ' …';
+          else if (hs.length && dn === hs.length) { cls2 = 'ok'; tx += ' ✔'; }
+          else if (!nowSet && hs.length) {
+            nowSet = true; cls2 = 'now'; var cur = hs.filter(function (h) { return !h.done; })[0];
+            tx += dn ? ' 진행 중 · ' + (hs.indexOf(cur) + 1) + '/' + hs.length : ' 다음';
+            var myH = me ? hs.filter(function (h) { return h.rows.some(function (r) { return pKey(r.name) === mk; }); })[0] : null;
+            if (myH && !myH.done) nextH = rndKo(x.l.name) + ' · 히트 ' + (hs.indexOf(myH) + 1) + '/' + hs.length + '|' + (myH === cur ? (dn ? '지금 · 다음 차례' : '첫 히트') : '지금 히트 ' + (hs.indexOf(cur) + 1));
+          }
+          return '<span class="' + cls2 + '">' + esc(tx) + '</span>';
+        }).join('') + '</div>';
+      }
+      /* the driver's best of the day: round rankings (qualifiers) + mains, with when */
+      var bests = null;
+      if (me && ms.some(function (x) { return nmKey(x.cls) === ck; })) {
+        var cand = [];
+        (o.ranks || []).forEach(function (rk) {
+          var rr = evX(ev.sel, o, 'rk' + rk.name, rk.href, evParseRank, again); if (!rr) return;
+          rr.filter(function (r) { return pKey(r.name) === mk && (!r.cls || nmKey(r.cls) === ck); }).forEach(function (r) {
+            var at = (o.rows || []).filter(function (x) { return nmKey(x.sec) === nmKey(rk.name) && nmKey(x.name).indexOf(ck) === 0 && new RegExp('heat\\s*' + r.heat + '\\s*/', 'i').test(x.name); })[0];
+            cand.push({ w: rndKo(rk.name) + (r.heat ? ' · 히트 ' + r.heat : '') + (at && at.at ? ' · ' + at.at : ''), f: r.fast, t3: r.t3, lt: r.lt });
+          });
+        });
+        mains.forEach(function (r) { (o.races[r.id] || []).filter(function (x) { return pKey(x.name) === mk; }).forEach(function (x) { var at = (o.rows || []).filter(function (y) { return y.id === r.id; })[0]; cand.push({ w: r.label + (at && at.at ? ' · ' + at.at : ''), f: x.fast, t3: x.t3, lt: x.lt }); }); });
+        var pick = function (k) { var b = null; cand.forEach(function (c) { var v = toSec(c[k]); if (v > 0 && (!b || v < toSec(b[k]))) b = c; }); return b; };
+        var pickLT = function () { var b = null, sc = function (c) { var mm = String(c.lt).match(/^(\d+)\/(.+)$/); return mm ? [+mm[1], toSec(mm[2])] : null; }; cand.forEach(function (c) { var s = sc(c); if (!s) return; var bs = b && sc(b); if (!bs || s[0] > bs[0] || (s[0] === bs[0] && s[1] < bs[1])) b = c; }); return b; };
+        bests = { f: pick('f'), t3: pick('t3'), lt: pickLT() };
+      }
+      right = '<div class="rs-h"><b>' + esc(meta.name || o.name) + '</b><span>' + (live ? '오늘 ' : '') + esc((meta.date || '').replace(/-/g, '.').slice(0, 10)) + '</span>' + (live ? '<span class="rs-live"><i>●</i> 실시간 · 30초마다 · ' + new Date(o.t).toTimeString().slice(0, 8) + '</span>' : '') + '<a href="/results/?p=view_event&id=' + esc(ev.sel) + '" target="_blank" rel="noopener">LiveRC ↗</a></div>' +
+        strip + '<div class="rs-chips">' + names.map(function (n) { return '<button class="rs-c' + (nmKey(n) === ck ? ' on' : '') + '" data-cls="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
       if (me) {
+        var B = function (lab, val, sub, cls) { return '<span' + (cls ? ' class="' + cls + '"' : '') + '><small>' + lab + '</small><b>' + val + '</b>' + (sub ? '<i' + (cls === 'gb' ? ' class="g"' : '') + '>' + sub + '</i>' : '') + '</span>'; };
         var flow = function (mm) {
-          var on = nmKey(mm.cls) === ck, h = '<div class="rs-flow">' + (mm.q ? '<span><small>예선 포인트</small>' + mm.q.pos + '위</span><i class="ar">→</i>' : '');
+          var on = nmKey(mm.cls) === ck, h = '<div class="rs-flow">' + (mm.q ? B('예선 포인트' + (o.ptsName && /\(/.test(o.ptsName) ? ' ' + esc((o.ptsName.match(/\(([^)]*)\)/) || [])[1].replace(/\s*of\s*/i, '/')) : ''), mm.q.pos + '위') : '');
+          if (on && live) {
+            var pr = null; try { var dd = SC() ? list(SC().driverData).filter(function (x) { return pKey(nameOf(x)) === mk; })[0] : null; if (dd && qd.pred) pr = qd.pred[nmKey(nameOf(dd))]; } catch (e) {}
+            if (pr && pr.rank) h += B('이번 라운드 예상 · LAP X', pr.rank + '위', pr.chg ? (pr.chg > 0 ? '▲' + pr.chg : '▼' + (-pr.chg)) : '');
+            if (nextH) h += B('다음 히트', esc(nextH.split('|')[0]), esc(nextH.split('|')[1]));
+          }
+          if (on && hasEntry) h += B('메인 엔트리', esc(entry[mk] || '-'), '');
           if (mm.mm) {   /* Triple / Double A-Main: every leg, then the total */
             var M = (o.multi || {})[nmKey(mm.cls)], used = multiUsed(M, mm.mm), drop = [];
-            h += mm.mm.legs.map(function (l, i) { var nm = M.legN[i] || 'A' + (i + 1); if (l && l.L > 0 && !used[i]) drop.push(nm); return '<span class="' + (l && l.L > 0 && !used[i] ? 'dr' : '') + '"><small>' + esc(nm) + '</small>' + (l && l.L > 0 ? l.pos + '위' : '-') + (l && l.L > 0 ? '<i>' + l.pts + '점 · ' + fmtLegLT(l) + '</i>' : '') + '</span>'; }).join('') +
-              '<span class="tot"><small>' + (drop.length ? esc(drop.join('·')) + ' 빠짐' : '합계') + '</small>' + mm.mm.points + '점</span><i class="ar">→</i>';
+            h += mm.mm.legs.map(function (l, i) { var nm = M.legN[i] || 'A' + (i + 1); var ok = l && l.L > 0; if (ok && !used[i]) drop.push(nm); return B(esc(nm), ok ? l.pos + '위' : '-', ok ? l.pts + '점 · ' + fmtLegLT(l) : '', ok && !used[i] ? 'dr' : ''); }).join('') +
+              B(drop.length ? esc(drop.join('·')) + ' 빠짐' : '합계', mm.mm.points + '점', '', 'tot');
           } else if (on && mine.length) {   /* engine: mains from the lowest up, bump-ups in green */
-            h += mine.slice().reverse().map(function (r) { var x = (o.races[r.id] || []).filter(function (y) { return pKey(y.name) === mk; })[0], up = upOf(r)[mk]; return '<span><small>' + esc(r.label) + '</small>' + x.pos + '위<i' + (up ? ' class="g">⬆ 범프 업' : '>' + esc(x.lt)) + '</i></span><i class="ar">→</i>'; }).join('');
-          } else if (mm.fin && /main/i.test(mm.fin.race)) h += '<span><small>' + esc(mm.fin.race) + '</small>' + (((mm.fin.res.match(/^\[(\d+)\]/) || [])[1]) || '-') + '위</span><i class="ar">→</i>';
-          h += mm.fin ? '<span class="fin"><small>최종</small>' + mm.fin.pos + '위</span>' + (mm.mm ? '' : '<span><small>기록</small>' + esc(resNoBr(mm.fin.res)) + '</span>') : (mm.mm ? '<span class="fin"><small>최종</small>' + mm.mm.pos + '위</span>' : '');
-          return h.replace(/<i class="ar">→<\/i>$/, '') + '</div>';
+            h += mine.slice().reverse().map(function (r) { var x = (o.races[r.id] || []).filter(function (y) { return pKey(y.name) === mk; })[0], up = upOf(r)[mk]; return B(esc(r.label), x.pos + '위', up ? '⬆ 범프 업' : esc(x.lt), up ? 'gb' : ''); }).join('');
+          } else if (mm.fin && /main/i.test(mm.fin.race)) h += B(esc(mm.fin.race), (((mm.fin.res.match(/^\[(\d+)\]/) || [])[1]) || '-') + '위', '');
+          if (mm.fin || mm.mm) h += B('최종', (mm.fin ? mm.fin.pos : mm.mm.pos) + '위', '', 'fin');
+          if (on && bests) {
+            if (bests.f) h += B('베스트 랩', esc(bests.f.f), esc(bests.f.w), 'bl');
+            if (bests.t3) h += B('Top 3 연속', esc(bests.t3.t3), esc(bests.t3.w), 'bl');
+            if (bests.lt) h += B('최고 랩/시간', esc(bests.lt.lt), esc(bests.lt.w), 'bl');
+          } else if (mm.fin && !mm.mm) h += B('기록', esc(resNoBr(mm.fin.res)), '');
+          return h + '</div>';
         };
-        right += ms.length ? '<div class="rs-me"><b>' + MK() + esc(me) + '</b>' + (ms.length > 1 ? ' <span class="rs-n">' + ms.length + '종목 참가</span>' : '') +
-          ms.map(function (mm) { var on = nmKey(mm.cls) === ck; return '<div class="rs-mc' + (on ? ' on' : '') + '" data-cls="' + esc(mm.cls) + '"><div class="rs-mn">' + esc(mm.cls) + (mm.car ? ' <span class="vl-car">(' + esc(mm.car) + ')</span>' : '') + (on ? '' : ' <small>눌러서 표 보기</small>') + '</div>' + flow(mm) + '</div>'; }).join('') + '</div>'
+        var msL = ms.length ? ms : (live && me ? [{ cls: ev.cls, fin: null, q: pt ? pt.rows.filter(function (r) { return pKey(r.name) === mk; })[0] : null }] : []);
+        right += msL.length ? '<div class="rs-me"><b>' + MK() + esc(me) + '</b>' + (msL.length > 1 ? ' <span class="rs-n">' + msL.length + '종목 참가</span>' : '') +
+          msL.map(function (mm) { var on = nmKey(mm.cls) === ck; return '<div class="rs-mc' + (on ? ' on' : '') + '" data-cls="' + esc(mm.cls) + '"><div class="rs-mn">' + esc(mm.cls) + (mm.car ? ' <span class="vl-car">(' + esc(mm.car) + ')</span>' : '') + (on ? '' : ' <small>눌러서 표 보기</small>') + '</div>' + flow(mm) + '</div>'; }).join('') + '</div>'
           : '<div class="rs-me no">' + MK() + esc(me) + ' — 이 대회 기록 없음</div>';
       }
       var isMe = function (n) { return me && pKey(n) === mk; }, mark = function (n) { return isMe(n) ? ' class="me"' : ''; }, who = function (n) { return (isMe(n) ? MK() : '') + nmH(n); };
@@ -4380,14 +4502,15 @@
           }).join('') + '</tbody></table></div></div>';
       } else if (cl) finT = '<div class="vl-lxc"><h5>최종 결과<small>' + (o.mains.length ? '메인 ' + o.mains.length + '개' : '') + '</small></h5><table class="vl-lt rs-t"><thead><tr><th>#</th><th>선수</th><th>기록</th><th>레이스</th></tr></thead><tbody>' +
         cl.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td><td>' + esc(resNoBr(r.res)) + '</td><td>' + esc(r.race) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      else if (live && hasEntry) finT = '<div class="vl-lxc"><h5>최종 결과<small>메인이 끝나면 채워짐</small></h5><div class="vl-pnone">메인 라인업: ' + esc(sheet.filter(function (h) { return nmKey(h.label).indexOf(ck) === 0; }).map(function (h) { return (h.label.slice(ev.cls.length).trim() || h.label) + ' ' + h.rows.length + '명'; }).join(' · ')) + '</div></div>';
       /* engine + a driver: the mains he ran, top main first; who moved up from a main is marked in that main */
-      var mainT = mine.map(function (r) {
+      var mainT = mu ? '' : mine.map(function (r) {
         var up = upOf(r), isTop = mains.indexOf(r) === 0;
         return '<div class="vl-lxc"><h5>' + esc(r.label) + '<small>' + esc(ev.cls) + '</small></h5><table class="vl-lt rs-t rs-mn2"><thead><tr><th>#</th><th>선수</th><th>랩/시간</th><th>베스트</th></tr></thead><tbody>' +
           (o.races[r.id] || []).map(function (x) { var b = !isTop && up[pKey(x.name)]; return '<tr' + (isMe(x.name) ? ' class="me"' : b ? ' class="bu"' : '') + '><td>' + x.pos + '</td><td>' + who(x.name) + (b ? ' <span class="rs-bu">⬆ 범프 업</span>' : '') + '</td><td>' + esc(x.lt) + '</td><td>' + esc(x.fast) + '</td></tr>'; }).join('') + '</tbody></table></div>';
       }).join('') + (waitR ? '<div class="vl-pnone">메인 결과를 읽는 중…</div>' : '');
-      var ptsT = pt ? '<div class="vl-lxc"><h5>예선 포인트<small>초록 = 합계에 들어감 · 회색 취소선 = 빠짐</small></h5><div class="px-sw"><table class="vl-lt rs-t rs-m"><thead><tr><th>#</th><th>선수</th><th>합계</th>' + pt.rounds.map(function (r) { return '<th>' + r + '</th>'; }).join('') + '</tr></thead><tbody>' +
-        pt.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td><td><b>' + esc(r.tot) + '</b></td>' + r.r.map(function (x) { return !x || x.none ? '<td class="x">-</td>' : '<td' + (x.u ? ' class="u"' : ' class="x"') + '><b>' + esc(x.p) + '</b><small>' + esc(x.lt) + '</small></td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div></div>' : '';
+      var ptsT = pt ? '<div class="vl-lxc"><h5>예선 포인트<small>' + (o.ptsName ? esc(o.ptsName) + ' · ' : '') + '초록 = 합계에 들어감 · 회색 취소선 = 빠짐</small></h5><div class="px-sw"><table class="vl-lt rs-t rs-m"><thead><tr><th>#</th><th>선수</th>' + (hasEntry ? '<th>메인</th>' : '') + '<th>합계</th>' + pt.rounds.map(function (r) { return '<th>' + r + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        pt.rows.map(function (r) { return '<tr' + mark(r.name) + '><td>' + r.pos + '</td><td>' + who(r.name) + '</td>' + (hasEntry ? '<td class="mn">' + esc(entry[pKey(r.name)] || '') + '</td>' : '') + '<td><b>' + esc(r.tot) + '</b></td>' + r.r.map(function (x) { return !x || x.none ? '<td class="x">-</td>' : '<td' + (x.u ? ' class="u"' : ' class="x"') + '><b>' + esc(x.p) + '</b><small>' + esc(x.lt) + '</small></td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div></div>' : '';
       right += '<div class="rs-tabs">' + (finT + mainT + ptsT || '<div class="vl-pnone">이 클래스의 결과가 아직 없어요</div>') + '</div>';
     }
     var foc = document.activeElement && document.activeElement.id === 'vl_rsq', ss = foc ? document.activeElement.selectionStart : 0;
@@ -4400,14 +4523,26 @@
     }
     if (foc) { var qi = $('vl_rsq'); qi.focus(); try { qi.setSelectionRange(ss, ss); } catch (e) {} }
     /* which events the driver raced in: read the period's events in the background, 4 at a time (finished ones are kept on this device) */
-    if (me) { var todo = per.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, Math.max(0, 4 - Object.keys(ev.loading).filter(function (k) { return k.charAt(0) !== 'r'; }).length)); todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'res') renderRes(); }); }); }
+    if (me) { var todo = per.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, Math.max(0, 4 - Object.keys(ev.loading).filter(function (k) { return /^\d+$/.test(k); }).length)); todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'res') renderRes(); }); }); }
   }
+  /* today's event: read again every 30 s while 대회 결과 is open */
+  setInterval(function () {
+    try {
+      if (cfg.tab !== 'res' || !ev.list || panel.style.display === 'none') return;
+      var t = ev.list.filter(evIsToday)[0]; if (!t || ev.sel !== t.id || ev.loading[t.id]) return;
+      evLoad(t.id, function () { if (cfg.tab === 'res') renderRes(); }, true);
+      if (Date.now() - ev.at > 120000) { ev.at = 0; evListLoad(function () { if (cfg.tab === 'res') renderRes(); }); }
+    } catch (e) {}
+  }, 30000);
+  function setRmin(v) { v = Math.round(+v); if (!(v >= 0 && v <= 99)) return; cfg.resMin = v; save(); renderRes(); }
+  $('vl_res').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('rminin')) setRmin(e.target.value); });
   $('vl_res').addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('[data-ev]'), c = e.target.closest && e.target.closest('[data-cls]');
-    var rp = e.target.closest && e.target.closest('[data-rper]'), rc = e.target.closest && e.target.closest('[data-rcar]');
-    if (rp) { cfg.resPer = rp.getAttribute('data-rper'); save(); renderRes(); }
+    var rp = e.target.closest && e.target.closest('[data-rper]'), rc = e.target.closest && e.target.closest('[data-rcar]'), rm = e.target.closest && e.target.closest('[data-rmin]');
+    if (rm) setRmin((+cfg.resMin || 0) + (+rm.getAttribute('data-rmin')));
+    else if (rp) { cfg.resPer = rp.getAttribute('data-rper'); save(); renderRes(); }
     else if (rc) setCar(rc.getAttribute('data-rcar'), rc.getAttribute('data-rcd') || '');
-    else if (a) { ev.sel = a.getAttribute('data-ev'); ev.cls = ''; ev.jump = true; renderRes(); }
+    else if (a) { ev.sel = a.getAttribute('data-ev'); ev.cls = ''; ev.jump = true; ev.picked = true; renderRes(); }
     else if (c) { ev.cls = c.getAttribute('data-cls'); renderRes(); }
   });
   $('vl_res').addEventListener('input', function (e) { if (e.target.id === 'vl_rsq') { ev.q = e.target.value; renderRes(); } });
