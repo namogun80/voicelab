@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.18
+// @version      3.2.19
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 102;   /* = VER below */
-  /* var VER = 102; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 103;   /* = VER below */
+  /* var VER = 103; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.18';
+  var VERSION = '3.2.19';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -4427,7 +4427,7 @@ window.__vlAuto = true;
   });
 
   /* ---------- 📋 대회 결과: LiveRC events of this track (/events/), one event = final results + qual points per class ---------- */
-  var ev = { list: null, at: 0, busy: false, err: '', sel: '', cls: '', q: '', data: {}, loading: {} };
+  var ev = { list: null, at: 0, busy: false, err: '', sel: '', cls: '', q: '', data: {}, loading: {}, cbs: {}, fail: {} };
   var EVK = 'vlEvCache';
   function evCacheGet() { try { return JSON.parse(localStorage.getItem(EVK) || '{}') || {}; } catch (e) { return {}; } }
   function evCachePut(id, d) { try { var o = evCacheGet(); o[id] = d; var ks = Object.keys(o); if (ks.length > 120) ks.sort(function (a, b) { return (o[a].t || 0) - (o[b].t || 0); }).slice(0, ks.length - 120).forEach(function (k) { delete o[k]; }); localStorage.setItem(EVK, JSON.stringify(o)); } catch (e) {} }
@@ -4545,7 +4545,7 @@ window.__vlAuto = true;
   function evLoad(id, cb, force) {
     if (!force && ev.data[id]) { if (cb) cb(ev.data[id]); return; }
     var c = force ? null : evCacheGet()[id]; if (c && c.v === 3) { ev.data[id] = c; if (cb) cb(c); return; }
-    if (ev.loading[id]) return;
+    if (ev.loading[id]) { if (cb) (ev.cbs[id] = ev.cbs[id] || []).push(cb); return; }   /* already loading (background): tell this caller too when it's done */
     if (!force && ev.fail && Date.now() - (ev.fail[id] || 0) < 30000) return;   /* failed a moment ago (offline): don't retry in a loop */
     ev.loading[id] = 1;
     getDoc('/results/?p=view_event&id=' + id).then(function (doc) {
@@ -4573,8 +4573,9 @@ window.__vlAuto = true;
     }).then(function (o) {
       ev.data[id] = o; delete ev.loading[id];
       if (evDone(id)) evCachePut(id, o);   /* finished events never change */
-      if (cb) cb(o);
-    }, function () { delete ev.loading[id]; (ev.fail = ev.fail || {})[id] = Date.now(); if (cb) cb(null); });
+      var q = ev.cbs[id] || []; delete ev.cbs[id];
+      if (cb) cb(o); q.forEach(function (f) { try { f(o); } catch (e) {} });
+    }, function () { delete ev.loading[id]; (ev.fail = ev.fail || {})[id] = Date.now(); var q = ev.cbs[id] || []; delete ev.cbs[id]; if (cb) cb(null); q.forEach(function (f) { try { f(null); } catch (e) {} }); });
   }
   function evDone(id) { var e = (ev.list || []).filter(function (x) { return x.id === id; })[0]; return !!(e && e.date && e.date.slice(0, 10) < todayS()); }
   /* the mains of one class (engine: A/B/C, 1/4 → 1/2 → final), top first; loads their results on demand */
@@ -4638,7 +4639,8 @@ window.__vlAuto = true;
     if (todayE && per.indexOf(todayE) < 0) per.unshift(todayE);
     /* the driver's cars in this period (events read so far) */
     var cars = {}, joined = 0, msOf = {}, wait = 0;
-    if (me) per.forEach(function (e) { var o = evGet(e.id, cache); if (!o) { wait++; return; } var ms = evMineAll(o, me); msOf[e.id] = ms; if (!ms.length) return; joined++; var seen = {}; ms.forEach(function (m) { var k = (m.car || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; cars[k] = cars[k] || { d: m.car, n: 0 }; cars[k].n++; }); });
+    var offN = 0;
+    if (me) per.forEach(function (e) { var o = evGet(e.id, cache); if (!o) { if (ev.off && ev.fail && ev.fail[e.id]) offN++; else wait++; return; } var ms = evMineAll(o, me); msOf[e.id] = ms; if (!ms.length) return; joined++; var seen = {}; ms.forEach(function (m) { var k = (m.car || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; cars[k] = cars[k] || { d: m.car, n: 0 }; cars[k].n++; }); });
     var CAR = me && cfg.car && cars[cfg.car] ? cfg.car : '';
     /* a driver picked: only the events he raced in (read so far) — none picked: every event; today's event always on top */
     var lst = per.filter(function (e) { return !q || nmKey(e.name).indexOf(q) >= 0 || e.date.indexOf(ev.q) >= 0; })
@@ -4656,7 +4658,7 @@ window.__vlAuto = true;
       lst.map(function (e) {
         var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0], td = e === todayE;
         return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? '오늘 ' : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
-      }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (!lst.length && !(me && wait) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
+      }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (me && offN ? '<div class="rs-wait">📴 저장 안 된 대회 ' + offN + '개 — 인터넷 연결 뒤 확인</div>' : '') + (!lst.length && !(me && (wait || offN)) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
     var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); }, live = !!(todayE && ev.sel === todayE.id);
     if (!ev.sel) right = me ? resGraph(per, cache, CAR, joined, wait) : '<div class="vl-pnone"></div>';
     else if (!o) { right = '<div class="vl-pnone">' + (ev.off ? '📴 오프라인 — 이 대회는 저장된 결과가 없어요' : '대회 결과를 읽는 중…') + '</div>'; evLoad(ev.sel, again); }
@@ -4835,7 +4837,7 @@ window.__vlAuto = true;
   function srGroups(per, cache) {
     var C = {}, wait = 0;
     per.slice().reverse().forEach(function (e) {   /* oldest first */
-      var o = evGet(e.id, cache); if (!o) { wait++; return; }
+      var o = evGet(e.id, cache); if (!o) { if (!(ev.off && ev.fail && ev.fail[e.id])) wait++; return; }
       srClassRows(o).forEach(function (c) {
         var k = srKeyOf(c.cls), g = C[k] = C[k] || { k: k, names: {}, evs: [], raw: {} }; g.raw[srClsKey(c.cls)] = c.cls;
         g.names[c.cls] = (g.names[c.cls] || 0) + 1;
