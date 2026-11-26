@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.32
+// @version      3.2.33
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 116;   /* = VER below */
-  /* var VER = 116; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 117;   /* = VER below */
+  /* var VER = 117; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.32';
+  var VERSION = '3.2.33';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -572,9 +572,7 @@ window.__vlAuto = true;
     '#vl_root .vl-trg{margin:0 8px 8px 0}#vl_root .vl-race{color:#ffb070;font-size:14px;white-space:normal}#vl_root .vl-mr h5{flex-wrap:wrap}#vl_root .vl-mrt{margin:0 0 8px}#vl_root .vl-rd{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;font-weight:800}#vl_root .vl-rd.q{background:#4fc3f722;color:#4fc3f7}#vl_root .vl-rd.mn{background:#ff7a1a22;color:#ffb070}' +
     '#vl_root .vl-mrt2 tr.mr1 td{border-top:1px solid #232b40;cursor:pointer;white-space:nowrap}#vl_root .vl-mrt2 tr.mr2 td{padding-top:0;border-bottom:0;cursor:pointer}#vl_root .vl-mrt2 tr.on td{background:rgba(255,122,26,.07)}#vl_root .vl-mrt2 tr.mr1.on td:first-child{box-shadow:inset 3px 0 #ff7a1a}#vl_root .vl-mrt2 tr.mrx td{padding:2px 0 10px;white-space:normal;text-align:left}#vl_root .vl-mrt2 td.r,#vl_root .vl-mrt2 th.r{text-align:right}' +
     '#vl_root .vl-mrd{background:#10162a;border:1px solid #2b3550;border-radius:10px;padding:10px}#vl_root .vl-mrd .dh{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px;color:#dfe4ee;font-size:14px}#vl_root .vl-mrd .dh a{color:#8ab4ff;margin-left:auto}#vl_root .vl-mrd h6{margin:6px 0 2px;font-size:14px;color:#fff}#vl_root .vl-mrd h6 small{color:#b8c0d0;font-weight:400;font-size:13px}' +
-    '#vl_root .vl-mrg{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:stretch}#vl_root .vl-mrg>.vl-lts{min-height:0;height:0;min-height:100%;overflow-y:auto;border:1px solid #232b40;border-radius:8px}#vl_root.vl-pit .vl-mrg{display:block}#vl_root.vl-pit .vl-mrg>.vl-lts{height:auto;overflow:visible;border:0}' +
-    '#vl_root .vl-lts thead th{position:sticky;top:0;background:#141a2a;z-index:1}#vl_root.vl-lx:not(.vl-pit) .vl-plx .px-right{position:sticky;top:0;max-height:calc(var(--vlbh) - 20px)}#vl_root.vl-lx:not(.vl-pit) .vl-plx .px-right>.vl-lxc{display:flex;flex-direction:column;min-height:0;max-height:100%}#vl_root.vl-lx:not(.vl-pit) .px-right .vl-lts{flex:1 1 auto;min-height:140px;overflow-y:auto}' +
-    '#vl_root.vl-lx:not(.vl-pit) #vl_lxl>.vl-lxc{overflow-y:auto}#vl_root.vl-lx:not(.vl-pit) #vl_lxl thead th{position:sticky;top:0;background:#141a2a;z-index:1}#vl_root.vl-lx:not(.vl-pit) .rs-tabs>.vl-lxc{max-height:calc(var(--vlbh) - 40px);overflow:auto}#vl_root.vl-lx:not(.vl-pit) .rs-tabs thead th{position:sticky;top:0;background:#141a2a;z-index:1}#vl_root.vl-lx:not(.vl-pit) .vl-td .px-sw{max-height:calc(var(--vlbh) - 60px);overflow:auto}#vl_root.vl-lx:not(.vl-pit) .vl-ttb tr:first-child th{position:sticky;top:0;background:#141a2a;z-index:1}' +
+    '#vl_root .vl-mrg{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}#vl_root.vl-pit .vl-mrg{display:block}' +
     '#vl_root .vl-tc{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--c);color:#fff;background:#141a2a;border-radius:999px;padding:3px 10px;font-size:14px;font-weight:700;white-space:nowrap;cursor:pointer}#vl_root .vl-tc i{width:10px;height:10px;border-radius:50%;background:var(--c);display:inline-block}#vl_root .vl-tc.inh{border-style:dashed;color:#dfe4ee;font-weight:600;background:transparent}#vl_root .vl-tc.add{border-color:#3a4560;color:#b8c0d0;border-style:dashed;font-weight:600}' +
     '#vl_root .vl-pp{display:inline-block;border:1px solid #2b3550;border-radius:8px;padding:2px 7px;margin-right:4px;font-size:14px;color:#dfe4ee;white-space:nowrap}#vl_root tr.px-t2 .vl-pp[data-tgt]{cursor:pointer}#vl_root .vl-pp.on{border-color:#4fc3f7;color:#4fc3f7}#vl_root .vl-pp.off{color:#b8c0d0}#vl_root .vl-pp.ch{border-color:#ffd54a;color:#ffd54a}#vl_root .vl-tag{color:#ffb070;font-size:13px;font-weight:700}#vl_root .mut{color:#b8c0d0}' +
     '#vl_root .vl-ptab{margin:0 0 10px;display:inline-flex !important;width:auto !important}#vl_root .vl-ptab button{font-size:15px !important;font-weight:800;padding:8px 18px !important;flex:0 0 auto !important}#vl_root .vl-tnow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#141a2a;border:1px solid #2b3550;border-radius:12px;padding:8px 12px}#vl_root .vl-tnow .tnl{font-weight:800;color:#fff;font-size:15px}#vl_root .vl-tnow .tnb{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}' +
@@ -5746,7 +5744,7 @@ window.__vlAuto = true;
       var c = $('vl_lxl').firstElementChild, b = $('vl_body'); if (!c) return;
       if (!root.classList.contains('vl-lx') || root.classList.contains('vl-pit')) { c.style.maxHeight = ''; return; }
       var top = c.getBoundingClientRect().top - b.getBoundingClientRect().top + b.scrollTop;
-      c.style.maxHeight = Math.max(260, b.clientHeight - top - 12) + 'px';
+      c.style.maxHeight = '';   /* 2026-11-27: back to the full list (no inner scroll) */
     } catch (e) {}
   }
   function renderPracLx(name, rows) {
