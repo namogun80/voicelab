@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.35
+// @version      3.2.36
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 119;   /* = VER below */
-  /* var VER = 119; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 120;   /* = VER below */
+  /* var VER = 120; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.35';
+  var VERSION = '3.2.36';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -570,6 +570,15 @@ window.__vlAuto = true;
     '#vl_root.vl-pit #vl_tab_prac .pr-row{display:flex;flex-wrap:wrap;gap:6px}#vl_root.vl-pit #vl_pchip{display:inline-block;border-color:#ff7a1a;color:#fff;font-weight:800;border-radius:999px}#vl_root.vl-pit #vl_pselbox{display:none !important}#vl_root.vl-pit #vl_tab_prac.vl-popen #vl_pselbox{display:block !important;max-height:55vh;overflow:auto;border:1px solid #ff7a1a;border-radius:12px;padding:8px;margin:6px 0}' +
     '#vl_root table.vl-one tr.px-t2,#vl_root table.vl-one tr.l2{display:none}#vl_root table.vl-one.vl-two tr.px-t2,#vl_root table.vl-one.vl-two tr.l2{display:table-row}#vl_root table.vl-one.vl-two .tz,#vl_root table.vl-one.vl-two .tzh{display:none}#vl_root table.vl-ttb:not(.vl-one) .tz1,#vl_root table.vl-ttb.vl-two .tz1{display:none}#vl_root table.vl-ttb.vl-two td.tz:not(.tz1){display:table-cell}' +
     '#vl_root table.vl-one td.tz{background:#10162a;width:1%;white-space:nowrap}#vl_root table.vl-one td.tz+td.tz{padding-left:3px !important}#vl_root table.vl-one .tzl{border-right:2px solid #2b3550 !important;padding-right:10px !important}#vl_root table.vl-one th.tzh,#vl_root table.vl-one th.tzh0{background:#10162a;color:#ffb070}#vl_root table.vl-one th.tzh{border-right:2px solid #2b3550}#vl_root table.vl-ttb.vl-one th.tz1{border-right:0}#vl_root table.vl-ttb.vl-one tr:first-child th:nth-child(3){border-right:2px solid #2b3550}#vl_root table.vl-one td.nb{white-space:nowrap;text-align:left !important;width:1%}#vl_root table.vl-one th.tz1:last-child{text-align:left !important}#vl_root table.vl-one tr.on td.tz{background:rgba(255,122,26,.10)}' +
+    '#vl_navdrv,#vl_navzm,#vl_navt,#vl_navf,#vl_nave{display:none}#vl_root.vl-lx:not(.vl-pit) #vl_navt{display:flex;order:9;align-self:flex-end;align-items:center;justify-content:center;width:36px;height:32px;margin-top:6px;background:#141a2a;border:1px solid #2b3550;border-radius:9px;color:#dfe4ee;font-size:18px;cursor:pointer}' +
+    '#vl_root.vl-nav1 #vl_panel{grid-template-columns:64px minmax(0,1fr)}#vl_root.vl-nav1 #vl_head{padding:10px 6px;align-items:center}#vl_root.vl-nav1 #vl_brand{padding:0 0 10px}#vl_root.vl-nav1 #vl_brand>div{display:none}#vl_root.vl-nav1 #vl_brand img{width:40px;height:40px}' +
+    '#vl_root.vl-nav1 #vl_head .tab{justify-content:center;width:46px;padding:10px 0 !important;font-size:20px !important}#vl_root.vl-nav1 #vl_head .tab .vl-lxn{display:none !important}#vl_root.vl-nav1 #vl_sdrv,#vl_root.vl-nav1 #vl_lxft,#vl_root.vl-nav1 #vl_go{display:none !important}' +
+    '#vl_root.vl-nav1 #vl_tools{flex-direction:column;order:8}#vl_root.vl-nav1 #vl_tools #vl_zm{display:none !important}#vl_root.vl-nav1.vl-zpop #vl_tools #vl_zm{display:inline-flex !important;position:fixed;left:70px;bottom:90px;z-index:40;width:180px;flex:none;box-shadow:0 8px 24px #000a;border:1px solid #ff7a1a}' +
+    '#vl_root.vl-nav1 #vl_navdrv,#vl_root.vl-nav1 #vl_navzm{display:flex;order:7;align-items:center;justify-content:center;width:46px;height:40px;background:#141a2a;border:1px solid #2b3550;border-radius:10px;font-size:18px;cursor:pointer;color:#fff;margin:2px 0}#vl_root.vl-nav1 #vl_navdrv{border-color:#ff7a1a;margin-top:10px}#vl_root.vl-nav1 #vl_navt{align-self:center;width:46px}' +
+    '#vl_root.vl-nav0 #vl_panel{grid-template-columns:0 minmax(0,1fr);position:relative}#vl_root.vl-nav0 #vl_head{visibility:hidden;padding:0;border:0;overflow:hidden}#vl_root.vl-nav0 #vl_body{padding-left:52px}' +
+    '#vl_root.vl-nav0 #vl_navf{display:flex;position:absolute;left:10px;top:12px;z-index:35;width:34px;height:34px;align-items:center;justify-content:center;background:#1f273d;border:1px solid #2b3550;border-radius:9px;color:#fff;font-size:18px;cursor:pointer}#vl_root.vl-nav0 #vl_nave{display:block;position:absolute;left:0;top:0;bottom:0;width:6px;z-index:34}' +
+    '#vl_root.vl-nav0.vl-navpk #vl_head{visibility:visible;position:absolute;left:0;top:0;bottom:0;width:212px;box-sizing:border-box;z-index:36;padding:14px 12px;border-right:1px solid #ff7a1a;box-shadow:8px 0 24px #000a;overflow-y:auto}' +
+    '#vl_root .vl-keyt{border-collapse:collapse;margin:8px 0}#vl_root .vl-keyt td{padding:5px 10px 5px 0;font-size:15px;color:#dfe4ee;border-bottom:1px solid #232b40}#vl_root .vl-keyt kbd{display:inline-block;min-width:40px;text-align:center;background:#1f273d;border:1px solid #3a4560;border-bottom-width:3px;border-radius:7px;padding:2px 8px;font:800 14px inherit;font-family:inherit;color:#fff}#vl_root .vl-navrow{display:flex;gap:10px;align-items:center;margin:6px 0;font-size:15px}' +
     '#vl_root .vl-fi{display:inline-flex;align-items:center;gap:6px;background:#0b0f1a;border:1px solid #2b3550;border-radius:8px;padding:3px 8px;min-width:0}#vl_root .vl-fi i{font-style:normal;color:#b8c0d0;font-size:14px;white-space:nowrap}#vl_root .vl-fi input{background:transparent;border:0;outline:0;color:#fff;font-size:15px;font-weight:700;padding:3px 0;min-width:0}#vl_root .vl-fi:focus-within{border-color:#ff7a1a}' +
     '#vl_root .vl-trg{margin:0}#vl_root .vl-ttb td,#vl_root .vl-ttb th{padding-left:5px !important;padding-right:5px !important}#vl_root .vl-tbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:14px}#vl_root .vl-race{color:#ffb070;font-size:14px;white-space:normal}#vl_root .vl-mr h5{flex-wrap:wrap}#vl_root .vl-mrt{margin:0 0 8px}#vl_root .vl-rd{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;font-weight:800}#vl_root .vl-rd.q{background:#4fc3f722;color:#4fc3f7}#vl_root .vl-rd.mn{background:#ff7a1a22;color:#ffb070}' +
     '#vl_root .vl-mrt2 tr.mr1 td{border-top:1px solid #232b40;cursor:pointer;white-space:nowrap}#vl_root .vl-mrt2 tr.mr2 td{padding-top:0;border-bottom:0;cursor:pointer}#vl_root .vl-mrt2 tr.on td{background:rgba(255,122,26,.07)}#vl_root .vl-mrt2 tr.mr1.on td:first-child{box-shadow:inset 3px 0 #ff7a1a}#vl_root .vl-mrt2 tr.mrx td{padding:2px 0 10px;white-space:normal;text-align:left}#vl_root .vl-mrt2 td.r,#vl_root .vl-mrt2 th.r{text-align:right}' +
@@ -710,7 +719,7 @@ window.__vlAuto = true;
     '<div id="vl_panel">' +
     '<div id="vl_head"><div id="vl_brand"><img alt="" src="data:image/webp;base64,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"><div><b>LAP <i>X</i><em>Pit</em></b><small>Live · Results · Practice</small></div></div><button id="vl_pittk" title="트랙 바꾸기"></button><button class="tab" data-tab="board">🏁<span class="vl-tn"> 레이스</span><span class="vl-tl"> 보드</span><span class="vl-lxn">Live Race</span></button><button class="tab" data-tab="res" id="vl_tres">📋<span class="vl-tn"> 결과</span><span class="vl-lxn">대회 결과</span></button><button class="tab" data-tab="main" id="vl_tmain" style="display:none">🏆<span class="vl-tn"> 메인</span><span class="vl-lxn">오늘 메인</span></button><button class="tab" data-tab="prac">📊<span class="vl-tn"> 연습</span><span class="vl-tl"> 기록</span><span class="vl-lxn">연습 기록</span></button><span id="vl_lxsp"></span><button class="tab" data-tab="set">⚙<span class="vl-tn"> 설정</span><span class="vl-lxn">설정</span><i id="vl_upddot" title="새 버전이 있어요 — 설정 › 일반 › 업데이트"></i></button>' +
     '<span id="vl_zm" title="화면 확대/축소"><i>🔍</i><button data-zs="-1" title="작게">−</button><button id="vl_zv" title="눌러서 퍼센트 고르기">100%</button><button data-zs="1" title="크게">+</button><span id="vl_zl"></span></span>' +
-    '<button id="vl_go"></button><span class="vl-tsep"></span><button class="tab vl-tkb" data-tab="trk" title="트랙 바꾸기 — 눌러도 바로 이동하지 않아요">📍<span class="vl-tn"> 트랙</span><span class="vl-lxn">트랙</span></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span><div id="vl_sdrv" data-dpk="1"></div><div id="vl_tools"></div><div id="vl_lxft"></div></div>' +
+    '<button id="vl_go"></button><span class="vl-tsep"></span><button class="tab vl-tkb" data-tab="trk" title="트랙 바꾸기 — 눌러도 바로 이동하지 않아요">📍<span class="vl-tn"> 트랙</span><span class="vl-lxn">트랙</span></button><span id="vl_net" style="display:none"></span><button id="vl_fs" title="전체 화면"></button><span id="vl_min" title="접기">─</span><div id="vl_sdrv" data-dpk="1"></div><div id="vl_tools"></div><button id="vl_navdrv" data-dpk="1" title="선수 찾기 · S">🏎</button><button id="vl_navzm" title="확대 · 축소 (+ −)">🔍</button><button id="vl_navt" title="메뉴 접기 · M"></button><div id="vl_lxft"></div></div><button id="vl_navf" title="메뉴 열기 · M">☰</button><div id="vl_nave"></div>' +
     '<div id="vl_unl">🔊 화면을 한 번 누르면 음성이 켜져요</div>' +
     '<div id="vl_warn" style="display:none;background:#5a1414;color:#ffd2d2;font-size:12px;line-height:1.45;padding:8px 12px;border-bottom:1px solid #7a2020"></div>' +
     '<div id="vl_body">' +
@@ -882,7 +891,8 @@ window.__vlAuto = true;
     '<div class="sec grp" data-g="gen"><div class="gh"><span class="ar"></span><span class="sech">⚙ 일반</span><span class="gs" id="vl_gs_gen"></span></div><div class="gb">' +
     '<div class="gap" id="vl_upd"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:15px">🔄 업데이트</b><span style="color:#bbb" id="vl_updv"></span><button class="ub" id="vl_updb" style="margin-left:auto">업데이트 확인</button></div><div id="vl_updi"></div>' +
     '<div style="margin-top:6px;color:#999;font-size:12px">하루 한 번 자동으로 확인하고, 새 버전이 있으면 ⚙ 설정 탭에 빨간 점 · Tampermonkey 자동 업데이트도 그대로</div></div>' +
-    '<div class="lim" style="color:#b8c0d0;flex-wrap:wrap">⌨ 단축키(PC · 아이패드 키보드): <b>1</b> Live Race · <b>2</b> 대회 결과 · <b>3</b> 연습 기록 · <b>F</b> 창/전체 화면 · <b>+ −</b> 확대/축소 · <b>S</b> 선수 찾기 · <b>Esc</b> 창 닫기/선수 해제</div>' +
+    '<div class="gap" id="vl_keys"><b style="font-size:15px">⌨ 단축키</b> <span style="color:#b8c0d0;font-size:13px">PC · 아이패드 키보드 · 입력 칸에 쓰는 중에는 안 됨</span><table class="vl-keyt">' + [['1', 'Live Race'], ['2', '대회 결과'], ['3', '연습 기록'], ['F', '창 모드 ↔ 전체 화면'], ['M', '왼쪽 메뉴 접기 → 숨기기 → 펼치기'], ['+ / −', '확대 · 축소 10%'], ['S', '선수 찾기'], ['Esc', '열린 창 닫기 · 없으면 고른 선수 해제']].map(function (k) { return '<tr><td><kbd>' + k[0] + '</kbd></td><td>' + k[1] + '</td></tr>'; }).join('') + '</table>' +
+    '<div class="vl-navrow">왼쪽 메뉴 <span class="vl-sg"><button data-navset="full">펼침</button><button data-navset="rail">아이콘만</button><button data-navset="hide">숨김</button></span></div><div style="color:#b8c0d0;font-size:13px;line-height:1.6">메뉴 맨 아래 « » 단추로도 바꿔요 · 숨김은 전체 화면일 때만(창 모드에서는 아이콘만) · 숨김일 때 왼쪽 위 ☰ 또는 화면 왼쪽 끝에 마우스 → 메뉴가 떠서 열리고 탭을 누르면 닫혀요 · 이 기기에만 기억</div></div>' +
     '<div class="grid"><label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_wake">화면 꺼짐 방지 (휴대폰 · 아이패드 · PC)</label>' +
     '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_afit"><span>넓은 화면에서 표를 화면 폭에 맞춰 크게 <small style="color:#999">(PC·아이패드, 최대 1.5배)</small></span></label></div>' +
     '<div class="sub"><span>☁ 구글 드라이브 동기화</span><span id="vl_sdot"></span></div>' +
@@ -928,12 +938,34 @@ window.__vlAuto = true;
   }
   function isLx() { return (W.innerWidth || 0) >= 1000; }   /* LAP X wide layout: PC, iPad landscape */
   function fullOn() { return cfg.full === true || (cfg.full !== false && (isPhone() || isLx())); }
+  /* LAP X side menu: full (212px) · rail (icons, 64px) · hide (full screen only; ☰ / left edge / M opens it over the page) */
+  function navMode() { var n = cfg.nav === 'rail' || cfg.nav === 'hide' ? cfg.nav : 'full'; return n === 'hide' && !(cfg.full === true || (cfg.full !== false && isLx())) ? 'rail' : n; }
+  function navApply() {
+    var n = navMode(), lx = root.classList.contains('vl-lx') && !root.classList.contains('vl-pit');
+    root.classList.toggle('vl-nav1', lx && n === 'rail'); root.classList.toggle('vl-nav0', lx && n === 'hide');
+    if (!(lx && n === 'hide')) root.classList.remove('vl-navpk');
+    if (!(lx && n === 'rail')) root.classList.remove('vl-zpop');
+    var t = $('vl_navt'); if (t) { t.textContent = n === 'full' ? '«' : '»'; t.title = n === 'full' ? '메뉴 접기 · M' : '메뉴 펼치기 · M'; }
+    var d = $('vl_navdrv'); if (d) d.title = (myName() ? myName() + ' · ' : '') + '선수 찾기 · S';
+    [].forEach.call(root.querySelectorAll('[data-navset]'), function (b) { b.classList.toggle('on', b.getAttribute('data-navset') === (cfg.nav || 'full')); });
+    [].forEach.call(root.querySelectorAll('#vl_head .tab'), function (b) { var l = b.querySelector('.vl-lxn'), k = { board: '1', res: '2', prac: '3' }[b.getAttribute('data-tab')]; if (l) b.title = l.textContent + (k ? ' · ' + k : ''); });
+  }
+  function navSet(n) { cfg.nav = n; save(); navApply(); try { fit(); } catch (e) {} }
+  function navCycle() { var n = navMode(), full = cfg.full === true || (cfg.full !== false && isLx()); navSet(n === 'full' ? 'rail' : n === 'rail' && full ? 'hide' : 'full'); }
+  $('vl_navt').onclick = function () { navSet(navMode() === 'full' ? 'rail' : 'full'); };
+  $('vl_navf').onclick = function () { root.classList.toggle('vl-navpk'); };
+  $('vl_nave').addEventListener('mouseenter', function () { root.classList.add('vl-navpk'); });
+  $('vl_head').addEventListener('mouseleave', function () { if (root.classList.contains('vl-nav0')) root.classList.remove('vl-navpk'); });
+  $('vl_head').addEventListener('click', function (e) { if (root.classList.contains('vl-nav0') && e.target.closest && e.target.closest('.tab')) setTimeout(function () { root.classList.remove('vl-navpk'); }, 0); });
+  $('vl_navzm').onclick = function () { root.classList.toggle('vl-zpop'); };
+  root.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-navset]'); if (b) navSet(b.getAttribute('data-navset')); else if (root.classList.contains('vl-zpop') && !(e.target.closest && e.target.closest('#vl_zm,#vl_navzm'))) root.classList.remove('vl-zpop'); });
   function fit() {
     var on = fullOn() && panel.style.display !== 'none', st = root.style;
     root.classList.toggle('full', on);
     root.classList.toggle('vl-lx', on && isLx());
     root.classList.toggle('vl-lxmd', on && isLx() && (W.innerWidth || 0) < 1300);
     root.classList.toggle('vl-lxall', !!cfg.lxAll);
+    try { navApply(); } catch (e) {}
     root.classList.toggle('vl-pit', on && !isLx() && (W.innerWidth || 0) < 700);
     document.documentElement.classList.toggle('vl-lock', on);
     if (on) {
@@ -1138,7 +1170,7 @@ window.__vlAuto = true;
   });
   $('vl_freset').onclick = fuelReset;
   /* ---- Google Drive sync (through the user's own "VoiceLab sync" Apps Script web app) ---- */
-  var SYNC_LOCAL = ['syncUrl', 'syncKey', 'tab', 'open', 'full', '_ts', 'graphSel', 'zoom', 'bigView', 'gOpen', 'syncOk', 'v228s', 'graphAuto'];   /* stay on this device */
+  var SYNC_LOCAL = ['syncUrl', 'syncKey', 'tab', 'open', 'full', '_ts', 'graphSel', 'zoom', 'bigView', 'gOpen', 'syncOk', 'v228s', 'graphAuto', 'nav'];   /* stay on this device */
   var syncQK = 'vlSyncQ', syncTmr = null, syncBusy = false, syncLast = 0, syncErr = '', syncFolder = '', syncPushT = null;
   function vlSafe(h) { return String(h || '').toLowerCase().replace(/[^a-z0-9.-]/g, '').replace(/\.liverc\.com$/, '').slice(0, 60) || 'track'; }
   function vlStamp(d) { var p2 = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds()); }
@@ -2887,7 +2919,8 @@ window.__vlAuto = true;
     if (k === '1') tab('board'); else if (k === '2') tab('res'); else if (k === '3') tab('prac');
     else if (k === 'f' || k === 'F') { var f = $('vl_fs'); if (f) f.click(); }
     else if (k === '+' || k === '=') zoomSet((+cfg.zoom || 100) + 10); else if (k === '-' || k === '_') zoomSet((+cfg.zoom || 100) - 10);
-    else if (k === 's' || k === 'S') { var d = root.querySelector('#vl_sdrv[data-dpk], [data-dpk]'); if (d) d.click(); }
+    else if (k === 's' || k === 'S') { var d = root.querySelector(root.classList.contains('vl-nav1') || root.classList.contains('vl-nav0') ? '#vl_navdrv' : '#vl_sdrv[data-dpk], [data-dpk]'); if (d) d.click(); }
+    else if (k === 'm' || k === 'M') navCycle();
     else if (k === 'Escape') {
       var pop = [$('vl_clpop'), $('vl_dpk')].filter(function (p) { return p && p.style.display === 'block'; })[0];
       if (pop) pop.style.display = 'none'; else if (myName()) setPerson('');
