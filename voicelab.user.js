@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.19
+// @version      3.2.20
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 103;   /* = VER below */
-  /* var VER = 103; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 104;   /* = VER below */
+  /* var VER = 104; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.19';
+  var VERSION = '3.2.20';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -4671,17 +4671,39 @@ window.__vlAuto = true;
       if (!ev.cls || !names.some(function (n) { return nmKey(n) === nmKey(ev.cls); })) ev.cls = m ? m.cls : names[0] || '';
       var ck = nmKey(ev.cls), cl = o.classes.filter(function (c) { return nmKey(c.name) === ck; })[0], pt = (o.points || {})[ck], mu = (o.multi || {})[ck], mk = pKey(me);
       var meta = (ev.list.filter(function (e) { return e.id === ev.sel; })[0] || {});
-      /* mains of this class (engine: the ones the driver ran; any class: his best laps) */
-      var mains = me ? evClassMains(o, ev.cls) : [], waitR = mains.length && evRacesLoad(ev.sel, o, mains, again);
-      var mine = mains.filter(function (r) { return (o.races[r.id] || []).some(function (x) { return pKey(x.name) === mk; }); });
-      var upOf = function (r) { var i = mains.indexOf(r), up = {}; mains.slice(0, i).forEach(function (u) { (o.races[u.id] || []).forEach(function (x) { up[pKey(x.name)] = 1; }); }); return up; };
-      /* main entry (main · grid) from the Main Events heat sheet */
-      var msh = (o.lineups || []).filter(function (l) { return /main/i.test(l.name); })[0], sheet = msh ? evX(ev.sel, o, 'sh' + msh.id, '/results/?p=view_heat_sheet&id=' + msh.id, evParseSheet, again) : null, entry = {};
-      if (sheet) sheet.filter(function (h) { return nmKey(h.label).indexOf(ck) === 0; }).sort(function (a, b) { return a.num - b.num; }).forEach(function (h) {
-        var lab = h.label.slice(ev.cls.length).replace(/^[\s\-:]+/, '').replace(/-?\s*main$/i, '') || h.label;
-        h.rows.forEach(function (r) { var k = pKey(r.name); if (!entry[k]) entry[k] = lab + ' · ' + r.pos + '번'; });
-      });
-      var hasEntry = Object.keys(entry).length > 0;
+      /* per class the driver ran (the picked class and every other one): mains · bump-ups · main entry · best of the day */
+      var PCC = {}, pcOf = function (cls) {
+        var kk = nmKey(cls); if (PCC[kk]) return PCC[kk];
+        var P = PCC[kk] = { entry: {} };
+        P.mains = me ? evClassMains(o, cls) : []; P.waitR = P.mains.length && evRacesLoad(ev.sel, o, P.mains, again);
+        P.mine = P.mains.filter(function (r) { return (o.races[r.id] || []).some(function (x) { return pKey(x.name) === mk; }); });
+        P.upOf = function (r) { var i = P.mains.indexOf(r), up = {}; P.mains.slice(0, i).forEach(function (u) { (o.races[u.id] || []).forEach(function (x) { up[pKey(x.name)] = 1; }); }); return up; };
+        if (sheet) sheet.filter(function (h) { return nmKey(h.label).indexOf(kk) === 0; }).sort(function (a, b) { return a.num - b.num; }).forEach(function (h) {
+          var lab = h.label.slice(cls.length).replace(/^[\s\-:]+/, '').replace(/-?\s*main$/i, '') || h.label;
+          h.rows.forEach(function (r) { var q = pKey(r.name); if (!P.entry[q]) P.entry[q] = lab + ' · ' + r.pos + '번'; });
+        });
+        P.hasEntry = Object.keys(P.entry).length > 0;
+        P.bests = null;
+        if (me && ms.some(function (x) { return nmKey(x.cls) === kk; })) {
+          var cand = [];
+          (o.ranks || []).forEach(function (rk) {
+            var rr = evX(ev.sel, o, 'rk' + rk.name, rk.href, evParseRank, again); if (!rr) return;
+            rr.filter(function (r) { return pKey(r.name) === mk && (!r.cls || nmKey(r.cls) === kk); }).forEach(function (r) {
+              var at = (o.rows || []).filter(function (x) { return nmKey(x.sec) === nmKey(rk.name) && nmKey(x.name).indexOf(kk) === 0 && new RegExp('heat\\s*' + r.heat + '\\s*/', 'i').test(x.name); })[0];
+              cand.push({ w: rndKo(rk.name) + (r.heat ? ' · 히트 ' + r.heat : '') + (at && at.at ? ' · ' + at.at : ''), f: r.fast, t3: r.t3, lt: r.lt });
+            });
+          });
+          P.mains.forEach(function (r) { (o.races[r.id] || []).filter(function (x) { return pKey(x.name) === mk; }).forEach(function (x) { var at = (o.rows || []).filter(function (y) { return y.id === r.id; })[0]; cand.push({ w: r.label + (at && at.at ? ' · ' + at.at : ''), f: x.fast, t3: x.t3, lt: x.lt }); }); });
+          var pick = function (q) { var b = null; cand.forEach(function (c) { var v = toSec(c[q]); if (v > 0 && (!b || v < toSec(b[q]))) b = c; }); return b; };
+          var pickLT = function () { var b = null, sc = function (c) { var m2 = String(c.lt).match(/^(\d+)\/(.+)$/); return m2 ? [+m2[1], toSec(m2[2])] : null; }; cand.forEach(function (c) { var x = sc(c); if (!x) return; var bs = b && sc(b); if (!bs || x[0] > bs[0] || (x[0] === bs[0] && x[1] < bs[1])) b = c; }); return b; };
+          P.bests = { f: pick('f'), t3: pick('t3'), lt: pickLT() };
+          if (!P.bests.f && !P.bests.t3 && !P.bests.lt) P.bests = null;
+        }
+        return P;
+      };
+      var msh = (o.lineups || []).filter(function (l) { return /main/i.test(l.name); })[0], sheet = msh ? evX(ev.sel, o, 'sh' + msh.id, '/results/?p=view_heat_sheet&id=' + msh.id, evParseSheet, again) : null;
+      var P0 = pcOf(ev.cls), mains = P0.mains, waitR = P0.waitR, mine = P0.mine, upOf = P0.upOf, entry = P0.entry, hasEntry = P0.hasEntry, bests = P0.bests;
+      ms.forEach(function (x) { pcOf(x.cls); });
       /* today: rounds so far (heat sheets) and the driver's next heat */
       var strip = '', nextH = '';
       if (live) {
@@ -4701,46 +4723,30 @@ window.__vlAuto = true;
           return '<span class="' + cls2 + '">' + esc(tx) + '</span>';
         }).join('') + '</div>';
       }
-      /* the driver's best of the day: round rankings (qualifiers) + mains, with when */
-      var bests = null;
-      if (me && ms.some(function (x) { return nmKey(x.cls) === ck; })) {
-        var cand = [];
-        (o.ranks || []).forEach(function (rk) {
-          var rr = evX(ev.sel, o, 'rk' + rk.name, rk.href, evParseRank, again); if (!rr) return;
-          rr.filter(function (r) { return pKey(r.name) === mk && (!r.cls || nmKey(r.cls) === ck); }).forEach(function (r) {
-            var at = (o.rows || []).filter(function (x) { return nmKey(x.sec) === nmKey(rk.name) && nmKey(x.name).indexOf(ck) === 0 && new RegExp('heat\\s*' + r.heat + '\\s*/', 'i').test(x.name); })[0];
-            cand.push({ w: rndKo(rk.name) + (r.heat ? ' · 히트 ' + r.heat : '') + (at && at.at ? ' · ' + at.at : ''), f: r.fast, t3: r.t3, lt: r.lt });
-          });
-        });
-        mains.forEach(function (r) { (o.races[r.id] || []).filter(function (x) { return pKey(x.name) === mk; }).forEach(function (x) { var at = (o.rows || []).filter(function (y) { return y.id === r.id; })[0]; cand.push({ w: r.label + (at && at.at ? ' · ' + at.at : ''), f: x.fast, t3: x.t3, lt: x.lt }); }); });
-        var pick = function (k) { var b = null; cand.forEach(function (c) { var v = toSec(c[k]); if (v > 0 && (!b || v < toSec(b[k]))) b = c; }); return b; };
-        var pickLT = function () { var b = null, sc = function (c) { var mm = String(c.lt).match(/^(\d+)\/(.+)$/); return mm ? [+mm[1], toSec(mm[2])] : null; }; cand.forEach(function (c) { var s = sc(c); if (!s) return; var bs = b && sc(b); if (!bs || s[0] > bs[0] || (s[0] === bs[0] && s[1] < bs[1])) b = c; }); return b; };
-        bests = { f: pick('f'), t3: pick('t3'), lt: pickLT() };
-      }
       right = '<div class="rs-h"><b>' + esc(meta.name || o.name) + '</b><span>' + (live ? '오늘 ' : '') + esc((meta.date || '').replace(/-/g, '.').slice(0, 10)) + '</span>' + (live ? '<span class="rs-live"><i>●</i> 실시간 · 30초마다 · ' + new Date(o.t).toTimeString().slice(0, 8) + '</span>' : '') + '<a href="/results/?p=view_event&id=' + esc(ev.sel) + '" target="_blank" rel="noopener">LiveRC ↗</a></div>' +
         strip + '<div class="rs-chips">' + names.map(function (n) { return '<button class="rs-c' + (nmKey(n) === ck ? ' on' : '') + '" data-cls="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
       if (me) {
         var B = function (lab, val, sub, cls) { return '<span' + (cls ? ' class="' + cls + '"' : '') + '><small>' + lab + '</small><b>' + val + '</b>' + (sub ? '<i' + (cls === 'gb' ? ' class="g"' : '') + '>' + sub + '</i>' : '') + '</span>'; };
         var flow = function (mm) {
-          var on = nmKey(mm.cls) === ck, h = '<div class="rs-flow">' + (mm.q ? B('예선 포인트' + (o.ptsName && /\(/.test(o.ptsName) ? ' ' + esc((o.ptsName.match(/\(([^)]*)\)/) || [])[1].replace(/\s*of\s*/i, '/')) : ''), mm.q.pos + '위') : '');
+          var on = nmKey(mm.cls) === ck, P = pcOf(mm.cls), h = '<div class="rs-flow">' + (mm.q ? B('예선 포인트' + (o.ptsName && /\(/.test(o.ptsName) ? ' ' + esc((o.ptsName.match(/\(([^)]*)\)/) || [])[1].replace(/\s*of\s*/i, '/')) : ''), mm.q.pos + '위') : '');
           if (live && liveCls && nmKey(mm.cls) === liveCls) {   /* the prediction belongs to the class racing now */
             var pr = null; try { var dd = SC() ? list(SC().driverData).filter(function (x) { return pKey(nameOf(x)) === mk; })[0] : null; if (dd && qd.pred) pr = qd.pred[nmKey(nameOf(dd))]; } catch (e) {}
             if (pr && pr.rank) h += B('이번 라운드 예상 · LAP X', pr.rank + '위', pr.chg ? (pr.chg > 0 ? '▲' + pr.chg : '▼' + (-pr.chg)) : '');
           }
           if (on && live && nextH) h += B('다음 히트', esc(nextH.split('|')[0]), esc(nextH.split('|')[1]));
-          if (on && hasEntry) h += B('메인 엔트리', esc(entry[mk] || '-'), '');
+          if (P.hasEntry) h += B('메인 엔트리', esc(P.entry[mk] || '-'), '');
           if (mm.mm) {   /* Triple / Double A-Main: every leg, then the total */
             var M = (o.multi || {})[nmKey(mm.cls)], used = multiUsed(M, mm.mm), drop = [];
             h += mm.mm.legs.map(function (l, i) { var nm = M.legN[i] || 'A' + (i + 1); var ok = l && l.L > 0; if (ok && !used[i]) drop.push(nm); return B(esc(nm), ok ? l.pos + '위' : '-', ok ? l.pts + '점 · ' + fmtLegLT(l) : '', ok && !used[i] ? 'dr' : ''); }).join('') +
               B(drop.length ? esc(drop.join('·')) + ' 빠짐' : '합계', mm.mm.points + '점', '', 'tot');
-          } else if (on && mine.length) {   /* engine: mains from the lowest up, bump-ups in green */
-            h += mine.slice().reverse().map(function (r) { var x = (o.races[r.id] || []).filter(function (y) { return pKey(y.name) === mk; })[0], up = upOf(r)[mk]; return B(esc(r.label), x.pos + '위', up ? '⬆ 범프 업' : esc(x.lt), up ? 'gb' : ''); }).join('');
+          } else if (P.mine.length) {   /* engine: mains from the lowest up, bump-ups in green */
+            h += P.mine.slice().reverse().map(function (r) { var x = (o.races[r.id] || []).filter(function (y) { return pKey(y.name) === mk; })[0], up = P.upOf(r)[mk]; return B(esc(r.label), x.pos + '위', up ? '⬆ 범프 업' : esc(x.lt), up ? 'gb' : ''); }).join('');
           } else if (mm.fin && /main/i.test(mm.fin.race)) h += B(esc(mm.fin.race), (((mm.fin.res.match(/^\[(\d+)\]/) || [])[1]) || '-') + '위', '');
           if (mm.fin || mm.mm) h += B('최종', (mm.fin ? mm.fin.pos : mm.mm.pos) + '위', '', 'fin');
-          if (on && bests) {
-            if (bests.f) h += B('베스트 랩', esc(bests.f.f), esc(bests.f.w), 'bl');
-            if (bests.t3) h += B('Top 3 연속', esc(bests.t3.t3), esc(bests.t3.w), 'bl');
-            if (bests.lt) h += B('최고 랩/시간', esc(bests.lt.lt), esc(bests.lt.w), 'bl');
+          if (P.bests) {
+            if (P.bests.f) h += B('베스트 랩', esc(P.bests.f.f), esc(P.bests.f.w), 'bl');
+            if (P.bests.t3) h += B('Top 3 연속', esc(P.bests.t3.t3), esc(P.bests.t3.w), 'bl');
+            if (P.bests.lt) h += B('최고 랩/시간', esc(P.bests.lt.lt), esc(P.bests.lt.w), 'bl');
           } else if (mm.fin && !mm.mm) h += B('기록', esc(resNoBr(mm.fin.res)), '');
           return h + '</div>';
         };
