@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 117;   /* = VER below */
-  /* var VER = 117; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 118;   /* = VER below */
+  /* var VER = 118; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.33';
+  var VERSION = '3.2.34';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -548,7 +548,7 @@
     /* Pit 연습 기록: one column, days as chips, laps under the picked session */
     '#vl_root.vl-pit #vl_tab_prac .pr-row{display:flex;flex-wrap:wrap;gap:6px}#vl_root.vl-pit #vl_pchip{display:inline-block;border-color:#ff7a1a;color:#fff;font-weight:800;border-radius:999px}#vl_root.vl-pit #vl_pselbox{display:none !important}#vl_root.vl-pit #vl_tab_prac.vl-popen #vl_pselbox{display:block !important;max-height:55vh;overflow:auto;border:1px solid #ff7a1a;border-radius:12px;padding:8px;margin:6px 0}' +
     '#vl_root .vl-fi{display:inline-flex;align-items:center;gap:6px;background:#0b0f1a;border:1px solid #2b3550;border-radius:8px;padding:3px 8px;min-width:0}#vl_root .vl-fi i{font-style:normal;color:#b8c0d0;font-size:14px;white-space:nowrap}#vl_root .vl-fi input{background:transparent;border:0;outline:0;color:#fff;font-size:15px;font-weight:700;padding:3px 0;min-width:0}#vl_root .vl-fi:focus-within{border-color:#ff7a1a}' +
-    '#vl_root .vl-trg{margin:0 8px 8px 0}#vl_root .vl-race{color:#ffb070;font-size:14px;white-space:normal}#vl_root .vl-mr h5{flex-wrap:wrap}#vl_root .vl-mrt{margin:0 0 8px}#vl_root .vl-rd{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;font-weight:800}#vl_root .vl-rd.q{background:#4fc3f722;color:#4fc3f7}#vl_root .vl-rd.mn{background:#ff7a1a22;color:#ffb070}' +
+    '#vl_root .vl-trg{margin:0}#vl_root .vl-ttb td,#vl_root .vl-ttb th{padding-left:5px !important;padding-right:5px !important}#vl_root .vl-tbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:14px}#vl_root .vl-race{color:#ffb070;font-size:14px;white-space:normal}#vl_root .vl-mr h5{flex-wrap:wrap}#vl_root .vl-mrt{margin:0 0 8px}#vl_root .vl-rd{display:inline-block;border-radius:6px;padding:0 6px;font-size:13px;font-weight:800}#vl_root .vl-rd.q{background:#4fc3f722;color:#4fc3f7}#vl_root .vl-rd.mn{background:#ff7a1a22;color:#ffb070}' +
     '#vl_root .vl-mrt2 tr.mr1 td{border-top:1px solid #232b40;cursor:pointer;white-space:nowrap}#vl_root .vl-mrt2 tr.mr2 td{padding-top:0;border-bottom:0;cursor:pointer}#vl_root .vl-mrt2 tr.on td{background:rgba(255,122,26,.07)}#vl_root .vl-mrt2 tr.mr1.on td:first-child{box-shadow:inset 3px 0 #ff7a1a}#vl_root .vl-mrt2 tr.mrx td{padding:2px 0 10px;white-space:normal;text-align:left}#vl_root .vl-mrt2 td.r,#vl_root .vl-mrt2 th.r{text-align:right}' +
     '#vl_root .vl-mrd{background:#10162a;border:1px solid #2b3550;border-radius:10px;padding:10px}#vl_root .vl-mrd .dh{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px;color:#dfe4ee;font-size:14px}#vl_root .vl-mrd .dh a{color:#8ab4ff;margin-left:auto}#vl_root .vl-mrd h6{margin:6px 0 2px;font-size:14px;color:#fff}#vl_root .vl-mrd h6 small{color:#b8c0d0;font-weight:400;font-size:13px}' +
     '#vl_root .vl-mrg{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}#vl_root.vl-pit .vl-mrg{display:block}' +
@@ -5376,20 +5376,21 @@
     var ex = (cfg.tireOf || {})[owner] || {}, pr = (cfg.tirePrep || {})[owner] || {};
     var E = Object.keys(ex).map(function (k) { return { k: k, t: ex[k].t, at: ex[k].at || '' }; }).sort(function (a, b) { return a.at < b.at ? -1 : a.at > b.at ? 1 : 0; });
     var nx = pr.next && pr.next.at ? pr.next : null, nxU = 0;
+    var cL = {}, cT = {};
     var out = {}, cnt = {}, w = null, wt = '', prevT = '', prevW = null, last = {};
     rs.slice().sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }).forEach(function (r) {
       var at = r[4], cur = null; E.forEach(function (e) { if (e.at <= at) cur = e; });
       var tid = cur ? cur.t : '', exp = !!(cur && (cur.k === r[0] || (cur.k.slice(0, 2) === 'n:' && !last[cur.k])));
       if (cur && cur.k.slice(0, 2) === 'n:') last[cur.k] = 1;
       var t = tireById(tid), k = 0;
-      if (tid) { cnt[tid] = (cnt[tid] || 0) + 1; k = cnt[tid]; }
+      if (tid) { cnt[tid] = (cnt[tid] || 0) + 1; k = cnt[tid]; cL[tid] = (cL[tid] || 0) + (+r[5] || 0); cT[tid] = (cT[tid] || 0) + (secs(r[6]) || 0); }
       var p = pr[r[0]];
       if (!p && nx && !nxU && nx.at <= at) { nxU = 1; nx.sid = r[0]; p = nx; }
       p = p || {};
       if (p.w !== undefined && p.w !== null && p.w !== '') { w = +p.w; wt = p.wt || ''; }
       else if (exp && t && t.warm !== undefined && t.warm !== '') { w = +t.warm || 0; wt = t.warmT || ''; }
       var g = p.g !== undefined ? +p.g : (exp && k === 1 && t && t.grip ? 1 : 0), gn = p.gn || (t && t.grip) || '', gm = p.gm !== undefined ? p.gm : (t && t.gripMin) || '';
-      out[r[0]] = { t: tid, k: k, exp: exp, again: exp && k > 1, inh: !!tid && !exp, g: g, gn: g ? gn : '', gm: g ? gm : '', w: w, wt: wt, chW: prevW !== null && w !== prevW, memo: p.memo || '', prev: prevT };
+      out[r[0]] = { t: tid, k: k, cl: tid ? cL[tid] : 0, ct: tid ? cT[tid] : 0, exp: exp, again: exp && k > 1, inh: !!tid && !exp, g: g, gn: g ? gn : '', gm: g ? gm : '', w: w, wt: wt, chW: prevW !== null && w !== prevW, memo: p.memo || '', prev: prevT };
       if (tid && tid !== prevT) out[r[0]].sw = 1;
       prevT = tid || prevT; prevW = w;
     });
@@ -5412,7 +5413,8 @@
   function tCell(x, short) {
     if (!x || !x.t) return '<span class="vl-tc add">＋ 타이어</span>';
     var t = tireById(x.t), nm = short ? '#' + (t ? t.no || 1 : '?') : tShort(t);
-    return x.inh ? tChip(t, '↓ #' + (t ? t.no || 1 : '?') + ' · ' + x.k + '회', true) : tChip(t, nm + ' · ' + x.k + '회') + (x.again ? ' <small class="vl-tag">↩' + (short ? '' : ' 다시') + '</small>' : '');
+    var cl = x.cl ? ' · ' + x.cl + '랩' : '';
+    return x.inh ? tChip(t, '↓ #' + (t ? t.no || 1 : '?') + ' · ' + x.k + '회' + cl, true) : tChip(t, nm + ' · ' + x.k + '회' + cl) + (x.again ? ' <small class="vl-tag">↩' + (short ? '' : ' 다시') + '</small>' : '');
   }
   /* sessions of a tire across everything loaded (all cars of the person) */
   function tSessOf(tid, rows, TL) { return rows.filter(function (r) { return TL[r[0]] && TL[r[0]].t === tid; }).sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }); }
@@ -5465,6 +5467,10 @@
     return (short ? '⇆ ' : '⇆ 가장 가까운 시간의 다른 타이어: ') + tChip(q, tShort(q) + ' · ' + b.y.k + '회 · ' + b.r[4].slice(11, 16), true) + ' <span class="mut">(' + b.gap + ')</span> ' + b.med.toFixed(3) + ' <b style="color:' + (dd <= 0 ? '#3ddc84' : '#ff6b6b') + '">' + Math.abs(dd).toFixed(2) + '초 ' + (dd <= 0 ? '빠름' : '느림') + '</b>';
   }
   /* wear: the tire's best session (가운데값) → its latest session */
+  /* the tire axis: 회 (uses) · 누적 랩 · 누적 시간 — default 누적 랩 */
+  function tAx() { return cfg.tireAx === 'n' || cfg.tireAx === 'ct' ? cfg.tireAx : 'cl'; }
+  function tAxV(x) { var a = tAx(); return !x ? 0 : a === 'n' ? x.k : a === 'cl' ? x.cl : x.ct; }
+  function tAxL(x) { var a = tAx(); return !x ? '' : a === 'n' ? x.k + '회' : a === 'cl' ? x.cl + '랩' : Math.round(x.ct / 60) + '분'; }
   function tWear(ss) {
     var m = ss.map(sMed), bi = -1; m.forEach(function (v, i) { if (v > 0 && (bi < 0 || v < m[bi])) bi = i; });
     var li = m.length - 1; while (li >= 0 && !(m[li] > 0)) li--;
@@ -5472,7 +5478,7 @@
   }
   /* 💡 recommendation from what was driven: same person, the sessions loaded, 1st–3rd use of each tire, compared by 가운데값 */
   function tRecommend(rows, TL) {
-    var grp = function (keyF) { var g = {}; rows.forEach(function (r) { var x = TL[r[0]], f = sMed(r); if (!x || !x.t || !(f > 0) || x.k > 3) return; var k = keyF(x, r); if (k === null) return; (g[k] = g[k] || []).push(f); }); return g; };
+    var grp = function (keyF) { var g = {}; rows.forEach(function (r) { var x = TL[r[0]], f = sMed(r); if (!x || !x.t || !(f > 0)) return; if (tAx() === 'ct' ? x.ct - (secs(r[6]) || 0) >= 35 * 60 : tAx() === 'cl' ? x.cl - (+r[5] || 0) >= 75 : x.k > 3) return; var k = keyF(x, r); if (k === null) return; (g[k] = g[k] || []).push(f); }); return g; };
     var best = function (g, min) { var b = null; Object.keys(g).forEach(function (k) { var a = g[k]; if (a.length < min) return; var m = a.reduce(function (s, v) { return s + v; }, 0) / a.length; if (!b || m < b.m) b = { k: k, m: m, n: a.length }; }); return b; };
     var model = function (x) { var t = tireById(x.t); return t ? nmKey([t.mk, t.nm, t.cp].join('|')) : null; };
     var gM = grp(model), bM = best(gM, 3), gG = grp(function (x) { return x.g ? '1' : '0'; }), bG = best(gG, 3), gW = grp(function (x) { return x.w === null ? null : String(x.w); }), bW = best(gW, 3);
@@ -5484,7 +5490,7 @@
       var ss = tSessOf(t.id, rows, TL); if (ss.length < 3) return null;
       var w = tWear(ss); if (!w || w.li === w.bi || w.d < 0.2) return null;
       var nb = tNear(ss[w.li], rows, TL);
-      return { t: t, d: w.d, bi: w.bi + 1, nb: nb && w.l > nb.med ? { q: tireById(nb.y.t), d: w.l - nb.med } : null };
+      return { t: t, d: w.d, bi: w.bi + 1, bl: tAxL(TL[ss[w.bi][0]]), nb: nb && w.l > nb.med ? { q: tireById(nb.y.t), d: w.l - nb.med } : null };
     }).filter(Boolean).sort(function (a, b) { return b.d - a.d; });
     return { n: n, conf: conf, m: bM, mt: fresh || mt[0] || null, mo: bM ? other(gM, bM) : null, mf: few(gM, bM), g: bG, go: bG ? other(gG, bG) : null, w: bW, wo: bW ? other(gW, bW) : null, alerts: alerts };
   }
@@ -5493,11 +5499,11 @@
     if (!R.m && !R.g && !R.w && !R.alerts.length) return '<div class="vl-trec"><h5>💡 추천<small>' + R.n + '세션 · 자료 부족</small></h5><div class="tw">타이어 · 그립제 · 워머를 세션에 등록하면 조합마다 3세션 이상 모일 때 추천이 나와요.</div></div>';
     var al = R.alerts[0];
     return '<div class="vl-trec"><h5>💡 다음 연습 추천<small>이 기간 세션 ' + R.n + '개 · 믿을 만함 ' + dots + ' · 비교 = 가운데값</small></h5><div class="tg">' +
-      box('타이어', R.m ? esc(R.mt ? [R.mt.mk, R.mt.nm, R.mt.cp].filter(Boolean).join(' ') : R.m.k) : '자료 부족', R.m ? '1~3회 가운데값 평균 ' + R.m.m.toFixed(2) + (R.mo ? ' · 다음보다 ' + (R.mo - R.m.m).toFixed(2) + '초 빠름' : R.mf ? ' · 다른 타이어는 자료 부족' : '') : '') +
+      box('타이어', R.m ? esc(R.mt ? [R.mt.mk, R.mt.nm, R.mt.cp].filter(Boolean).join(' ') : R.m.k) : '자료 부족', R.m ? (tAx() === 'ct' ? '처음 0~35분' : tAx() === 'cl' ? '처음 0~75랩' : '1~3회') + ' 가운데값 평균 ' + R.m.m.toFixed(2) + (R.mo ? ' · 다음보다 ' + (R.mo - R.m.m).toFixed(2) + '초 빠름' : R.mf ? ' · 다른 타이어는 자료 부족' : '') : '') +
       box('그립제', R.g ? (R.g.k === '1' ? '바름' : '안 바름') : '자료 부족', R.g && R.go ? (R.go - R.g.m).toFixed(2) + '초 빠름' : '') +
       box('워머', R.w ? (+R.w.k > 0 ? R.w.k + '분' : '없음') : '자료 부족', R.w && R.wo ? (R.wo - R.w.m).toFixed(2) + '초 빠름' : '') +
-      (al ? box('교체 알림', '<span style="color:#ffd54a">' + esc(tShort(al.t)) + '</span>', '<span style="color:#ff6b6b">최고(' + al.bi + '회)보다 +' + al.d.toFixed(2) + '초' + (al.nb && !pit ? ' · 가까운 시간 ' + esc(tShort(al.nb.q)) + '보다 ' + al.nb.d.toFixed(2) + '초 느림' : '') + '</span>', true) : '') + '</div>' +
-      (pit ? '' : '<div class="tw">근거: 같은 선수의 이 기간 세션 · 조합마다 가운데값(사고 · 멈춤 랩 영향 없음) 평균 비교, 3세션 미만은 "자료 부족" · 마모를 맞추려고 각 타이어 1~3회만 · 교체 알림 = 그 타이어 최고 세션보다 0.2초 넘게 느려짐</div>') + '</div>';
+      (al ? box('교체 알림', '<span style="color:#ffd54a">' + esc(tShort(al.t)) + '</span>', '<span style="color:#ff6b6b">' + esc(al.bl) + ' 뒤부터 느려짐 · 최고보다 +' + al.d.toFixed(2) + '초' + (al.nb && !pit ? ' · 가까운 시간 ' + esc(tShort(al.nb.q)) + '보다 ' + al.nb.d.toFixed(2) + '초 느림' : '') + '</span>', true) : '') + '</div>' +
+      (pit ? '' : '<div class="tw">근거: 같은 선수의 이 기간 세션 · 조합마다 가운데값(사고 · 멈춤 랩 영향 없음) 평균 비교, 3세션 미만은 "자료 부족" · 마모를 맞추려고 각 타이어 ' + (tAx() === 'ct' ? '처음 0~35분' : tAx() === 'cl' ? '처음 0~75랩' : '1~3회') + '만 · 교체 알림 = 그 타이어 최고 세션보다 0.2초 넘게 느려짐</div>') + '</div>';
   }
   /* 🕒 one day, every session of the person + car: 가운데값 in tire colours (the track and the weather change through the day) */
   function tDayFlow(rows, TL, owner, day, pit) {
@@ -5538,10 +5544,11 @@
       var ss = tSessOf(t.id, rows, TL), st = pstats(ss), f1 = ss[0], fl = ss[ss.length - 1], bi = 0; ss.forEach(function (r, i) { if (r[0] === st.bestId) bi = i + 1; });
       var wr = tWear(ss), wHot = wr && wr.li !== wr.bi && wr.d >= 0.2;
       var wBox = !wr ? '<div><small>가운데값 · 최고 → 지금</small><b>-</b><em>' + (ss.length < 2 ? '2회부터 보여요' : '랩타임 불러오는 중…') + '</em></div>'
-        : wr.li === wr.bi ? '<div><small>가운데값 · 최고 → 지금</small><b style="color:#3ddc84">최고</b><em>지금(' + (wr.li + 1) + '회) ' + wr.l.toFixed(3) + '가 가장 빠름</em></div>'
-        : '<div' + (wHot ? ' class="vl-twear"' : '') + '><small>가운데값 · 최고 → 지금</small><b style="color:' + (wHot ? '#ff6b6b' : '#fff') + '">+' + wr.d.toFixed(2) + '초</b><em>' + (wr.bi + 1) + '회 ' + wr.b.toFixed(3) + ' → ' + (wr.li + 1) + '회 ' + wr.l.toFixed(3) + '</em></div>';
+        : wr.li === wr.bi ? '<div><small>가운데값 · 최고 → 지금</small><b style="color:#3ddc84">최고</b><em>지금(' + tAxL(TL[ss[wr.li][0]]) + ') ' + wr.l.toFixed(3) + '가 가장 빠름</em></div>'
+        : '<div' + (wHot ? ' class="vl-twear"' : '') + '><small>가운데값 · 최고 → 지금</small><b style="color:' + (wHot ? '#ff6b6b' : '#fff') + '">+' + wr.d.toFixed(2) + '초</b><em>' + tAxL(TL[ss[wr.bi][0]]) + ' → ' + tAxL(TL[ss[wr.li][0]]) + (tAx() === 'cl' ? ' (' + (TL[ss[wr.li][0]].cl - TL[ss[wr.bi][0]].cl) + '랩 사이)' : '') + '</em></div>';
+      var lx = fl ? TL[fl[0]] : null, bx = wr ? TL[ss[wr.bi][0]] : null;
       D += '<div class="vl-lxc"><h5>' + tChip(t, tFull(t)) + '<small><button class="tl" data-tedit="1">✏ 고치기</button> · <button class="tl" data-tdup="1">⧉ 복제</button> · <button class="tl" data-tret="1">' + (t.ret ? '↺ 되살리기' : '🗑 폐기') + '</button></small></h5>' +
-        '<div class="px-kp"><div><small>쓴 횟수</small><b>' + ss.length + '회</b><em>' + (f1 ? esc(f1[4].slice(5, 10).replace('-', '/')) + (fl !== f1 ? ' ~ ' + esc(fl[4].slice(5, 10).replace('-', '/')) : '') : '&nbsp;') + '</em></div><div><small>총 랩 · 주행</small><b>' + st.laps + '</b><em>' + hms(st.time) + '</em></div><div><small>베스트' + (bi ? ' (' + bi + '회)' : '') + '</small><b style="color:' + C.B + '">' + fmtS(st.best) + '</b><em>&nbsp;</em></div>' + wBox + '</div>' +
+        '<div class="px-kp"><div><small>쓴 횟수 · 누적</small><b>' + (lx ? lx.k + '회 · ' + lx.cl + '랩' : ss.length + '회') + '</b><em>' + (lx ? hms(lx.ct) + ' 주행' : '&nbsp;') + '</em></div><div><small>가장 좋았던 구간</small><b>' + (bx ? esc(tAxL(bx)) : '-') + '</b><em>' + (bx ? (tAx() === 'n' ? bx.cl + '랩' : bx.k + '회') + ' · 가운데값 ' + wr.b.toFixed(3) : '&nbsp;') + '</em></div><div><small>베스트' + (bi ? ' (' + bi + '회)' : '') + '</small><b style="color:' + C.B + '">' + fmtS(st.best) + '</b><em>&nbsp;</em></div>' + wBox + '</div>' +
         '<div class="tinfo">' + esc([t.wh && '휠 ' + t.wh, t.ins && '인서트 ' + t.ins, t.ax || '앞뒤 같은 세트', t.grip && '기본 💧 ' + t.grip + (t.gripMin ? ' ' + t.gripMin + '분 전' : ''), t.warm !== undefined && t.warm !== '' && '기본 🔥 ' + (+t.warm ? t.warm + '분' : '없음') + (t.warmT ? ' ' + t.warmT + '℃' : ''), t.note && '메모: ' + t.note].filter(Boolean).join(' · ')) + '</div></div>';
       /* graph: x = n-th use of the tire, one value at a time, other tires to compare */
       var TM = { best: ['베스트', C.B], t3: ['Top 3', '#ffd54a'], med: ['가운데값', '#2ee6d6'], f5: ['빠른 5랩', '#ff7a1a'], pj: ['예상', '#7fd4ff'] }, tm = TM[cfg.tgM] ? cfg.tgM : 'med', PJ = +cfg.projMin || 5;
@@ -5551,35 +5558,42 @@
       var W = pit ? 340 : 760, H = 200, L0 = tm === 't3' || tm === 'pj' ? 66 : 54, R0 = 16, T0 = 22, B0 = 28, g = '';
       if (ys.length) {
         var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pd = Math.max((y1 - y0) * 0.15, tm === 'pj' ? 0.1 : 0.05); y0 -= pd; y1 += pd;
-        var X = function (i) { return L0 + (N > 1 ? i / (N - 1) : 0.5) * (W - L0 - R0); }, Y = function (v) { var f = (v - y0) / (y1 - y0); return T0 + (tm === 'pj' ? 1 - f : f) * (H - T0 - B0); };
+        var AX = tAx(), xMax = 1; ser.forEach(function (s2) { s2.ss.forEach(function (r) { xMax = Math.max(xMax, tAxV(TL[r[0]])); }); });
+        var X = function (i) { return L0 + (N > 1 ? i / (N - 1) : 0.5) * (W - L0 - R0); }, XV = function (v) { return L0 + v / (xMax * 1.04) * (W - L0 - R0); }, XR = function (r, i) { return AX === 'n' ? X(i) : XV(tAxV(TL[r[0]])); }, Y = function (v) { var f = (v - y0) / (y1 - y0); return T0 + (tm === 'pj' ? 1 - f : f) * (H - T0 - B0); };
         var fm = function (v) { return tm === 'pj' ? v.toFixed(1) + '랩' : tm === 't3' ? fmtS(v) : v.toFixed(2); };
         for (var k = 0; k <= 3; k++) { var yv = y0 + (y1 - y0) * k / 3; g += '<line x1="' + L0 + '" x2="' + (W - R0) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#232b40"/><text x="' + (L0 - 6) + '" y="' + (Y(yv) + 4) + '" fill="#b8c0d0" font-size="12" text-anchor="end">' + fm(yv) + '</text>'; }
-        for (var i2 = 0; i2 < N; i2++) if (N <= 12 || i2 % Math.ceil(N / 12) === 0) { var rx = ss[i2], kx = rx && TL[rx[0]] ? TL[rx[0]].k : i2 + 1; g += '<text x="' + X(i2) + '" y="' + (H - 8) + '" fill="' + (isRace(rx) ? '#ffb070' : '#b8c0d0') + '" font-size="12" text-anchor="middle">' + kx + '회' + (isRace(rx) ? '🏁' : '') + '</text>'; }
-        if (tm === 'med' && wHot) g += '<line x1="' + X(wr.bi).toFixed(1) + '" y1="' + Y(wr.b).toFixed(1) + '" x2="' + X(wr.li).toFixed(1) + '" y2="' + Y(wr.l).toFixed(1) + '" stroke="#ff6b6b" stroke-width="7" opacity=".35"/><text x="' + ((X(wr.bi) + X(wr.li)) / 2).toFixed(1) + '" y="' + ((Y(wr.b) + Y(wr.l)) / 2 + 20).toFixed(1) + '" fill="#ff6b6b" font-size="13" font-weight="800" text-anchor="middle">+' + wr.d.toFixed(2) + '초</text>';
+        if (AX === 'n') { for (var i2 = 0; i2 < N; i2++) if (N <= 12 || i2 % Math.ceil(N / 12) === 0) { var rx = ss[i2], kx = rx && TL[rx[0]] ? TL[rx[0]].k : i2 + 1; g += '<text x="' + X(i2) + '" y="' + (H - 8) + '" fill="' + (isRace(rx) ? '#ffb070' : '#b8c0d0') + '" font-size="12" text-anchor="middle">' + kx + '회' + (isRace(rx) ? '🏁' : '') + '</text>'; } }
+        else {   /* even ticks in laps or minutes */
+          var unit = AX === 'cl' ? 1 : 60, mx = xMax / unit, stp = [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000].filter(function (q) { return mx / q <= (pit ? 4 : 7); })[0] || 1000;
+          for (var tk = 0; tk <= mx * 1.04; tk += stp) g += '<text x="' + XV(tk * unit).toFixed(1) + '" y="' + (H - 8) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + tk + (AX === 'cl' ? '랩' : '분') + '</text>';
+        }
+        if (tm === 'med' && wHot) g += '<line x1="' + XR(ss[wr.bi], wr.bi).toFixed(1) + '" y1="' + Y(wr.b).toFixed(1) + '" x2="' + XR(ss[wr.li], wr.li).toFixed(1) + '" y2="' + Y(wr.l).toFixed(1) + '" stroke="#ff6b6b" stroke-width="7" opacity=".35"/><text x="' + ((XR(ss[wr.bi], wr.bi) + XR(ss[wr.li], wr.li)) / 2).toFixed(1) + '" y="' + ((Y(wr.b) + Y(wr.l)) / 2 + 20).toFixed(1) + '" fill="#ff6b6b" font-size="13" font-weight="800" text-anchor="middle">+' + wr.d.toFixed(2) + '초</text>';
         ser.slice().reverse().forEach(function (s) {
-          var main = s.t.id === t.id, c = s.t.col || '#c0c6d4', pts = []; s.ss.forEach(function (r, i) { var v = val(r); if (v > 0) pts.push([X(i), Y(v), TL[r[0]] && TL[r[0]].g, r[0], v]); });
+          var main = s.t.id === t.id, c = s.t.col || '#c0c6d4', pts = []; s.ss.forEach(function (r, i) { var v = val(r); if (v > 0) pts.push([XR(r, i), Y(v), TL[r[0]] && TL[r[0]].g, r[0], v]); });
           if (pts.length > 1) g += '<path d="' + pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + '" fill="none" stroke="' + c + '" stroke-width="' + (main ? 3.5 : 2.2) + '"' + (main ? '' : ' stroke-dasharray="6 5"') + '/>';
           if (main) pts.forEach(function (p) { g += (/^r/.test(p[3]) ? '<path d="M' + p[0].toFixed(1) + ' ' + (p[1] - 7.5).toFixed(1) + ' l7.5 7.5 l-7.5 7.5 l-7.5 -7.5z" fill="' + c + '" stroke="#0b0f1a" stroke-width="1.5"/>' : '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5.5" fill="' + (p[2] ? c : '#0b0f1a') + '" stroke="' + c + '" stroke-width="2.5"/>') + (pit ? '' : '<text x="' + p[0].toFixed(1) + '" y="' + (p[1] - 10).toFixed(1) + '" fill="#fff" font-size="12" font-weight="700" text-anchor="middle">' + fm(p[4]) + '</text>'); });
         });
-        if (tm === 'med' && wr && wr.li !== wr.bi) g += '<text x="' + X(wr.bi).toFixed(1) + '" y="' + (Y(wr.b) + 22).toFixed(1) + '" fill="#ffd54a" font-size="13" font-weight="800" text-anchor="middle">★ 최고</text>';
+        if (tm === 'med' && wr && wr.li !== wr.bi) g += '<text x="' + XR(ss[wr.bi], wr.bi).toFixed(1) + '" y="' + (Y(wr.b) + 22).toFixed(1) + '" fill="#ffd54a" font-size="13" font-weight="800" text-anchor="middle">★ 최고</text>';
         g = '<svg viewBox="0 0 ' + W + ' ' + H + '">' + g + '</svg>';
       } else g = '<div class="vl-pnone">' + TM[tm][0] + ' 기록이 없어요' + (tm === 'med' || tm === 'f5' ? ' (랩타임 불러오는 중이면 잠시 뒤)' : '') + '</div>';
       var chipsT = '<div class="px-pgm">' + Object.keys(TM).map(function (k) { return k === 'pj' ? '<span class="vl-pjc' + (tm === 'pj' ? ' on' : '') + '"><button data-tgmm="pj">예상</button><button data-pjd="-1">−</button><b>' + PJ + '분</b><button data-pjd="1">+</button></span>' : '<button data-tgmm="' + k + '" class="' + (k === tm ? 'on' : '') + '" style="--c:' + TM[k][1] + '">' + TM[k][0] + '</button>'; }).join('') + '</div>';
       var others = tires().filter(function (q) { return q.id !== t.id && tUseC[q.id]; }).slice(0, 8);
-      D += '<div class="vl-lxc"><h5>📈 몇 회 → ' + TM[tm][0] + '<small>' + (tm === 'pj' ? '위 = 랩 많음' : '위 = 빠름') + ' · ● 그립제 바름 ○ 안 바름' + (hasRace ? ' · ◆ 대회' : '') + '</small></h5>' + rTg + chipsT + (others.length ? '<div class="tcmp">비교 ' + others.map(function (q) { return '<button data-tcmp="' + esc(q.id) + '">' + tChip(q, tShort(q), cmp.indexOf(q.id) < 0) + '</button>'; }).join('') + '</div>' : '') + g + '</div>';
+      var axSg = '<span class="vl-sg vl-tax"><button data-tax="n" class="' + (tAx() === 'n' ? 'on' : '') + '">회</button><button data-tax="cl" class="' + (tAx() === 'cl' ? 'on' : '') + '">누적 랩</button><button data-tax="ct" class="' + (tAx() === 'ct' ? 'on' : '') + '">누적 시간</button></span>';
+      D += '<div class="vl-lxc"><h5>📈 ' + (tAx() === 'n' ? '몇 회' : tAx() === 'cl' ? '누적 랩' : '누적 시간') + ' → ' + TM[tm][0] + '<small>' + (tm === 'pj' ? '위 = 랩 많음' : '위 = 빠름') + ' · ● 그립제 바름 ○ 안 바름' + (hasRace ? ' · ◆ 대회' : '') + '</small></h5><div class="vl-tbar"><span class="mut">가로축</span>' + axSg + rTg + '</div>' + chipsT + (others.length ? '<div class="tcmp">비교 ' + others.map(function (q) { return '<button data-tcmp="' + esc(q.id) + '">' + tChip(q, tShort(q), cmp.indexOf(q.id) < 0) + '</button>'; }).join('') + '</div>' : '') + g + '</div>';
       if (fl) D += tDayFlow(rowsA, TL, tOwner(fl[1]), fl[4].slice(0, 10), pit);
       /* sessions driven on this tire */
       var rowsAll = rows.slice().sort(function (a, b) { return a[4] < b[4] ? -1 : 1; });
       var betw = function (r0, r1) { if (!r0) return ''; var o = {}; rowsAll.forEach(function (q) { if (q[4] > r0[4] && q[4] < r1[4] && tOwner(q[1]) === tOwner(r1[1])) { var x = TL[q[0]]; var k = x && x.t ? x.t : '-'; o[k] = (o[k] || 0) + 1; } }); return Object.keys(o).map(function (k) { var q = tireById(k); return q ? tChip(q, '#' + (q.no || 1) + ' ' + o[k] + '세션', true) : '<span class="mut">없음 ' + o[k] + '</span>'; }).join(' '); };
       var rowsH = ss.map(function (r, i) {
-        var x = TL[r[0]], pj = projOf(r[0]), pjs = pj ? pj.n + '/' + Math.floor(pj.t / 60) + ':' + ('0' + (pj.t % 60).toFixed(pit ? 1 : 3)).slice(pit ? -4 : -6) : '-', b = betw(ss[i - 1], r), f = secs(r[7]), ls = lapStat(r[0]), me = ls ? ls.med : NaN;
+        var x = TL[r[0]], pj = projOf(r[0]), pjs = pj ? pj.n + '/' + Math.floor(pj.t / 60) + ':' + ('0' + (pj.t % 60).toFixed(1)).slice(-4) : '-', b = betw(ss[i - 1], r), f = secs(r[7]), ls = lapStat(r[0]), me = ls ? ls.med : NaN;
         var bs = f > 0 && Math.abs(f - st.best) < 0.0005 ? ' style="color:' + C.B + ';font-weight:800"' : '', top = wr && wr.li !== wr.bi && i === wr.bi, nh = tNearH(r, rows, TL, me, pit);
         var medH = ls === undefined ? '…' : me > 0 ? '<b>' + me.toFixed(3) + '</b>' + (top ? ' ★' : '') : '-';
         var kk = x ? x.k : i + 1, rcH = isRace(r) ? '<div class="vl-race">🏁 ' + esc(r[9].ev) + ' · ' + esc(r[9].t) + ' · ' + r[9].pos + '위</div>' : '';
-        if (pit) return '<tr class="l1' + (top ? ' vl-ttop1' : '') + '"><td>' + kk + '회</td><td>' + esc(r[4].slice(5, 10).replace('-', '/')) + '<br>' + esc(r[4].slice(11, 16)) + '</td><td class="r"' + bs + '>' + fmtS(f) + '</td><td class="r">' + medH + '</td></tr><tr class="l2"><td></td><td colspan="3">' + rcH + prepChips(x, false) + (b ? ' ' + b : '') + (nh ? '<br>' + nh : '') + '</td></tr>';
-        return (b ? '<tr class="l0"><td></td><td colspan="9">⇣ 사이에 쓴 타이어 ' + b + '</td></tr>' : '') + '<tr' + (top ? ' class="vl-ttop1"' : '') + '><td>' + kk + '회</td><td>' + esc(r[4].slice(5, 16).replace('-', '/')) + rcH + '</td><td>' + prepChips(x, false) + '</td><td class="r">' + (+r[5] || 0) + '</td><td class="r"' + bs + '>' + fmtS(f) + '</td><td class="r">' + medH + '</td><td class="r">' + (ls ? ls.f5.toFixed(3) : ls === undefined ? '…' : '-') + '</td><td class="r">' + (secs(pc.t3[r[0]]) > 0 ? fmtS(secs(pc.t3[r[0]])) : '-') + '</td><td class="r">' + pjs + '</td><td class="r mut">' + (ls ? ls.slow : '') + '</td></tr>' + (nh || (x && x.memo) ? '<tr class="l2"><td></td><td colspan="9">' + nh + (x && x.memo ? (nh ? ' · ' : '') + '<span class="mut">📝 ' + esc(x.memo) + '</span>' : '') + '</td></tr>' : '');
+        var cuL = x ? x.cl : 0, cuT = x ? x.ct : 0;
+        if (pit) return '<tr class="l1' + (top ? ' vl-ttop1' : '') + '"><td>' + kk + '회<br><span class="mut">' + esc(r[4].slice(5, 10).replace('-', '/')) + ' ' + esc(r[4].slice(11, 16)) + '</span></td><td class="r"><b>' + cuL + '랩</b></td><td class="r">' + (+r[5] || 0) + '</td><td class="r">' + medH + '</td></tr><tr class="l2"><td></td><td colspan="3">' + rcH + prepChips(x, false) + (b ? ' ' + b : '') + (nh ? '<br>' + nh : '') + '</td></tr>';
+        return (b ? '<tr class="l0"><td></td><td colspan="9">⇣ 사이에 쓴 타이어 ' + b + '</td></tr>' : '') + '<tr' + (top ? ' class="vl-ttop1"' : '') + '><td>' + kk + '회</td><td class="r"><b>' + cuL + '랩</b> <span class="mut">· ' + Math.round(cuT / 60) + '분</span></td><td>' + esc(r[4].slice(5, 16).replace('-', '/')) + rcH + '</td><td class="r">' + (+r[5] || 0) + '</td><td class="r"' + bs + '>' + fmtS(f) + '</td><td class="r">' + medH + '</td><td class="r">' + (ls ? ls.f5.toFixed(3) : ls === undefined ? '…' : '-') + '</td><td class="r">' + (secs(pc.t3[r[0]]) > 0 ? fmtS(secs(pc.t3[r[0]])) : '-') + '</td><td class="r">' + pjs + '</td><td class="r mut">' + (ls ? ls.slow : '') + '</td></tr>' + '<tr class="l2"><td></td><td colspan="9">' + prepChips(x, false) + (nh ? ' ' + nh : '') + (x && x.memo ? ' <span class="mut">📝 ' + esc(x.memo) + '</span>' : '') + '</td></tr>';
       }).join('');
-      D += '<div class="vl-lxc"><h5>이 타이어로 주행한 세션<small>' + ss.length + '회 · 예상 ' + PJ + '분' + (pit ? '' : ' · 느린 랩 = 베스트 + 2초 넘는 랩') + '</small></h5>' + (ss.length ? '<div class="px-sw"><table class="vl-lt vl-ttb">' + (pit ? '<tr><th>회</th><th>날짜</th><th class="r">베스트</th><th class="r">가운데값</th></tr>' : '<tr><th>회</th><th>날짜 · 시각</th><th>세션 준비</th><th class="r">랩</th><th class="r">베스트</th><th class="r">가운데값</th><th class="r">빠른 5랩</th><th class="r">Top 3</th><th class="r">예상 랩/시간</th><th class="r">느린 랩</th></tr>') + rowsH + '</table></div>' : '<div class="vl-pnone">아직 이 타이어로 주행한 세션이 없어요. 📊 세션에서 타이어를 고르세요.</div>') + '</div>';
+      D += '<div class="vl-lxc"><h5>이 타이어로 주행한 세션<small>' + ss.length + '회' + (lx ? ' · 누적 ' + lx.cl + '랩' : '') + ' · 예상 ' + PJ + '분' + (pit ? '' : ' · 느린 랩 = 베스트 + 2초 넘는 랩') + '</small></h5>' + (ss.length ? '<div class="px-sw"><table class="vl-lt vl-ttb">' + (pit ? '<tr><th>회</th><th class="r">누적</th><th class="r">랩</th><th class="r">가운데값</th></tr>' : '<tr><th>회</th><th class="r">누적</th><th>날짜 · 시각</th><th class="r">랩</th><th class="r">베스트</th><th class="r">가운데값</th><th class="r">빠른 5랩</th><th class="r">Top 3</th><th class="r">예상</th><th class="r">느린 랩</th></tr>') + rowsH + '</table></div>' : '<div class="vl-pnone">아직 이 타이어로 주행한 세션이 없어요. 📊 세션에서 타이어를 고르세요.</div>') + '</div>';
     }
     var top = '<div class="vl-ttop">' + (pit ? '' : '<button class="tbtn" data-tlib="1">📚 메이커 목록 · 합치기</button>') + '<button class="tbtn o" data-tnew="1">＋ 새 타이어</button></div>';
     var lib = cfg.tireLib && !pit ? tLibH() : '';
@@ -5666,6 +5680,7 @@
     var tl0 = (q('[data-tlast]') || { getAttribute: function () { return ''; } }).getAttribute('data-tlast') || '', nAt = tNowS() > tl0 ? tNowS() : tl0 + '~';   /* "from the next session": after the last session we have, even if the clock says earlier */
     if ((el = q('[data-tgt]')) && q('tr.px-t2')) { tPrep(ow, q('tr.px-t2').getAttribute('data-psid'), 'g', el.classList.contains('on') ? 0 : 1); rer(); return true; }   /* 💧 in the session list: toggle right there */
     if ((el = q('[data-tundo]'))) { tDoUndo(); rer(); return true; }
+    if ((el = q('[data-tax]'))) { cfg.tireAx = el.getAttribute('data-tax'); save(); rer(); return true; }
     if ((el = q('[data-trace]'))) { cfg.tireRace = el.getAttribute('data-trace'); save(); rer(); return true; }
     if ((el = q('[data-ptab]'))) { cfg.pxTab = a(el, 'data-ptab'); tPick = ''; save(); rer(); return true; }
     if ((el = q('[data-trec]'))) { cfg.pxTab = 'tire'; save(); rer(); return true; }
