@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 111;   /* = VER below */
-  /* var VER = 111; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 112;   /* = VER below */
+  /* var VER = 112; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.27';
+  var VERSION = '3.2.28';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -489,6 +489,8 @@
     '.my-cc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.my-cc button{background:#141a2a;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 11px;font-size:14px;font-family:inherit;cursor:pointer}.my-cc button.on{background:#ff7a1a;border-color:#ff7a1a;color:#0b0f1a;font-weight:800}' +
     '.my-tb{margin-bottom:8px}.my-tb .th{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;margin-bottom:4px;color:#fff}.my-tg{font-size:11px;font-weight:800;border-radius:5px;padding:1px 6px}.my-tg.q{background:#123447;color:#7fd4ff}.my-tg.m{background:#47301a;color:#ffb070}.my-tg.f{background:#47401a;color:#ffd54a}' +
     '.my-tb table{width:100%;border-collapse:collapse;font-size:14px}.my-tb th{color:#b8c0d0;font-size:12px;text-align:left;font-weight:600;padding:3px 4px}.my-tb td{padding:5px 4px;border-top:1px solid #1f273d;color:#eef1f6}.my-tb tr.me td{color:#ff7a1a;font-weight:800}.my-tb .r{text-align:right;white-space:nowrap}' +
+    '#vl_hold{grid-column:1/-1;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#1d1a17;border:1px solid #ff7a1a;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:800;color:#ffb070;font-size:15px}#vl_hold small{color:#dfe4ee;font-weight:600;font-size:14px}#vl_hold button{margin-left:auto;background:#1f273d;border:1px solid #2b3550;color:#eef1f6;border-radius:8px;padding:5px 10px;font-size:14px;font-family:inherit;cursor:pointer}' +
+    '.bc-held{display:block;font-size:13px;font-weight:700;color:#ffb070;margin-bottom:2px}' +
     '.my-ev{margin-bottom:8px;font-size:15px;line-height:1.55}.my-eh{display:flex;justify-content:space-between;gap:8px}.my-eh b{color:#fff;font-size:16px}.my-eh span{color:#b8c0d0;font-size:13px}.my-ec{color:#b8c0d0;font-size:13px}.my-ev small{color:#b8c0d0}.my-more{width:100%;margin-top:6px}' +
     /* ---- phone: LAP X Pit ---- */
     '#vl_root.vl-pit #vl_brand{display:flex;align-items:center;gap:6px;flex:none;padding:0 2px}#vl_root.vl-pit #vl_brand img{width:28px;height:28px;border-radius:7px}#vl_root.vl-pit #vl_brand small{display:none}' +
@@ -2551,7 +2553,7 @@
         (nbOn && ahead ? rival(ahead, 'ah' + (r.closeTo ? ' cl' : ''), '▲ 앞차', gapLab(r.bhd, '앞'), bhdSt[r.key], true) :
           nbOn && r.p == 1 ? '<div class="vl-bc rv ah lead"><div class="rv-h"><span>▲ 선두</span><span class="rv-n" style="color:#bbb">앞차 없음</span></div></div>' : '') +
         '<div class="vl-bc mine">' +
-        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
+        '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.held ? '<span class="bc-held">지난 런 · 다시 찍히면 새로</span>' : '') + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
         '<div class="bc-row">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('평균', esc(r.avg || '-')) + cell('Top 3', esc(t3Fmt(r.t3))) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
           cell(bst('베스트'), bst(esc(r.fast))) +
@@ -2845,8 +2847,28 @@
     } else return;
     e.preventDefault();
   });
+  /* 대회: after a heat the board, predictions, lap table and graphs stay until the next heat's clock starts (or someone crosses) */
+  var hold = { shown: '', skip: '' };
+  function holdNow(sc) {
+    if (!root.classList.contains('vl-lx') || root.classList.contains('vl-pit') || !sc || isPractice(sc)) return false;
+    var sid = sessId(sc), all = list(sc.driverData || {}), laps = all.some(function (d) { return (+d.laps || 0) > 0; });
+    if (laps) { hold.shown = sid; return false; }
+    if (!hold.shown || sid === hold.shown || hold.skip === sid) return false;
+    if (rs.id === sid && rs.clk) { hold.shown = sid; return false; }
+    return true;
+  }
+  function holdBar(sc) {
+    var b = $('vl_hold'); if (!b) { b = document.createElement('div'); b.id = 'vl_hold'; $('vl_rb').insertBefore(b, $('vl_rb').firstChild); }
+    var nx = [pageText('#class .value'), pageText('#round .value'), pageText('#race .value')].filter(Boolean).join(' · ');
+    var h = '<span>⏸ 지난 세션 결과를 보여 주는 중</span><small>다음: ' + esc(nx || '대기') + ' — 시계가 돌면 바뀜</small><button data-holdx="1">다음 세션 보기</button>';
+    if (b.innerHTML !== h) b.innerHTML = h; b.style.display = 'flex';
+  }
+  var prHold = null;
   function renderRaceBoard(force) {
     if (cfg.tab !== 'board' && !force) return;
+    var scH = SC();
+    if (holdNow(scH)) { holdBar(scH); return; }
+    if ($('vl_hold')) $('vl_hold').style.display = 'none';
     renderGraphs(force);
     var sc = SC(), dd = sc && sc.driverData, now = Date.now();
     var all = dd ? list(dd).filter(function (d) { return nameOf(d); }) : [];
@@ -2894,8 +2916,15 @@
       rnd: [pageText('#round .value') && 'Round ' + pageText('#round .value'), pageText('#race .value') && 'Race ' + pageText('#race .value')].filter(Boolean).join(' · '),
       rem: pageText('#time_remaining .value'), ela: pageText('#time_elapsed .value'),
       color: (sc && sc.raceData && sc.raceData.raceClassColor) || '#01B2F0' };
-    renderBig(rowsData, closeCol);
-    try { renderLx(rowsData, prc); } catch (e) {}
+    var rowsX = rowsData, mr = rowsData.filter(function (r) { return r.mine; })[0], meP = myName();
+    if (!prc || !meP || root.classList.contains('vl-pit')) prHold = null;
+    else if (mr && +mr.l > 0) prHold = { k: pKey(meP), row: Object.assign({}, mr), hist: (lapHist[mr.key] || []).slice() };
+    else if (prHold && prHold.k === pKey(meP)) {   /* left the course / new run not crossed yet: last run's card */
+      lapHist['~held'] = prHold.hist;
+      rowsX = rowsData.filter(function (r) { return r !== mr; }).concat([Object.assign({}, prHold.row, { key: '~held', mine: true, held: true, isNew: false })]);
+    }
+    renderBig(rowsX, closeCol);
+    try { renderLx(rowsX, prc); } catch (e) {}
     rowsData = sortRows(rowsData);   /* Behind was computed in position order above; only the display order changes */
     var sig = JSON.stringify([rowsData, hdr, cols.map(function (c) { return c.k; }), cfg.sortK, cfg.sortD, closeCol, cfg.trendSrc, cfg.paceColor, cfg.graphSel, cfg.lapLive, cfg.lapPass, cfg.raceOn, cfg.finOn, cfg.bigView, prc, cfg.lapDev, cfg.lapNear, cfg.lapFar, cfg.lapBest]);
     if (sig === lastSig && !force) return;
@@ -3751,6 +3780,7 @@
   function fmtRun(t) { var m = Math.floor(t / 60), r = t - m * 60; return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1); }
   function updLive() {
     if (cfg.raceOn === false || cfg.lapLive === false || cfg.tab !== 'board') return;
+    if ($('vl_hold') && $('vl_hold').style.display === 'flex') return;
     var els = root.querySelectorAll('#vl_rb .lt[data-lt]'); if (!els.length) return;
     var sc = SC(), st = String(((sc || {}).raceData || {}).raceStatus || '');
     if (/complete|finish|stop|ended/i.test(st)) return;
@@ -5095,6 +5125,7 @@
     box.innerHTML = h;
   }
   setInterval(function () { try { if (cfg.tab === 'my' && root.classList.contains('vl-pit') && panel.style.display !== 'none' && myLiveEv()) renderMy(); } catch (e) {} }, 30000);
+  $('vl_rb').addEventListener('click', function (e) { var x = e.target.closest && e.target.closest('[data-holdx]'); if (!x) return; hold.skip = sessId(SC()); renderRaceBoard(true); });
   $('vl_my').addEventListener('click', function (e) {
     var t = e.target.closest ? e.target : null; if (!t) return;
     if (t.id === 'vl_mymore') { myMore += 12; renderMy(); return; }
@@ -5504,6 +5535,7 @@
         !all.some(function (d) { return (+d.laps || 0) > 0; })) { rs.gun = 1; playTone(9); }
     if (remNow > 0 && remNow < rs.rem) rs.still = 0;
     var clkRun = remNow > 0 && rs.rem > 0 && remNow < rs.rem;   /* the race clock is counting down (before the start the elapsed time can still be the last race's) */
+    if (clkRun) rs.clk = 1;
     rs.rem = remNow;
     var elaNow = secs(pageText('#time_elapsed .value'));
     if (!prcNow && clkRun && elaNow >= 0) { var dN = Math.round(elaNow + remNow); if (!(rs.dur > 0) || Math.abs(dN - rs.dur) > 3) rs.dur = dN; }
