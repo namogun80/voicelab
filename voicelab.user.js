@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.23
+// @version      3.2.24
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 107;   /* = VER below */
-  /* var VER = 107; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 108;   /* = VER below */
+  /* var VER = 108; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.23';
+  var VERSION = '3.2.24';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -550,6 +550,9 @@ window.__vlAuto = true;
     '#vl_clpop .cp-s{color:#b8c0d0;font-size:13px}#vl_clpop .cp-st{display:flex;align-items:center;gap:10px;margin:8px 0}#vl_clpop .cp-st button{width:40px;height:40px;border-radius:10px;border:1px solid #2b3550;background:#1a2135;color:#fff;font-size:20px;cursor:pointer}' +
     '#vl_clpop .cp-st b{font-size:26px;min-width:64px;text-align:center}#vl_clpop .cp-v{color:#ff7ae6;font-weight:800;font-size:16px}#vl_clpop .cp-b{display:flex;gap:8px;margin-top:8px}#vl_clpop .cp-b button{border:1px solid #2b3550;background:#1a2135;color:#ddd;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:inherit}' +
     '.px-cars{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.px-cars>span{color:#b8c0d0;font-size:13px;margin-right:2px}.px-car{background:#1a2135;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;font-family:inherit}.px-car small{opacity:.75;margin-left:3px}.px-car.on{background:#ff7a1a;border-color:#ff7a1a;color:#111;font-weight:800}' +
+    '.px-gwrap{display:flex;flex-direction:column;gap:8px}.px-pgm{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.px-pgm button{background:#141a2a;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}' +
+    '.px-pgc{display:flex;flex-direction:column;gap:10px}.vl-pit .px-pgm{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.vl-pit .px-pgm button{padding:7px 2px;font-size:14px;white-space:nowrap}.vl-pit .px-pgm small{grid-column:1/-1;text-align:right;margin:0}' +
+    '.px-pgm button.on{border-color:var(--c);color:#0b0f1a;background:var(--c)}.px-pgm small{margin-left:auto;color:#b8c0d0;font-size:13px}' +
     '.px-gr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.px-gr2>.vl-lxc{min-width:0}.px-gr2 h5 small{display:block;margin:2px 0 0}' +
     '.px-g{margin-bottom:8px}.px-g svg{width:100%;height:auto;max-height:260px}' +
     /* Pit 연습 기록: one column, days as chips, laps under the picked session */
@@ -5169,11 +5172,43 @@ window.__vlAuto = true;
     var asc = dl.slice().reverse(), half = !pit, W2 = half ? (root.classList.contains('vl-lxmd') ? 215 : 300) : (root.classList.contains('vl-lxmd') ? 520 : 760);
     var trDay = bavSvg(asc.map(function (d) { return d.slice(5).replace('-', '/'); }), asc.map(function (d) { return pstats(days[d]); }), W2, asc.indexOf(pxs.day));
     if (half) keyH = '<small><span style="color:' + C.B + '">━ 베스트</span> · <span style="color:#ff7a1a">━ 평균</span> · 위 = 빠름</small>';
-    var trend = '<div class="vl-lxc"><h5>📈 날짜별' + (half ? '' : ' 베스트 · 평균') + keyH + '</h5>' + (trDay || '<div style="color:#999;padding:10px">기록이 없어요</div>') + '</div>';
-    if (half) {   /* PC · iPad: the day's sessions, same lines, the picked session marked (click a point = that session) */
+    var trend = '<div class="vl-lxc"><h5>📈 날짜별 베스트 · 평균' + keyH + '</h5>' + (trDay || '<div style="color:#999;padding:10px">기록이 없어요</div>') + '</div>';
+    {   /* one value at a time (chips: 베스트 · Top 3 · 평균 · N분 예상). PC · iPad: days | the picked day's sessions side by side; Pit: one of them, picked like 랩 표 | 랩타임 그래프 */
+      var GW = half ? W2 : 300;
+      var PM = { best: ['베스트', C.B], t3: ['Top 3', '#ffd54a'], avg: ['평균', '#ff7a1a'], pj: [(+cfg.projMin || 5) + '분 예상', '#7fd4ff'] }, pm = PM[cfg.pgM] ? cfg.pgM : 'best';
+      var pjRate = function (r) { var q = projOf(r[0]), T = (+cfg.projMin || 5) * 60; return q && q.t > 0 ? q.n * T / q.t : NaN; };   /* laps in the set minutes (13/5:09.6 → 12.59) */
+      var mVal = function (rs) {
+        if (pm === 'pj') { var v = NaN; rs.forEach(function (r) { var x = pjRate(r); if (x > 0 && !(v >= x)) v = x; }); return v; }
+        return pstats(rs)[pm];
+      };
+      var mFmt = function (v) { return pm === 'pj' ? v.toFixed(2) + '랩' : pm === 't3' ? fmtS(v) : v.toFixed(2); };
+      var mSvg = function (labs, vals, W2, mark, ids) {
+        var H = 170, L = pm === 't3' || pm === 'pj' ? 64 : 52, R = 14, T = 16, B = 26, ys = vals.filter(function (v) { return v > 0; }), tr = '';
+        if (!ys.length) return '';
+        var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pd = Math.max((y1 - y0) * 0.12, pm === 'pj' ? 0.1 : 0.05); y0 -= pd; y1 += pd;
+        var X = function (i) { return labs.length > 1 ? L + i / (labs.length - 1) * (W2 - L - R) : (L + W2 - R) / 2; };
+        var Y = function (v) { var f = (v - y0) / (y1 - y0); return T + (pm === 'pj' ? 1 - f : f) * (H - T - B); };   /* up = better: fewer seconds, more laps */
+        for (var k = 0; k <= 3; k++) { var yv = y0 + (y1 - y0) * k / 3; tr += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#232b40"/><text x="' + (L - 6) + '" y="' + (Y(yv) + 4) + '" fill="#b8c0d0" font-size="12" text-anchor="end">' + mFmt(yv) + '</text>'; }
+        var step = Math.max(1, Math.ceil(labs.length / Math.max(3, Math.floor(W2 / 95))));
+        labs.forEach(function (d, i) { if (i % step === 0 || i === labs.length - 1) tr += '<text x="' + X(i) + '" y="' + (H - 6) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + d + '</text>'; });
+        var col = PM[pm][1], pts = []; vals.forEach(function (v, i) { if (v > 0) pts.push([X(i), Y(v), i]); });
+        if (pts.length > 1) tr += '<path d="' + pts.map(function (q, i) { return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' ') + '" fill="none" stroke="' + col + '" stroke-width="3"/>';
+        pts.forEach(function (q) { tr += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="' + (q[2] === mark ? 5.5 : 3.5) + '" fill="' + col + '"' + (ids ? ' data-psid="' + ids[q[2]] + '" style="cursor:pointer"' : '') + '/>'; });
+        if (mark >= 0) { tr = '<line x1="' + X(mark) + '" x2="' + X(mark) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#ff7a1a" stroke-dasharray="3 4" opacity=".6"/>' + tr; if (vals[mark] > 0) { var mx = X(mark), an = mx > W2 - R - 30 ? 'end' : mx < L + 30 ? 'start' : 'middle'; tr += '<text x="' + (an === 'end' ? mx + 4 : an === 'start' ? mx - 4 : mx) + '" y="' + (Y(vals[mark]) - 10) + '" fill="#fff" font-size="13" font-weight="700" text-anchor="' + an + '">' + mFmt(vals[mark]) + '</text>'; } }
+        return '<svg viewBox="0 0 ' + W2 + ' ' + H + '">' + tr + '</svg>';
+      };
+      var chips = '<div class="px-pgm">' + Object.keys(PM).map(function (k) { return '<button data-pgm="' + k + '" class="' + (k === pm ? 'on' : '') + '" style="--c:' + PM[k][1] + '">' + PM[k][0] + '</button>'; }).join('') + '<small>위 = ' + (pm === 'pj' ? '랩 많음' : '빠름') + '</small></div>';
       var sesT = function (r) { return (r[4].match(/\d{1,2}:\d{2}/) || [''])[0]; };
-      var trSes = bavSvg(dr.map(sesT), dr.map(function (r) { return pstats([r]); }), W2, (function () { var sid = dr.some(function (r) { return r[0] === pxs.sid; }) ? pxs.sid : (S.bestId || dr[dr.length - 1][0]); for (var q = 0; q < dr.length; q++) if (dr[q][0] === sid) return q; return -1; })(), dr.map(function (r) { return r[0]; }));
-      trend = '<div class="px-gr2">' + trend + '<div class="vl-lxc"><h5>📈 ' + pdate(pxs.day).slice(0, 5) + ' 세션별' + keyH + '</h5>' + (dr.length > 1 && trSes ? trSes : '<div style="color:#999;padding:10px">이날 세션이 ' + dr.length + '개라 선이 없어요</div>') + '</div></div>';
+      var sMark = (function () { var sid = dr.some(function (r) { return r[0] === pxs.sid; }) ? pxs.sid : (S.bestId || dr[dr.length - 1][0]); for (var q = 0; q < dr.length; q++) if (dr[q][0] === sid) return q; return -1; })();
+      var pgv = cfg.pgV === 'ses' ? 'ses' : 'day';
+      var gDay = half || pgv === 'day' ? mSvg(asc.map(function (d) { return d.slice(5).replace('-', '/'); }), asc.map(function (d) { return mVal(days[d]); }), GW, asc.indexOf(pxs.day)) : '';
+      var gSes = half || pgv === 'ses' ? mSvg(dr.map(sesT), dr.map(function (r) { return mVal([r]); }), GW, sMark, dr.map(function (r) { return r[0]; })) : '';
+      var none = '<div style="color:#999;padding:10px">' + PM[pm][0] + ' 기록이 없어요</div>';
+      var cDay = '<div class="vl-lxc"><h5>📈 날짜별 ' + PM[pm][0] + '</h5>' + (gDay || none) + '</div>';
+      var cSes = '<div class="vl-lxc"><h5>📈 ' + pdate(pxs.day).slice(0, 5) + ' 세션별 ' + PM[pm][0] + '</h5>' + (dr.length > 1 && gSes ? gSes : dr.length > 1 ? none : '<div style="color:#999;padding:10px">이날 세션이 1개라 선이 없어요</div>') + '</div>';
+      if (half) trend = chips + '<div class="px-gr2">' + cDay + cSes + '</div>';
+      else trend = '<div class="vl-lxc px-pgc"><div class="px-seg"><button data-pgv="day" class="' + (pgv === 'day' ? 'on' : '') + '">📅 날짜별</button><button data-pgv="ses" class="' + (pgv === 'ses' ? 'on' : '') + '">⏱ ' + pdate(pxs.day).slice(0, 5) + ' 세션별</button></div>' + chips + (pgv === 'day' ? (gDay || none) : dr.length > 1 && gSes ? gSes : dr.length > 1 ? none : '<div style="color:#999;padding:10px">이날 세션이 1개라 선이 없어요</div>') + '</div>';
+      trend = '<div class="px-gwrap">' + trend + '</div>';
     }
     /* sessions of the day */
     if (!pit && !dr.some(function (r) { return r[0] === pxs.sid; })) pxs.sid = S.bestId || dr[dr.length - 1][0];
@@ -5209,6 +5244,8 @@ window.__vlAuto = true;
     if (!lxP() || !lastPrac) return;
     var d = e.target.closest && e.target.closest('[data-pday]'), r = e.target.closest && e.target.closest('[data-psid]');
     if (d) { pxs.day = d.getAttribute('data-pday'); pxs.sid = ''; renderPracLx(lastPrac[0][0], lastPrac[1]); }
+    else if (e.target.closest && e.target.closest('[data-pgv]')) { cfg.pgV = e.target.closest('[data-pgv]').getAttribute('data-pgv'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
+    else if (e.target.closest && e.target.closest('[data-pgm]')) { cfg.pgM = e.target.closest('[data-pgm]').getAttribute('data-pgm'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (r) { var sid = r.getAttribute('data-psid'); pxs.sid = root.classList.contains('vl-pit') && pxs.sid === sid ? '' : sid; renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (e.target.closest && e.target.closest('[data-pcar]')) { var ck = e.target.closest('[data-pcar]').getAttribute('data-pcar'); pxs.day = ''; pxs.sid = ''; setCar(ck, (e.target.closest('[data-pcar]').getAttribute('data-pcd') || '')); }
     else if (e.target.closest && e.target.closest('[data-pv]')) { cfg.pitPv = e.target.closest('[data-pv]').getAttribute('data-pv'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
