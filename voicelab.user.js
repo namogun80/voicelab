@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.26
+// @version      3.2.27
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 110;   /* = VER below */
-  /* var VER = 110; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 111;   /* = VER below */
+  /* var VER = 111; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.26';
+  var VERSION = '3.2.27';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -72,7 +72,7 @@ window.__vlAuto = true;
     gAllPrac: true, gVoice: true, gVoiceBold: true, mainSay: true,
     nameMulti: true, selKeep: true, toneAuto: true, toneVol: 70, startGun: false, voiceMerge: true, voiceLatest: true, sayDelta: false, runSum: true, finOn: true, finSay: true, finWord: '레이스 종료', finPos: true,
     remOn: true, remAt: { 180: false, 120: true, 60: true, 30: true, 10: false }, posChg: true, gapBehind: true, behindSec: 1, autoFit: true, bigView: false, v227: 1,
-    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, closeMin: 1, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl', pracStart: true, pracStartWord: '스타트', selQ: '', resMode: 'ev', srM: 'pt', srN: 5, srMin: 2, srCls: '', srMerge: {} };
+    gcShow: true, gcSay: true, gcMin: 0.05, tqSay: true, tqWord: 'TQ 예상', v2294: 1, v300: 1, v320: 1, closePct: 21, closeMin: 1, car: '', carD: '', resPer: 'year', resMin: 5, pitPv: 'tbl', selQ: '', resMode: 'ev', srM: 'pt', srN: 5, srMin: 2, srCls: '', srMerge: {} };
   var koVoice = null, koVoices = [], femVoices = [];
   var VPRESET = { def: { i: -1, pitch: 1, rate: 1 }, f1: { i: 0, pitch: 1.05, rate: 1 }, f2: { i: 1, pitch: 1.22, rate: 1.03 }, f3: { i: 2, pitch: 0.9, rate: 0.95 } };
   var CFG_KEYS = Object.keys(cfg), CFG_DEF = JSON.parse(JSON.stringify(cfg));
@@ -750,7 +750,6 @@ window.__vlAuto = true;
     '<div class="lim"><span style="color:#999">같은 선수의 안내가 기다리는 중에 다음 랩이 오면 새 랩으로 바꿈</span></div></div>' +
     '<button id="vl_test">🗣 음성 테스트</button>' +
     '<div id="vl_hint"></div>' +
-    '<div class="gap"><label><input type="checkbox" id="vl_pst">🏁 연습에서 처음 찍히면 말하기</label> <input type="text" id="vl_pstw" maxlength="12" style="width:90px;background:#111;color:#fff;border:1px solid #444;border-radius:6px;padding:3px 6px;font-size:15px"></div>' +
     '<div id="vl_vstat" class="vl-vstat"></div>' +
     '<div id="vl_vlog" class="vl-vlog"></div>' +
     '</div></div>' +
@@ -1026,8 +1025,6 @@ window.__vlAuto = true;
   bind('vl_llive', 'lapLive', function () { renderRaceBoard(true); });
   $('vl_clpct').value = +cfg.closePct || 21;
   $('vl_clpct').onchange = function () { var v = Math.round(+this.value); if (v >= 5 && v <= 50) { cfg.closePct = v; save(); clAt = 0; renderRaceBoard(true); } else this.value = cfg.closePct; };
-  $('vl_pst').checked = cfg.pracStart !== false; $('vl_pst').onchange = function () { cfg.pracStart = this.checked; save(); };
-  $('vl_pstw').value = cfg.pracStartWord || '스타트'; $('vl_pstw').onchange = function () { cfg.pracStartWord = this.value.trim() || '스타트'; this.value = cfg.pracStartWord; save(); };
   bind('vl_lxall', 'lxAll', function () { root.classList.toggle('vl-lxall', !!cfg.lxAll); renderRaceBoard(true); });
   /* 🔍 zoom of everything inside the panel (this device only) */
   var ZPRE = [80, 90, 100, 110, 125, 150, 175];
@@ -5635,10 +5632,7 @@ window.__vlAuto = true;
     all.forEach(function (d) {
       if (!match(d)) return;
       var key = keyOf(d), L = +d.laps || 0, prev = vseen[key]; vseen[key] = L;
-      if (prev === undefined) {   /* 🏁 practice: the first time the transponder is read this session → "스타트" */
-        if (prc && L === 0 && !(secs(d.lapTime) > 0) && cfg.pracStart !== false && cfg.voiceOn !== false && !muted && voiceOK()) say(key + ':st', cfg.pracStartWord || '스타트', -1, 0, true);
-        return;
-      }
+      if (prev === undefined) return;   /* first sight this session: nothing to say yet (LiveRC sends no lap-0 crossing, so no "스타트") */
       if (L < prev) { delete vsaid[key]; return; }
       if (L <= prev || L < 1) return;
       vstat.loops++; vstatShow();
