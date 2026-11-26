@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 106;   /* = VER below */
-  /* var VER = 106; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 107;   /* = VER below */
+  /* var VER = 107; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.22';
+  var VERSION = '3.2.23';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -5329,8 +5329,9 @@
     var FL = root.classList.contains('vl-lx') ? '주유' : 'FUEL';
     if (!d) { fuelCur = null; var fme = myName(); $('vl_fbox').innerHTML = '<span class="fw"><span class="fl">' + FL + (fme ? '<small>' + esc(fme) + '</small>' : '') + '</span><span class="fc">' + fmtClock(T) + '</span></span>'; return; }
     var key = keyOf(d), f = fuel[key] || { base: 0, phase: 'run', pit: NaN }, E = secs(d.elapsedTime) || 0;
-    var st = String(((SC() || {}).raceData || {}).raceStatus || ''), live = !/complete|finish|stop|ended/i.test(st);
-    if (live && lastCross[key] && +d.laps > 0) E += Math.min(120, (Date.now() - lastCross[key]) / 1000);   /* keep counting between line crossings */
+    /* a down timer: keeps running between line crossings. Open Practice always reports raceStatus 'complete' → count there too */
+    var st = String(((SC() || {}).raceData || {}).raceStatus || ''), live = isPractice(SC()) || !/complete|finish|stop|ended/i.test(st);
+    if (live && lastCross[key] && +d.laps > 0) E += Math.min(600, (Date.now() - lastCross[key]) / 1000);
     fuelCur = { key: key, E: E };
     var left = T - (E - f.base), t = match(d), name = (t && t.alias) || nameOf(d);
     var ph = f.phase === 'called' ? esc(cfg.pitWord || '피트 인') : f.phase === 'pitting' ? '주유 중' : f.phase === 'manual' ? '리셋됨' : '';
