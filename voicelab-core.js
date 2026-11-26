@@ -480,6 +480,15 @@
     '.my-now{margin-bottom:8px;font-size:16px;line-height:1.6}.my-now h5 .lv{margin-left:auto;background:#e5243b;color:#fff;font-size:12px;border-radius:6px;padding:0 6px}.my-now b{color:#7dffa8;font-size:20px}.my-now .up{color:#3ddc84}.my-now .dn{color:#ff8a8a}.my-now .tqm{color:#ffd400;font-weight:800}' +
     '.my-q{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin-top:6px}.my-q b{font-size:18px}.my-q .ok{color:#3ddc84}.my-q .no{color:#ff8a8a}.my-q .pk{color:#ff2bd6}' +
     '.rs-e em b{display:inline;font-size:inherit;color:#fff}.rs-e em.cl{color:#ffd8b8}.rs-n{background:#ff7a1a;color:#111;border-radius:6px;padding:1px 7px;font-size:13px;font-weight:800;margin-left:6px}.rs-mc{margin-top:10px;padding:8px 10px;border-radius:10px;border:1px solid #2b3550;background:#0f1424;cursor:pointer}.rs-mc.on{border-color:#ff7a1a;background:#1d1a17;cursor:default}.rs-mn{font-weight:800;color:#fff}.rs-mn small{color:#b8c0d0;font-weight:500;margin-left:6px}.rs-mc .rs-flow{margin-top:6px}.my-el+.my-ec{margin-top:6px;border-top:1px solid #232b40;padding-top:6px}' +
+    '.ev-q,.rs-e em .ev-q{color:#7fd4ff}.ev-m,.rs-e em .ev-m{color:#ffb070}.ev-f,.rs-e em .ev-f{color:#ffd54a}.ev-f b,.rs-e em .ev-f b{color:#ffd54a}.rs-e em span{display:inline;font-size:inherit}.rs-e em{color:#dfe4ee}' +
+    '.my-live{border-color:#ff7a1a;margin-bottom:8px}.my-lh{display:flex;align-items:flex-start;gap:8px}.my-lh b{font-size:17px;color:#fff;flex:1;min-width:0}.my-lh .lv{flex:none;white-space:nowrap;background:#e5243b;color:#fff;font-size:12px;font-weight:800;border-radius:6px;padding:1px 7px}.my-lsub{color:#b8c0d0;font-size:13px}' +
+    '.my-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}.my-3>div{border-radius:10px;padding:6px 8px;min-width:0;background:#0f1424;border:1px solid #2b3550}.my-3 small{display:block;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.my-3 b{display:block;font-size:20px;color:#fff}.my-3 em{display:block;font-style:normal;font-size:12px;color:#b8c0d0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.my-3 .q{border-color:#24506a}.my-3 .q small{color:#7fd4ff}.my-3 .m{border-color:#6a4424}.my-3 .m small{color:#ffb070}.my-3 .f{border-color:#6a5a24}.my-3 .f small{color:#ffd54a}' +
+    '.my-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}.my-btns button{background:#1f273d;border:1px solid #2b3550;color:#eef1f6;border-radius:10px;padding:8px 4px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}.my-btns button small{display:block;font-weight:500;color:#b8c0d0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.my-btns button.hot{border-color:#3ddc84;color:#3ddc84}' +
+    '.my-ev{cursor:pointer}.my-back{background:none;border:0;color:#b8c0d0;font-size:15px;padding:4px 0;font-family:inherit;cursor:pointer}.my-dh{display:flex;align-items:flex-start;gap:8px;margin:4px 0 8px}.my-dh b{font-size:18px;color:#fff;flex:1}.my-dh .lv{flex:none;white-space:nowrap;background:#e5243b;color:#fff;font-size:12px;font-weight:800;border-radius:6px;padding:1px 7px}' +
+    '.my-cc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.my-cc button{background:#141a2a;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 11px;font-size:14px;font-family:inherit;cursor:pointer}.my-cc button.on{background:#ff7a1a;border-color:#ff7a1a;color:#0b0f1a;font-weight:800}' +
+    '.my-tb{margin-bottom:8px}.my-tb .th{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;margin-bottom:4px;color:#fff}.my-tg{font-size:11px;font-weight:800;border-radius:5px;padding:1px 6px}.my-tg.q{background:#123447;color:#7fd4ff}.my-tg.m{background:#47301a;color:#ffb070}.my-tg.f{background:#47401a;color:#ffd54a}' +
+    '.my-tb table{width:100%;border-collapse:collapse;font-size:14px}.my-tb th{color:#b8c0d0;font-size:12px;text-align:left;font-weight:600;padding:3px 4px}.my-tb td{padding:5px 4px;border-top:1px solid #1f273d;color:#eef1f6}.my-tb tr.me td{color:#ff7a1a;font-weight:800}.my-tb .r{text-align:right;white-space:nowrap}' +
     '.my-ev{margin-bottom:8px;font-size:15px;line-height:1.55}.my-eh{display:flex;justify-content:space-between;gap:8px}.my-eh b{color:#fff;font-size:16px}.my-eh span{color:#b8c0d0;font-size:13px}.my-ec{color:#b8c0d0;font-size:13px}.my-ev small{color:#b8c0d0}.my-more{width:100%;margin-top:6px}' +
     /* ---- phone: LAP X Pit ---- */
     '#vl_root.vl-pit #vl_brand{display:flex;align-items:center;gap:6px;flex:none;padding:0 2px}#vl_root.vl-pit #vl_brand img{width:28px;height:28px;border-radius:7px}#vl_root.vl-pit #vl_brand small{display:none}' +
@@ -4520,7 +4529,14 @@
     });
     return undefined;
   }
-  function evIsToday(e) { return !!(e && e.date && e.date.slice(0, 10) === todayS()); }
+  function evIsToday(e) {
+    if (!e || !e.date) return false; var d = e.date.slice(0, 10), t = todayS();
+    if (d === t) return true;
+    if (d !== addDays(t, -1) && d !== addDays(t, 1)) return false;
+    /* the track's day ≠ the Korean day (US tracks race on "yesterday" here): live when the race on the scoring page belongs to this event */
+    var sc = SC(), n = sc && sc.raceData && sc.raceData.eventName;
+    return !!(n && nmKey(n) === nmKey(e.name));
+  }
   /* Triple / Double A-Main standings page: legs per driver (place · points · laps/time) */
   function evParseMulti(doc) {
     var r = mainParseMulti(doc); if (!r) return null;
@@ -4540,7 +4556,7 @@
       return { pos: +td[0].textContent.trim() || 0, name: (nm ? nm.textContent : cellTxt(td[iD]).replace(/view laps/i, '')).replace(/\s+/g, ' ').trim(), lt: iL >= 0 && td[iL] ? td[iL].textContent.trim() : '', fast: f ? f.textContent.trim() : '', t3: iT >= 0 && td[iT] ? cellTxt(td[iT]) : '' };
     }).filter(function (r) { return r && r.name; });
   }
-  function evGet(id, cache) { return ev.data[id] || (cache && cache[id] && cache[id].v === 3 ? cache[id] : null); }
+  function evGet(id, cache) { return ev.data[id] || (cache && cache[id] && cache[id].v === 3 && !evIsToday((ev.list || []).filter(function (x) { return x.id === id; })[0]) ? cache[id] : null); }
   function evLoad(id, cb, force) {
     if (!force && ev.data[id]) { if (cb) cb(ev.data[id]); return; }
     var c = force ? null : evCacheGet()[id]; if (c && c.v === 3) { ev.data[id] = c; if (cb) cb(c); return; }
@@ -4576,7 +4592,7 @@
       if (cb) cb(o); q.forEach(function (f) { try { f(o); } catch (e) {} });
     }, function () { delete ev.loading[id]; (ev.fail = ev.fail || {})[id] = Date.now(); var q = ev.cbs[id] || []; delete ev.cbs[id]; if (cb) cb(null); q.forEach(function (f) { try { f(null); } catch (e) {} }); });
   }
-  function evDone(id) { var e = (ev.list || []).filter(function (x) { return x.id === id; })[0]; return !!(e && e.date && e.date.slice(0, 10) < todayS()); }
+  function evDone(id) { var e = (ev.list || []).filter(function (x) { return x.id === id; })[0]; return !!(e && e.date && e.date.slice(0, 10) < todayS() && !evIsToday(e)); }
   /* the mains of one class (engine: A/B/C, 1/4 → 1/2 → final), top first; loads their results on demand */
   function evClassMains(o, cls) {
     var k = nmKey(cls);
@@ -4609,15 +4625,27 @@
     o.classes.forEach(function (c) { c.rows.forEach(function (r) { if (pKey(r.name) === k && !seen[nmKey(c.name)]) { seen[nmKey(c.name)] = 1; out.push({ cls: c.name, fin: r, car: splitName(r.name).c }); } }); });
     Object.keys(o.points || {}).forEach(function (ck) { var pr = o.points[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && pr) { seen[ck] = 1; out.push({ cls: o.points[ck].name || ck, fin: null, car: splitName(pr.name).c }); } });
     Object.keys(o.multi || {}).forEach(function (ck) { var mr = o.multi[ck].rows.filter(function (r) { return pKey(r.name) === k; })[0]; if (!seen[ck] && mr) { seen[ck] = 1; out.push({ cls: o.multi[ck].name || ck, fin: null, car: splitName(mr.name).c }); } });
+    out.forEach(function (h) { h.mr = evMainOf(o, h.cls, nm); });
     out.forEach(function (h) { var pt = (o.points || {})[nmKey(h.cls)], mu = (o.multi || {})[nmKey(h.cls)]; h.q = pt ? pt.rows.filter(function (r) { return pKey(r.name) === k; })[0] : null; h.mm = mu ? mu.rows.filter(function (r) { return pKey(r.name) === k; })[0] || null : null; });
     return out;
   }
   function evMine(o, nm) { return evMineAll(o, nm)[0] || null; }
+  function evMainOf(o, cls, nm) {
+    var k = pKey(nm), hit = null;
+    evClassMains(o, cls).forEach(function (r) { if (hit) return; var x = ((o.races || {})[r.id] || []).filter(function (y) { return pKey(y.name) === k; })[0]; if (x) hit = { label: r.label, pos: x.pos, lt: x.lt, fast: x.fast }; });
+    return hit;
+  }
+  function mainKo(t) { return String(t || '').replace(/\s*-?\s*main\b/i, '메인'); }
+  /* one line per class: 예선 (blue) → 메인 (orange) · 최종 (yellow) */
   function evLine(m) {
     if (!m) return '';
-    if (m.mm) return (m.q ? '예선 ' + m.q.pos + '위 → ' : '') + 'A메인 ' + m.mm.legs.map(function (l) { return l && l.L > 0 ? l.pos : '-'; }).join('·') + '위(' + m.mm.points + '점) · 최종 <b>' + (m.fin ? m.fin.pos : m.mm.pos) + '위</b>';
-    var race = m.fin ? m.fin.race : '', main = /main/i.test(race);
-    return (m.q ? '예선 ' + m.q.pos + '위' : '') + (main ? (m.q ? ' → ' : '') + esc(race.replace(/\s*main/i, '메인')) + ' ' + ((m.fin.res.match(/^\[(\d+)\]/) || [])[1] ? (m.fin.res.match(/^\[(\d+)\]/) || [])[1] + '위' : '') : '') + (m.fin ? ' · 최종 <b>' + m.fin.pos + '위</b>' : '');
+    var Q = m.q ? '<span class="ev-q">예선 ' + m.q.pos + '위</span>' : '';
+    if (m.mm) return (Q ? Q + ' → ' : '') + '<span class="ev-m">A메인 ' + m.mm.legs.map(function (l) { return l && l.L > 0 ? l.pos : '-'; }).join('·') + '위(' + m.mm.points + '점)</span> · <span class="ev-f">최종 <b>' + (m.fin ? m.fin.pos : m.mm.pos) + '위</b></span>';
+    var race = m.fin ? m.fin.race : '', main = /main/i.test(race), M = '';
+    if (m.mr) M = '<span class="ev-m">' + esc(mainKo(m.mr.label)) + ' ' + m.mr.pos + '위</span>';
+    else if (main) { var rp = (m.fin.res.match(/^\[(\d+)\]/) || [])[1]; M = '<span class="ev-m">' + esc(mainKo(race)) + (rp ? ' ' + rp + '위' : '') + '</span>'; }
+    var F = m.fin && (main || !m.mr) ? '<span class="ev-f">최종 <b>' + m.fin.pos + '위</b></span>' : m.mr ? '<span class="ev-f">최종 -</span>' : '';
+    return [Q && M ? Q + ' → ' + M : Q || M, F].filter(Boolean).join(' · ');
   }
   var RPER = [['30', '최근 30일'], ['90', '90일'], ['year', '올해'], ['last', '작년'], ['all', '전체']];
   function resPerOk(d) {
@@ -4656,7 +4684,7 @@
       '<input id="vl_rsq" type="search" placeholder="대회 이름 · 날짜 찾기" value="' + esc(ev.q) + '"></div>' +
       lst.map(function (e) {
         var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0], td = e === todayE;
-        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? '오늘 ' : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
+        return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? (e.date.slice(0, 10) === todayS() ? '오늘 ' : '현지 ') : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
       }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (me && offN ? '<div class="rs-wait">📴 저장 안 된 대회 ' + offN + '개 — 인터넷 연결 뒤 확인</div>' : '') + (!lst.length && !(me && (wait || offN)) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
     var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); }, live = !!(todayE && ev.sel === todayE.id);
     if (!ev.sel) right = me ? resGraph(per, cache, CAR, joined, wait) : '<div class="vl-pnone"></div>';
@@ -4995,25 +5023,47 @@
   $('vl_res').addEventListener('input', function (e) { if (e.target.id === 'vl_rsq') { ev.q = e.target.value; renderRes(); } });
   /* ---------- 🏆 내 대회 (phone): the picked driver's event now + earlier events ---------- */
   var myMore = 12;
+  var myDet = '', myDetCls = '';
+  function myLiveEv() { return ev.list ? ev.list.filter(evIsToday)[0] || null : null; }
   function renderMy() {
     var box = $('vl_my'); if (!box) return;
     var me = myName();
     if (!me) { box.innerHTML = '<div class="vl-pnone">라이브 탭에서 선수 이름을 눌러 선수를 고르면 그 선수의 대회 정보가 나와요.</div>'; return; }
+    if (myDet) return renderMyDet(box, me);
     var k = pKey(me), dn = (SC() ? list(SC().driverData) : []).filter(function (x) { return pKey(nameOf(x)) === k; })[0], h = '<div class="my-who">' + MK() + (dn ? nmH(nameOf(dn)) : esc(me)) + '</div>', p = (qd && qd.pred || {})[dn ? nmKey(nameOf(dn)) : nmKey(me)];
-    if (p || mainLive) {
-      h += '<div class="vl-lxc my-now"><h5>지금 대회<span class="lv">진행 중</span></h5>';
-      if (p) h += '<div>예선 ' + (qualRound(SC()) || '') + '라운드 예상 <b>' + (p.rank ? p.rank + '위' : '대기') + '</b>' + (p.chg ? ' <span class="' + (p.chg > 0 ? 'up' : 'dn') + '">' + (p.chg > 0 ? '▲' : '▼') + Math.abs(p.chg) + '</span>' : '') + '</div>' + (p.rank === 1 ? '<div class="tqm">🏁 TQ 예상</div>' : qd.tq ? '<div>🏁 TQ 예상 ' + esc(qd.tq) + '</div>' : '');
-      if (mainLive) { var sc = SC(), dd = sc ? list(sc.driverData) : [], d = dd.filter(function (x) { return pKey(nameOf(x)) === k; })[0]; if (d) { var mc = mainCard({ p: d.position, key: keyOf(d), nm: nameOf(d) }); if (mc) h += mc.replace('class="bc-q"', 'class="my-q"'); } }
-      h += '</div>';
-    }
-    if (!ev.list) { box.innerHTML = h + '<div class="vl-pnone">대회 목록을 읽는 중…</div>'; evListLoad(renderMy); return; }
-    var cache = evCacheGet(), lst = ev.list.slice(0, myMore), found = 0, wait = 0;
+    var live = '';
+    if (p) live += '<div>예선 ' + (qualRound(SC()) || '') + '라운드 예상 <b>' + (p.rank ? p.rank + '위' : '대기') + '</b>' + (p.chg ? ' <span class="' + (p.chg > 0 ? 'up' : 'dn') + '">' + (p.chg > 0 ? '▲' : '▼') + Math.abs(p.chg) + '</span>' : '') + '</div>' + (p.rank === 1 ? '<div class="tqm">🏁 TQ 예상</div>' : qd.tq ? '<div>🏁 TQ 예상 ' + esc(qd.tq) + '</div>' : '');
+    if (mainLive) { var sc = SC(), dd = sc ? list(sc.driverData) : [], d = dd.filter(function (x) { return pKey(nameOf(x)) === k; })[0]; if (d) { var mc = mainCard({ p: d.position, key: keyOf(d), nm: nameOf(d) }); if (mc) live += mc.replace('class="bc-q"', 'class="my-q"'); } }
+    if (!ev.list) { box.innerHTML = h + (live ? '<div class="vl-lxc my-now"><h5>지금 대회<span class="lv">진행 중</span></h5>' + live + '</div>' : '') + '<div class="vl-pnone">대회 목록을 읽는 중…</div>'; evListLoad(renderMy); return; }
+    /* today's event (the track's own day): 예선 → 메인 → 최종 per class, 오늘 메인 · 자세히 */
+    var te = myLiveEv(), to = te ? ev.data[te.id] : null;
+    if (te && (!to || Date.now() - (to.t || 0) > 30000) && !ev.loading[te.id]) evLoad(te.id, function () { if (cfg.tab === 'my') renderMy(); }, true);
+    if (te) {
+      var lm = mainLive ? (pageText('#class .value') + ' ' + mainKo(pageText('#round .value'))).trim() : '';
+      h += '<div class="vl-lxc my-live"><div class="my-lh"><b>' + esc(te.name) + '</b><span class="lv">● 진행 중</span></div><div class="my-lsub">' + esc(te.date.slice(5).replace('-', '/')) + (te.date.slice(0, 10) === todayS() ? '' : ' (현지)') + ' · 30초마다</div>';
+      if (live) h += '<div class="my-now">' + live + '</div>';
+      if (!to) h += '<div class="vl-pnone">대회 결과를 읽는 중…</div>';
+      else {
+        var ms = evMineAll(to, me);
+        ms.forEach(function (m) {
+          var mains = evClassMains(to, m.cls); if (mains.length) evRacesLoad(te.id, to, mains, function () { if (cfg.tab === 'my') renderMy(); });
+          var main = m.fin && /main/i.test(m.fin.race), rt = (to.ptsName || '').match(/\((\d+)\s*of\s*(\d+)\)/i);
+          h += '<div class="my-ec">' + esc(m.cls) + (m.car ? ' (' + esc(m.car) + ')' : '') + '</div><div class="my-3">' +
+            '<div class="q"><small>예선' + (rt ? ' ' + rt[1] + '/' + rt[2] : '') + '</small><b>' + (m.q ? m.q.pos + '위' : '-') + '</b><em>' + esc(m.q ? m.q.tot : '') + '</em></div>' +
+            '<div class="m"><small>' + (m.mm ? 'A메인 ' + m.mm.legs.length + '레그' : m.mr ? esc(mainKo(m.mr.label)) : '메인') + '</small><b>' + (m.mm ? m.mm.pos + '위' : m.mr ? m.mr.pos + '위' : '-') + '</b><em>' + (m.mm ? m.mm.points + '점' : m.mr ? esc(m.mr.lt) : '대기') + '</em></div>' +
+            '<div class="f"><small>최종</small><b>' + (m.fin && (main || m.mm || !mains.length) ? m.fin.pos + '위' : '-') + '</b><em>' + (m.fin && (main || m.mm || !mains.length) ? esc(resNoBr(m.fin.res)) : '대기') + '</em></div></div>';
+        });
+        if (!ms.length) h += '<div class="vl-pnone">이 대회 결과에 ' + esc(me) + ' 선수가 아직 없어요.</div>';
+      }
+      h += '<div class="my-btns">' + (md.ok ? '<button class="hot" data-mygo="main">🏆 오늘 메인' + (lm ? '<small>지금 ' + esc(lm) + '</small>' : '') + '</button>' : '') + '<button data-mydet="' + esc(te.id) + '"' + (md.ok ? '' : ' style="grid-column:1/-1"') + '>📋 대회 결과 자세히<small>예선 · 메인 표</small></button></div></div>';
+    } else if (live) h += '<div class="vl-lxc my-now"><h5>지금 대회<span class="lv">진행 중</span></h5>' + live + '</div>';
+    var cache = evCacheGet(), lst = ev.list.filter(function (e) { return e !== te; }).slice(0, myMore), found = 0, wait = 0;
     h += '<div class="my-sec">지난 대회</div>';
     lst.forEach(function (e) {
       var o = evGet(e.id, cache);
       if (!o) { wait++; return; }
       var ms = evMineAll(o, me); if (!ms.length) return; found++;
-      h += '<div class="vl-lxc my-ev"><div class="my-eh"><b>' + esc(e.name) + '</b><span>' + esc(e.date.slice(5).replace('-', '/')) + '</span></div>' + ms.map(function (m) { return '<div class="my-ec">' + esc(m.cls) + (m.car ? ' (' + esc(m.car) + ')' : '') + '</div><div class="my-el">' + evLine(m) + (m.fin ? ' <small>' + esc(m.fin.res.replace(/^\[\d+\]\s*/, '')) + '</small>' : '') + '</div>'; }).join('') + '</div>';
+      h += '<div class="vl-lxc my-ev" data-mydet="' + esc(e.id) + '"><div class="my-eh"><b>' + esc(e.name) + '</b><span>' + esc(e.date.slice(5).replace('-', '/')) + '</span></div>' + ms.map(function (m) { return '<div class="my-ec">' + esc(m.cls) + (m.car ? ' (' + esc(m.car) + ')' : '') + '</div><div class="my-el">' + evLine(m) + (m.fin ? ' <small>' + esc(resNoBr(m.fin.res)) + '</small>' : '') + '</div>'; }).join('') + '</div>';
     });
     if (wait) h += '<div class="vl-pnone">대회 ' + wait + '개 읽는 중…</div>';
     else if (!found) h += '<div class="vl-pnone">최근 ' + lst.length + '개 대회에 ' + esc(me) + ' 선수 기록이 없어요.</div>';
@@ -5022,7 +5072,40 @@
     var todo = lst.filter(function (e) { return !evGet(e.id, cache) && !ev.loading[e.id]; }).slice(0, 2);
     todo.forEach(function (e) { evLoad(e.id, function () { if (cfg.tab === 'my') renderMy(); }); });
   }
-  $('vl_my').addEventListener('click', function (e) { if (e.target.id === 'vl_mymore') { myMore += 12; renderMy(); } });
+  /* one event at Pit size: class chips (mine first) · main results · 예선 순위 (or 최종 순위) */
+  function renderMyDet(box, me) {
+    var e = (ev.list || []).filter(function (x) { return x.id === myDet; })[0], o = evGet(myDet, evCacheGet()), k = pKey(me), lvE = e && evIsToday(e);
+    var h = '<button class="my-back" data-myback="1">← 결과</button><div class="my-dh"><b>' + esc(e ? e.name : '대회') + '</b>' + (lvE ? '<span class="lv">● 진행 중</span>' : '<span style="color:#b8c0d0;font-size:13px">' + esc(e ? e.date.slice(5).replace('-', '/') : '') + '</span>') + '</div>';
+    if (!o) { box.innerHTML = h + '<div class="vl-pnone">대회 결과를 읽는 중…</div>'; evLoad(myDet, function () { if (cfg.tab === 'my') renderMy(); }); return; }
+    var mine = evMineAll(o, me).map(function (m) { return m.cls; }), all = [];
+    mine.concat(o.classes.map(function (c) { return c.name; }), Object.keys(o.points || {}).map(function (x) { return o.points[x].name; })).forEach(function (c) { if (c && !all.some(function (x) { return nmKey(x) === nmKey(c); })) all.push(c); });
+    var cls = all.filter(function (c) { return nmKey(c) === nmKey(myDetCls); })[0] || mine[0] || all[0] || '', ck = nmKey(cls);
+    h += '<div class="my-cc">' + all.map(function (c) { var mi = mine.some(function (x) { return nmKey(x) === nmKey(c); }); return '<button data-mycls="' + esc(c) + '" class="' + (nmKey(c) === ck ? 'on' : '') + '">' + esc(c) + (mi ? ' 🔊' : '') + '</button>'; }).join('') + '</div>';
+    var tr = function (rows, cols) { return '<table><tr>' + cols.map(function (c) { return '<th' + (c[2] ? ' class="r"' : '') + '>' + c[0] + '</th>'; }).join('') + '</tr>' + rows.map(function (r) { return '<tr' + (pKey(r.name) === k ? ' class="me"' : '') + '>' + cols.map(function (c) { return '<td' + (c[2] ? ' class="r"' : '') + '>' + esc(c[1](r)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>'; };
+    var mu = (o.multi || {})[ck];
+    if (mu) h += '<div class="vl-lxc my-tb"><div class="th"><span class="my-tg m">메인</span>A메인 합계</div>' + tr(mu.rows, [['#', function (r) { return r.pos; }], ['선수', function (r) { return pName(r.name); }], ['레그', function (r) { return r.legs.map(function (l) { return l && l.L > 0 ? l.pos : '-'; }).join('·'); }, 1], ['점수', function (r) { return r.points; }, 1]]) + '</div>';
+    var mains = evClassMains(o, cls); if (mains.length) evRacesLoad(myDet, o, mains, function () { if (cfg.tab === 'my') renderMy(); });
+    mains.forEach(function (r) {
+      var rows = (o.races || {})[r.id];
+      h += '<div class="vl-lxc my-tb"><div class="th"><span class="my-tg m">메인</span>' + esc(mainKo(r.label)) + ' 결과</div>' + (rows ? tr(rows, [['#', function (x) { return x.pos; }], ['선수', function (x) { return pName(x.name); }], ['랩/시간', function (x) { return x.lt; }, 1], ['베스트', function (x) { return x.fast; }, 1]]) : '<div class="vl-pnone">읽는 중…</div>') + '</div>';
+    });
+    var fc = o.classes.filter(function (c) { return nmKey(c.name) === ck; })[0], fMain = fc && fc.rows.some(function (r) { return /main/i.test(r.race); });
+    if (fc && fMain) h += '<div class="vl-lxc my-tb"><div class="th"><span class="my-tg f">최종</span>최종 순위</div>' + tr(fc.rows, [['#', function (x) { return x.pos; }], ['선수', function (x) { return pName(x.name); }], ['메인', function (x) { return mainKo(x.race); }], ['기록', function (x) { return resNoBr(x.res); }, 1]]) + '</div>';
+    var pt = (o.points || {})[ck], rt = (o.ptsName || '').match(/\((\d+)\s*of\s*(\d+)\)/i);
+    if (pt) h += '<div class="vl-lxc my-tb"><div class="th"><span class="my-tg q">예선</span>예선 순위' + (rt ? ' · ' + rt[1] + '/' + rt[2] : '') + '</div>' + tr(pt.rows, [['#', function (x) { return x.pos; }], ['선수', function (x) { return pName(x.name); }], ['기록', function (x) { return x.tot; }, 1]]) + '</div>';
+    else if (fc && !fMain) h += '<div class="vl-lxc my-tb"><div class="th"><span class="my-tg q">예선</span>예선 순위</div>' + tr(fc.rows, [['#', function (x) { return x.pos; }], ['선수', function (x) { return pName(x.name); }], ['기록', function (x) { return resNoBr(x.res); }, 1]]) + '</div>';
+    if (!mu && !mains.length && !fc && !pt) h += '<div class="vl-pnone">이 종목 결과가 아직 없어요.</div>';
+    box.innerHTML = h;
+  }
+  setInterval(function () { try { if (cfg.tab === 'my' && root.classList.contains('vl-pit') && panel.style.display !== 'none' && myLiveEv()) renderMy(); } catch (e) {} }, 30000);
+  $('vl_my').addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target : null; if (!t) return;
+    if (t.id === 'vl_mymore') { myMore += 12; renderMy(); return; }
+    var g = t.closest('[data-mygo]'); if (g) { setTab(g.getAttribute('data-mygo')); return; }
+    if (t.closest('[data-myback]')) { myDet = ''; renderMy(); try { $('vl_body').scrollTop = 0; } catch (x) {} return; }
+    var c = t.closest('[data-mycls]'); if (c) { myDetCls = c.getAttribute('data-mycls'); renderMy(); return; }
+    var dt = t.closest('[data-mydet]'); if (dt) { myDet = dt.getAttribute('data-mydet'); myDetCls = ''; renderMy(); try { $('vl_body').scrollTop = 0; } catch (x) {} }
+  });
   /* phone: bottom tabs + track button */
   root.querySelectorAll('#vl_pitbar button').forEach(function (b) { b.onclick = function () { setTab(b.getAttribute('data-tab')); }; });
   $('vl_pittk').textContent = '📍 ' + ((location.hostname || '').split('.')[0] || '트랙') + ' ▾';
