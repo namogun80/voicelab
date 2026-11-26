@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 108;   /* = VER below */
-  /* var VER = 108; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 109;   /* = VER below */
+  /* var VER = 109; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.24';
+  var VERSION = '3.2.25';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -2547,7 +2547,7 @@
         '<div class="vl-bc mine">' +
         '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
-        '<div class="bc-row">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('랩', (+r.l || 0) + '') + cell('Top 3', esc(r.t3)) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
+        '<div class="bc-row">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('평균', esc(r.avg || '-')) + cell('Top 3', esc(t3Fmt(r.t3))) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
           cell(bst('베스트'), bst(esc(r.fast))) +
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
           cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '')) +
@@ -5353,6 +5353,7 @@
     f.base = fuelCur.E; f.phase = 'manual';
     updFuel(list(((SC() || {}).driverData) || {}));
   }
+  function t3Fmt(v) { var x = secs(v); return x >= 60 ? fmtS(x) : (v || '-'); }   /* 78.876 → 1:18.876 */
   function fmtClock(v) { var n = v < 0; v = Math.abs(v); var m = Math.floor(v / 60), sx = Math.floor(v % 60); return (n ? '-' : '') + m + ':' + (sx < 10 ? '0' : '') + sx; }
   function updFuel(all) {
     var b = $('vl_fbtn'); b.classList.toggle('on', !!cfg.fuelOn);
