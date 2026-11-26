@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.28
+// @version      3.2.29
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 112;   /* = VER below */
-  /* var VER = 112; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 113;   /* = VER below */
+  /* var VER = 113; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.28';
+  var VERSION = '3.2.29';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -510,7 +510,7 @@ window.__vlAuto = true;
     '.my-cc{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}.my-cc button{background:#141a2a;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 11px;font-size:14px;font-family:inherit;cursor:pointer}.my-cc button.on{background:#ff7a1a;border-color:#ff7a1a;color:#0b0f1a;font-weight:800}' +
     '.my-tb{margin-bottom:8px}.my-tb .th{display:flex;align-items:center;gap:6px;font-weight:800;font-size:15px;margin-bottom:4px;color:#fff}.my-tg{font-size:11px;font-weight:800;border-radius:5px;padding:1px 6px}.my-tg.q{background:#123447;color:#7fd4ff}.my-tg.m{background:#47301a;color:#ffb070}.my-tg.f{background:#47401a;color:#ffd54a}' +
     '.my-tb table{width:100%;border-collapse:collapse;font-size:14px}.my-tb th{color:#b8c0d0;font-size:12px;text-align:left;font-weight:600;padding:3px 4px}.my-tb td{padding:5px 4px;border-top:1px solid #1f273d;color:#eef1f6}.my-tb tr.me td{color:#ff7a1a;font-weight:800}.my-tb .r{text-align:right;white-space:nowrap}' +
-    '#vl_hold{grid-column:1/-1;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#1d1a17;border:1px solid #ff7a1a;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:800;color:#ffb070;font-size:15px}#vl_hold small{color:#dfe4ee;font-weight:600;font-size:14px}#vl_hold button{margin-left:auto;background:#1f273d;border:1px solid #2b3550;color:#eef1f6;border-radius:8px;padding:5px 10px;font-size:14px;font-family:inherit;cursor:pointer}' +
+    '#vl_root.vl-pit #vl_hold{margin:0 0 10px;font-size:14px}#vl_root.vl-pit #vl_hold button{margin-left:0}#vl_hold{grid-column:1/-1;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#1d1a17;border:1px solid #ff7a1a;border-radius:10px;padding:8px 12px;margin-bottom:8px;font-weight:800;color:#ffb070;font-size:15px}#vl_hold small{color:#dfe4ee;font-weight:600;font-size:14px}#vl_hold button{margin-left:auto;background:#1f273d;border:1px solid #2b3550;color:#eef1f6;border-radius:8px;padding:5px 10px;font-size:14px;font-family:inherit;cursor:pointer}' +
     '.bc-held{display:block;font-size:13px;font-weight:700;color:#ffb070;margin-bottom:2px}' +
     '.my-ev{margin-bottom:8px;font-size:15px;line-height:1.55}.my-eh{display:flex;justify-content:space-between;gap:8px}.my-eh b{color:#fff;font-size:16px}.my-eh span{color:#b8c0d0;font-size:13px}.my-ec{color:#b8c0d0;font-size:13px}.my-ev small{color:#b8c0d0}.my-more{width:100%;margin-top:6px}' +
     /* ---- phone: LAP X Pit ---- */
@@ -2871,7 +2871,7 @@ window.__vlAuto = true;
   /* 대회: after a heat the board, predictions, lap table and graphs stay until the next heat's clock starts (or someone crosses) */
   var hold = { shown: '', skip: '' };
   function holdNow(sc) {
-    if (!root.classList.contains('vl-lx') || root.classList.contains('vl-pit') || !sc || isPractice(sc)) return false;
+    if (!(root.classList.contains('vl-lx') || root.classList.contains('vl-pit')) || !sc || isPractice(sc)) return false;
     var sid = sessId(sc), all = list(sc.driverData || {}), laps = all.some(function (d) { return (+d.laps || 0) > 0; });
     if (laps) { hold.shown = sid; return false; }
     if (!hold.shown || sid === hold.shown || hold.skip === sid) return false;
@@ -2938,7 +2938,7 @@ window.__vlAuto = true;
       rem: pageText('#time_remaining .value'), ela: pageText('#time_elapsed .value'),
       color: (sc && sc.raceData && sc.raceData.raceClassColor) || '#01B2F0' };
     var rowsX = rowsData, mr = rowsData.filter(function (r) { return r.mine; })[0], meP = myName();
-    if (!prc || !meP || root.classList.contains('vl-pit')) prHold = null;
+    if (!prc || !meP) prHold = null;
     else if (mr && +mr.l > 0) prHold = { k: pKey(meP), row: Object.assign({}, mr), hist: (lapHist[mr.key] || []).slice() };
     else if (prHold && prHold.k === pKey(meP)) {   /* left the course / new run not crossed yet: last run's card */
       lapHist['~held'] = prHold.hist;
