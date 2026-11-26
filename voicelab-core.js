@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 113;   /* = VER below */
-  /* var VER = 113; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 114;   /* = VER below */
+  /* var VER = 114; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.29';
+  var VERSION = '3.2.30';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -547,6 +547,25 @@
     '.px-g{margin-bottom:8px}.px-g svg{width:100%;height:auto;max-height:260px}' +
     /* Pit 연습 기록: one column, days as chips, laps under the picked session */
     '#vl_root.vl-pit #vl_tab_prac .pr-row{display:flex;flex-wrap:wrap;gap:6px}#vl_root.vl-pit #vl_pchip{display:inline-block;border-color:#ff7a1a;color:#fff;font-weight:800;border-radius:999px}#vl_root.vl-pit #vl_pselbox{display:none !important}#vl_root.vl-pit #vl_tab_prac.vl-popen #vl_pselbox{display:block !important;max-height:55vh;overflow:auto;border:1px solid #ff7a1a;border-radius:12px;padding:8px;margin:6px 0}' +
+    '#vl_root .vl-tc{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--c);color:#fff;background:#141a2a;border-radius:999px;padding:3px 10px;font-size:14px;font-weight:700;white-space:nowrap;cursor:pointer}#vl_root .vl-tc i{width:10px;height:10px;border-radius:50%;background:var(--c);display:inline-block}#vl_root .vl-tc.inh{border-style:dashed;color:#dfe4ee;font-weight:600;background:transparent}#vl_root .vl-tc.add{border-color:#3a4560;color:#b8c0d0;border-style:dashed;font-weight:600}' +
+    '#vl_root .vl-pp{display:inline-block;border:1px solid #2b3550;border-radius:8px;padding:2px 7px;margin-right:4px;font-size:14px;color:#dfe4ee;white-space:nowrap}#vl_root tr.px-t2 .vl-pp[data-tgt]{cursor:pointer}#vl_root .vl-pp.on{border-color:#4fc3f7;color:#4fc3f7}#vl_root .vl-pp.off{color:#b8c0d0}#vl_root .vl-pp.ch{border-color:#ffd54a;color:#ffd54a}#vl_root .vl-tag{color:#ffb070;font-size:13px;font-weight:700}#vl_root .mut{color:#b8c0d0}' +
+    '#vl_root .vl-ptab{margin:0 0 10px;display:inline-flex !important;width:auto !important}#vl_root .vl-ptab button{font-size:15px !important;font-weight:800;padding:8px 18px !important;flex:0 0 auto !important}#vl_root .vl-tnow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#141a2a;border:1px solid #2b3550;border-radius:12px;padding:8px 12px}#vl_root .vl-tnow .tnl{font-weight:800;color:#fff;font-size:15px}#vl_root .vl-tnow .tnb{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}' +
+    '#vl_root .tbtn{background:#1f273d;color:#dfe4ee;border:1px solid #2b3550;border-radius:9px;padding:6px 10px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}#vl_root .tbtn.o{background:#ff7a1a;border-color:#ff7a1a;color:#0b0f1a}#vl_root button.tl{background:none;border:0;color:#8ab4ff;font-size:14px;cursor:pointer;padding:0}' +
+    '#vl_root .vl-tblk{display:flex;flex-direction:column;gap:8px;background:#10162a;border:1px solid #2b3550;border-radius:10px;padding:10px;margin:6px 0 10px}#vl_root .vl-tblk .tb1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#vl_root .vl-tblk .tb1 .tbtn{margin-left:auto}#vl_root .vl-tblk .tb2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}#vl_root .vl-tblk .tb3,#vl_root .vl-trec .tw,#vl_root .vl-tform .tw{color:#b8c0d0;font-size:13px}' +
+    '#vl_root .vl-tblk .tpk{display:flex;flex-wrap:wrap;gap:6px}#vl_root .vl-tblk .tpk button{background:#1a2135;border:1px solid #2b3550;border-radius:10px;padding:5px 8px;color:#dfe4ee;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px}#vl_root .vl-tblk .tpk button.on{border-color:#ff7a1a}#vl_root .vl-tblk .tpk button.o{color:#ffb070;font-weight:700}#vl_root .vl-tblk .tpk small{font-size:13px;color:#b8c0d0}#vl_root .vl-tnow + .vl-tblk.tnx{margin-top:-4px}' +
+    '#vl_root .vl-sg{display:inline-flex;border:1px solid #2b3550;border-radius:9px;overflow:hidden}#vl_root .vl-sg button{background:#1a2135;color:#dfe4ee;border:0;border-right:1px solid #2b3550;padding:6px 10px;font-size:14px;cursor:pointer}#vl_root .vl-sg button:last-child{border-right:0}#vl_root .vl-sg button.on{background:#ff7a1a;color:#0b0f1a;font-weight:800}' +
+    '#vl_root .ti{background:#0b0f1a;color:#fff;border:1px solid #2b3550;border-radius:8px;padding:6px 8px;font-size:15px;min-width:0}' +
+    '#vl_root .vl-trec{background:#151b2e;border:1px solid #ffd54a55;border-radius:12px;padding:10px 12px;margin-bottom:12px}#vl_root .vl-trec h5{margin:0 0 8px;font-size:16px;color:#fff;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}#vl_root .vl-trec h5 small{font-size:13px;color:#b8c0d0;font-weight:400}#vl_root .vl-trec .tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}#vl_root .vl-trec .tg>div{background:#0f1424;border-radius:9px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}#vl_root .vl-trec .tg small{color:#b8c0d0;font-size:13px}#vl_root .vl-trec .tg b{color:#fff;font-size:16px}#vl_root .vl-trec .tg em{font-style:normal;color:#3ddc84;font-size:13px}' +
+    '#vl_root .vl-ttop{display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px}#vl_root .vl-trow{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;align-items:start}#vl_root .vl-td{display:flex;flex-direction:column;gap:12px;min-width:0}#vl_root.vl-lxmd .vl-trow{grid-template-columns:250px minmax(0,1fr)}' +
+    '#vl_root .vl-tlist{display:flex;flex-direction:column;gap:8px}#vl_root .vl-tlist .tlh{display:flex;gap:6px;align-items:center}#vl_root .vl-tlist .tgrp{color:#b8c0d0;font-size:13px;font-weight:700;margin-top:6px}#vl_root .vl-tcard{background:#141a2a;border:1px solid #2b3550;border-left:5px solid var(--c);border-radius:10px;padding:8px 10px;cursor:pointer}#vl_root .vl-tcard.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c)}#vl_root .vl-tcard.ret{opacity:.75}' +
+    '#vl_root .vl-tcard .t1{display:flex;justify-content:space-between;gap:6px}#vl_root .vl-tcard .t1 b{color:#fff;font-size:15px}#vl_root .vl-tcard .t1 span,#vl_root .vl-tcard .t3{color:#b8c0d0;font-size:13px}#vl_root .vl-tcard .t3{display:flex;gap:10px;flex-wrap:wrap;margin-top:3px}#vl_root .vl-tcard .bb{height:4px;background:#232b40;border-radius:3px;margin-top:6px}#vl_root .vl-tcard .bb i{display:block;height:100%;background:var(--c);border-radius:3px}' +
+    '#vl_root .vl-tinfo,#vl_root .tinfo{color:#dfe4ee;font-size:14px;margin-top:8px}#vl_root .tcmp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0;color:#b8c0d0;font-size:14px}#vl_root .tcmp button{background:none;border:0;padding:0;cursor:pointer}' +
+    '#vl_root .vl-pjc{display:inline-flex;align-items:center;border:1px solid #2b3550;border-radius:999px;overflow:hidden}#vl_root .vl-pjc button{background:none;border:0;color:#dfe4ee;padding:4px 9px;font-size:14px;cursor:pointer}#vl_root .vl-pjc b{color:#7fd4ff;font-size:14px;padding:0 4px}#vl_root .vl-pjc.on{border-color:#7fd4ff}#vl_root .vl-pjc.on button[data-tgmm]{background:#7fd4ff;color:#0b0f1a;font-weight:800}' +
+    '#vl_root .vl-ttb td,#vl_root .vl-ttb th{white-space:nowrap}#vl_root .vl-ttb tr.l2 td,#vl_root .vl-ttb tr.l0 td{white-space:normal;text-align:left !important}#vl_root .vl-ttb tr.l0 td{color:#b8c0d0;font-size:14px}#vl_root .vl-ttb th.r{text-align:right !important}#vl_root .vl-lxc .px-pgm{flex-wrap:wrap}#vl_root .vl-ttb td.r,#vl_root .vl-ttb th.r{text-align:right}#vl_root .vl-ttb tr.l1 td{border-bottom:0}#vl_root .vl-ttb tr.l2 td{padding-top:0}' +
+    '#vl_root .vl-tform .tfg{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px 12px;align-items:start}#vl_root .vl-tform .tfg>span{color:#dfe4ee;font-size:14px;padding-top:7px}#vl_root .vl-tform .tch{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}#vl_root .vl-tform .tch button{background:#1a2135;border:1px solid #2b3550;border-radius:999px;color:#dfe4ee;padding:4px 10px;font-size:14px;cursor:pointer}#vl_root .vl-tform .tch button.on{border-color:#ff7a1a;color:#ffb070}' +
+    '#vl_root .vl-tform .twarn{color:#ffd54a;font-size:14px;margin-top:6px}#vl_root .vl-tform .tcols{display:flex;gap:8px;flex-wrap:wrap}#vl_root .vl-tform .tcols button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer}#vl_root .vl-tform .tcols button.used{opacity:.45}#vl_root .vl-tform .tcols button.on{border-color:#fff;opacity:1}#vl_root .vl-tform .tfb{display:flex;gap:8px;margin-top:12px}' +
+    '#vl_root .vl-tundo{white-space:nowrap;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:2147483000;background:#1f273d;border:1px solid #ff7a1a;border-radius:12px;padding:8px 12px;display:flex;gap:12px;align-items:center;color:#fff;font-size:15px}#vl_root .vl-tundo button{background:#ff7a1a;border:0;border-radius:8px;color:#0b0f1a;font-weight:800;padding:6px 10px;font-size:14px;cursor:pointer}' +
+    '#vl_root tr.px-t2{cursor:pointer}#vl_root tr.px-t2.on td{background:rgba(255,122,26,.06)}#vl_root tr.px-t2 td{padding-top:0 !important;border-top:0 !important;white-space:normal !important;overflow:visible !important;text-overflow:clip !important}#vl_root tr.px-t2 .vl-tc{font-size:13px;padding:2px 8px}#vl_root #vl_pitire{margin-top:10px}#vl_root #vl_pitire:empty{display:none}#vl_root.vl-pit .vl-tform .tfg{grid-template-columns:minmax(0,1fr)}#vl_root.vl-pit .vl-tform .tfg>span{padding-top:0;font-weight:700}' +
     '.vl-plx.pit{grid-template-columns:minmax(0,1fr) !important;gap:10px}.vl-plx.pit .px-days{display:flex;gap:6px;overflow-x:auto;padding:8px}.vl-plx.pit .px-days h5{display:none}.vl-plx.pit .px-day{flex:none;padding:6px 10px;display:block;border-color:#2b3550}.vl-plx.pit .px-day .r{display:none}.vl-plx.pit .px-day small{display:none}' +
     '.vl-plx.pit .px-kp{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.vl-plx.pit .px-kp b{font-size:21px}.vl-plx.pit .px-kp>div{padding:6px 10px}' +
     '.vl-plx.pit .px-st td{font-size:14px !important;padding:6px 4px !important}.vl-plx.pit tr.px-det>td{padding:8px 0 !important;background:none !important}.px-seg{display:flex;border:1px solid #2b3550;border-radius:10px;overflow:hidden;margin-bottom:8px}.px-seg button{flex:1;background:none;border:0;color:#c9d0dd;padding:9px;font:700 15px/1.2 inherit;font-family:inherit;cursor:pointer}.px-seg button.on{background:#ff7a1a;color:#111}' +
@@ -673,7 +692,7 @@
     '<div style="white-space:nowrap"><span class="sub2 vl-hl vl-hl-rem">남은 시간</span><span class="clk" id="vl_rem">0:00</span></div>' +
     '<div id="vl_fuel"><button id="vl_fbtn" title="주유 타이머 켜기/끄기">⛽</button><span id="vl_fbox"></span><button id="vl_freset" title="수동 리셋 — 지금 주유 (다음 라인 통과 때 피트 타임 계산)">↺</button></div><button id="vl_bigb" title="내 선수 크게 보기 ↔ 표 보기">👤 크게</button></div><div class="sub2" id="vl_rnd"></div><button id="vl_clchip" data-clp="1"></button></div>' +
     '<div style="text-align:right" id="vl_elab"><div class="sub2 vl-hl vl-hl-ela">경과 시간</div><div class="clk" id="vl_clk"></div></div></div>' +
-    '<div id="vl_pitin"><div class="pi-cls" id="vl_picls"></div><div class="pi-row"><input id="vl_piq" type="search" autocomplete="off" placeholder="선수 한 명 · 이름 또는 초성 (예: ㄴㅎ)"><button id="vl_piadd">등록</button></div><div id="vl_pisug"></div><div id="vl_pichip"></div><div id="vl_pifuel"></div><div id="vl_piempty"></div></div>' +
+    '<div id="vl_pitin"><div class="pi-cls" id="vl_picls"></div><div class="pi-row"><input id="vl_piq" type="search" autocomplete="off" placeholder="선수 한 명 · 이름 또는 초성 (예: ㄴㅎ)"><button id="vl_piadd">등록</button></div><div id="vl_pisug"></div><div id="vl_pichip"></div><div id="vl_pifuel"></div><div id="vl_pitire"></div><div id="vl_piempty"></div></div>' +
     '<div id="vl_tms"></div><div id="vl_ovt"></div><div id="vl_mstrip"></div><div id="vl_lxR"><div id="vl_big"></div><div id="vl_lxl"></div></div><div id="vl_lxL"><div class="tw"><table><thead id="vl_rbh"></thead><tbody id="vl_rbb"></tbody></table></div><div id="vl_lxg"></div>' +
     '<div id="vl_qual"></div><div id="vl_lxm"></div>' +
     '<div class="lgd"><span id="vl_lgfin" style="display:none">🏁 완주 (남은 시간 0 뒤 통과)</span><span><i style="background:#2b250f;outline:1px solid #ffd54a"></i>안내 중인 선수</span><span><i style="background:#17351f"></i>방금 통과</span><span><b class="pb">하늘색</b> 개인 베스트</span><span><b class="rf">보라</b> 레이스 최고</span><span><b style="color:#ffb74d">+1L</b> Behind 랩 차이</span><span id="vl_lgcl"><i id="vl_lgclc" class="vl-cbk">↑</i>접전 (뒤 선수 → 앞 선수, 설정한 초 이내)</span><span id="vl_lgpc"></span><span id="vl_lgbd">Behind <b class="pu">줄어듦</b>/<b class="pd">늘어남</b> (변한 초)</span></div>' +
@@ -5214,6 +5233,302 @@
     if (aw) o.avg = as / aw;
     return o;
   }
+  /* ---------- 🛞 tires: kept in cfg (synced), matched to practice sessions ----------
+     cfg.tires    [{id, mk, nm, no, cp, wh, ins, ax, col, grip, gripMin, warm, warmT, note, from, ret}]
+     cfg.tireOf   {owner: {key: {t, at}}}   explicit tire from session time `at` on (key = session id, or 'n…' = "from the next session")
+     cfg.tirePrep {owner: {sid: {g, gn, gm, w, wt, memo}}}   💧 grip = this session only · 🔥 warmer carries on
+     owner = person key + '|' + car (lower case) */
+  var TCOL = ['#ffb070', '#4fc3f7', '#3ddc84', '#9b8cff', '#ff6b9a', '#ffd54a', '#2ee6d6', '#c0c6d4'];
+  var tUndo = null, tUndoT = 0, tForm = null, tPick = '';
+  function tires() { if (!Array.isArray(cfg.tires)) cfg.tires = []; return cfg.tires; }
+  function tireById(id) { return tires().filter(function (t) { return t.id === id; })[0] || null; }
+  function tShort(t) { return t ? (t.nm || t.mk || '타이어') + ' #' + (t.no || 1) : '-'; }
+  function tFull(t) { return t ? [t.mk, t.nm, t.cp].filter(Boolean).join(' ') + ' #' + (t.no || 1) : '-'; }
+  function tOwner(rowName) { var x = splitName(rowName); return pKey(x.p) + '|' + (x.c || '').toLowerCase(); }
+  function tChip(t, txt, inh) { var c = t && t.col || '#c0c6d4'; return '<span class="vl-tc' + (inh ? ' inh' : '') + '" style="--c:' + c + '">' + (inh ? '' : '<i></i>') + esc(txt) + '</span>'; }
+  function tSnap() { tUndo = JSON.stringify({ a: cfg.tires || [], b: cfg.tireOf || {}, c: cfg.tirePrep || {} }); tUndoT = Date.now(); }
+  function tSave() { save(); }
+  /* the tire / prep timeline of one owner over the sessions we have (oldest → newest) */
+  function tireTL(owner, rs) {
+    var ex = (cfg.tireOf || {})[owner] || {}, pr = (cfg.tirePrep || {})[owner] || {};
+    var E = Object.keys(ex).map(function (k) { return { k: k, t: ex[k].t, at: ex[k].at || '' }; }).sort(function (a, b) { return a.at < b.at ? -1 : a.at > b.at ? 1 : 0; });
+    var nx = pr.next && pr.next.at ? pr.next : null, nxU = 0;
+    var out = {}, cnt = {}, w = null, wt = '', prevT = '', prevW = null, last = {};
+    rs.slice().sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }).forEach(function (r) {
+      var at = r[4], cur = null; E.forEach(function (e) { if (e.at <= at) cur = e; });
+      var tid = cur ? cur.t : '', exp = !!(cur && (cur.k === r[0] || (cur.k.slice(0, 2) === 'n:' && !last[cur.k])));
+      if (cur && cur.k.slice(0, 2) === 'n:') last[cur.k] = 1;
+      var t = tireById(tid), k = 0;
+      if (tid) { cnt[tid] = (cnt[tid] || 0) + 1; k = cnt[tid]; }
+      var p = pr[r[0]];
+      if (!p && nx && !nxU && nx.at <= at) { nxU = 1; nx.sid = r[0]; p = nx; }
+      p = p || {};
+      if (p.w !== undefined && p.w !== null && p.w !== '') { w = +p.w; wt = p.wt || ''; }
+      else if (exp && t && t.warm !== undefined && t.warm !== '') { w = +t.warm || 0; wt = t.warmT || ''; }
+      var g = p.g !== undefined ? +p.g : (exp && k === 1 && t && t.grip ? 1 : 0), gn = p.gn || (t && t.grip) || '', gm = p.gm !== undefined ? p.gm : (t && t.gripMin) || '';
+      out[r[0]] = { t: tid, k: k, exp: exp, again: exp && k > 1, inh: !!tid && !exp, g: g, gn: g ? gn : '', gm: g ? gm : '', w: w, wt: wt, chW: prevW !== null && w !== prevW, memo: p.memo || '', prev: prevT };
+      if (tid && tid !== prevT) out[r[0]].sw = 1;
+      prevT = tid || prevT; prevW = w;
+    });
+    return out;
+  }
+  function tAll(rows) {   /* sid → timeline info, for every owner in these rows */
+    var by = {}, o = {}; rows.forEach(function (r) { var ow = tOwner(r[1]); (by[ow] = by[ow] || []).push(r); });
+    Object.keys(by).forEach(function (ow) { var tl = tireTL(ow, by[ow]); Object.keys(tl).forEach(function (s) { tl[s].ow = ow; o[s] = tl[s]; }); });
+    return o;
+  }
+  function tSet(owner, key, at, tid) { tSnap(); cfg.tireOf = cfg.tireOf || {}; var m = cfg.tireOf[owner] = cfg.tireOf[owner] || {}; if (tid) m[key] = { t: tid, at: at }; else delete m[key]; tSave(); }
+  function tPrep(owner, sid, k, v) { tSnap(); cfg.tirePrep = cfg.tirePrep || {}; var m = cfg.tirePrep[owner] = cfg.tirePrep[owner] || {}; var p = m[sid] = m[sid] || (m.next && m.next.sid === sid && sid !== 'next' ? JSON.parse(JSON.stringify(m.next)) : {}); delete p.sid; p[k] = v; tSave(); }
+  function wTxt(w, wt) { return w === null || w === undefined ? '' : +w > 0 ? '🔥 ' + w + '분' + (wt ? ' · ' + wt + '℃' : '') : '🔥 없음'; }
+  function prepChips(x, short) {
+    if (!x) return '';
+    var g = '<span class="vl-pp ' + (x.g ? 'on' : 'off') + '" data-tgt="1" title="눌러서 바름 / 안 바름">💧 ' + (x.g ? (short ? '바름' : esc(x.gn || '바름')) : '안 바름') + '</span>';
+    var w = x.w === null || x.w === undefined ? '' : '<span class="vl-pp' + (x.chW ? ' ch' : '') + '">' + (short ? (+x.w > 0 ? '🔥 ' + x.w : '🔥 없음') : esc(wTxt(x.w, x.wt))) + '</span>';
+    return g + w;
+  }
+  function tCell(x, short) {
+    if (!x || !x.t) return '<span class="vl-tc add">＋ 타이어</span>';
+    var t = tireById(x.t), nm = short ? '#' + (t ? t.no || 1 : '?') : tShort(t);
+    return x.inh ? tChip(t, '↓ #' + (t ? t.no || 1 : '?') + ' · ' + x.k + '번째', true) : tChip(t, nm + ' · ' + x.k + '번째') + (x.again ? ' <small class="vl-tag">↩' + (short ? '' : ' 다시') + '</small>' : '');
+  }
+  /* sessions of a tire across everything loaded (all cars of the person) */
+  function tSessOf(tid, rows, TL) { return rows.filter(function (r) { return TL[r[0]] && TL[r[0]].t === tid; }).sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }); }
+  /* the session block: tire · 💧 · 🔥 · 📝 (PC: right panel, Pit: under the session) */
+  function tireBlock(r, x, recId) {
+    var ow = tOwner(r[1]), t = x && x.t ? tireById(x.t) : null, act = tires().filter(function (q) { return !q.ret; });
+    var prev = x && x.prev && x.prev !== x.t ? tireById(x.prev) : null;
+    var h = '<div class="vl-tblk" data-tow="' + esc(ow) + '" data-tsid="' + esc(r[0]) + '" data-tat="' + esc(r[4]) + '">';
+    h += '<div class="tb1">' + (x && x.t ? tCell(x) : '<span class="mut">타이어 없음</span>') + '<button class="tbtn" data-tpick="1">🛞 바꾸기</button></div>';
+    if (tPick === r[0]) {
+      h += '<div class="tpk">' + (prev ? '<button data-tset="' + esc(prev.id) + '">' + tChip(prev, '⇄ 바로 전 ' + tShort(prev)) + '</button>' : '') +
+        act.filter(function (q) { return q !== prev; }).map(function (q) { return '<button data-tset="' + esc(q.id) + '" class="' + (x && x.t === q.id ? 'on' : '') + '">' + tChip(q, tShort(q)) + '<small>' + (q.id === recId ? '💡 추천 · ' : '') + tUseN(q.id) + '</small></button>'; }).join('') +
+        (x && x.exp ? '<button data-tset="">↓ 등록 지우기 (앞 세션 타이어로)</button>' : '') + '<button data-tnew="1" class="o">＋ 새 타이어</button></div>';
+    }
+    var wv = x ? x.w : null;
+    h += '<div class="tb2"><span>💧</span><div class="vl-sg"><button data-tg="0" class="' + (x && !x.g ? 'on' : '') + '">안 바름</button><button data-tg="1" class="' + (x && x.g ? 'on' : '') + '">바름</button></div>' + (x && x.g ? '<input data-tgn="1" value="' + esc(x.gn || '') + '" placeholder="그립제" class="ti" style="width:8em"><input data-tgm="1" value="' + esc(x.gm || '') + '" placeholder="분 전" class="ti" style="width:4em">' : '') + '</div>';
+    h += '<div class="tb2"><span>🔥</span><div class="vl-sg">' + [0, 10, 20, 30].map(function (m) { return '<button data-tw="' + m + '" class="' + (wv === m ? 'on' : '') + '">' + (m ? m + '분' : '없음') + '</button>'; }).join('') + '</div><input data-twm="1" class="ti" style="width:4em" placeholder="분" value="' + (wv !== null && [0, 10, 20, 30].indexOf(wv) < 0 ? wv : '') + '"><input data-twt="1" class="ti" style="width:4em" placeholder="℃" value="' + esc(x && x.wt || '') + '"></div>';
+    h += '<div class="tb2"><span>📝</span><input data-tmemo="1" class="ti" style="flex:1" placeholder="메모 (예: 먼지 많음)" value="' + esc(x && x.memo || '') + '"></div>';
+    h += '<div class="tb3">바꾸면 바로 저장 · 💧은 이 세션만, 🔥은 다음 세션에도 이어짐</div></div>';
+    return h;
+  }
+  var tUseC = {};
+  function tUseN(id) { var n = tUseC[id]; return n ? n + '세션' : '새 것'; }
+  /* 💡 recommendation from what was driven: same person, the sessions loaded (one track), 1st–3rd session of each tire */
+  function tRecommend(rows, TL) {
+    var grp = function (keyF) { var g = {}; rows.forEach(function (r) { var x = TL[r[0]], f = secs(r[7]); if (!x || !x.t || !(f > 0) || x.k > 3) return; var k = keyF(x, r); if (k === null) return; (g[k] = g[k] || []).push(f); }); return g; };
+    var best = function (g, min) { var b = null; Object.keys(g).forEach(function (k) { var a = g[k]; if (a.length < min) return; var m = a.reduce(function (s, v) { return s + v; }, 0) / a.length; if (!b || m < b.m) b = { k: k, m: m, n: a.length }; }); return b; };
+    var model = function (x) { var t = tireById(x.t); return t ? nmKey([t.mk, t.nm, t.cp].join('|')) : null; };
+    var gM = grp(model), bM = best(gM, 3), gG = grp(function (x) { return x.g ? '1' : '0'; }), bG = best(gG, 3), gW = grp(function (x) { return x.w === null ? null : String(x.w); }), bW = best(gW, 3);
+    var other = function (g, b) { var o = null; Object.keys(g).forEach(function (k) { if (k === b.k || g[k].length < 3) return; var m = g[k].reduce(function (s, v) { return s + v; }, 0) / g[k].length; if (!o || m < o) o = m; }); return o; };
+    var n = rows.filter(function (r) { return TL[r[0]] && TL[r[0]].t; }).length, conf = n >= 15 ? 4 : n >= 8 ? 3 : n >= 4 ? 2 : 1;
+    var mt = bM ? tires().filter(function (t) { return nmKey([t.mk, t.nm, t.cp].join('|')) === bM.k; }) : [], fresh = mt.filter(function (t) { return !t.ret; }).sort(function (a, b) { return (tUseC[a.id] || 0) - (tUseC[b.id] || 0); })[0];
+    var alerts = tires().filter(function (t) { return !t.ret; }).map(function (t) {
+      var ss = tSessOf(t.id, rows, TL); if (ss.length < 3) return null;
+      var a1 = secs(ss[0][8]), aN = secs(ss[ss.length - 1][8]), b1 = secs(ss[0][7]), bN = secs(ss[ss.length - 1][7]);
+      return bN > 0 && b1 > 0 && bN > b1 * 1.02 ? { t: t, d: bN - b1, a: aN - a1 } : null;
+    }).filter(Boolean);
+    return { n: n, conf: conf, m: bM, mt: fresh || mt[0] || null, mo: bM ? other(gM, bM) : null, g: bG, go: bG ? other(gG, bG) : null, w: bW, wo: bW ? other(gW, bW) : null, alerts: alerts };
+  }
+  function tRecCard(R, pit) {
+    var dots = '●●●●'.slice(0, R.conf) + '○○○○'.slice(0, 4 - R.conf), box = function (lab, val, sub) { return '<div><small>' + lab + '</small><b>' + val + '</b>' + (sub && !pit ? '<em>' + sub + '</em>' : '') + '</div>'; };
+    if (!R.m && !R.g && !R.w && !R.alerts.length) return '<div class="vl-trec"><h5>💡 추천<small>' + R.n + '세션 · 자료 부족</small></h5><div class="tw">타이어 · 그립제 · 워머를 세션에 등록하면 조합마다 3세션 이상 모일 때 추천이 나와요.</div></div>';
+    var al = R.alerts[0];
+    return '<div class="vl-trec"><h5>💡 다음 연습 추천<small>이 기간 세션 ' + R.n + '개 · 믿을 만함 ' + dots + '</small></h5><div class="tg">' +
+      box('타이어', R.m ? esc(R.mt ? [R.mt.mk, R.mt.nm, R.mt.cp].filter(Boolean).join(' ') : R.m.k) : '자료 부족', R.m ? '베스트 평균 ' + fmtS(R.m.m) + (R.mo ? ' · 다음보다 ' + (R.mo - R.m.m).toFixed(2) + '초 빠름' : '') : '') +
+      box('그립제', R.g ? (R.g.k === '1' ? '바름' : '안 바름') : '자료 부족', R.g && R.go ? (R.go - R.g.m).toFixed(2) + '초 빠름' : '') +
+      box('워머', R.w ? (+R.w.k > 0 ? R.w.k + '분' : '없음') : '자료 부족', R.w && R.wo ? (R.wo - R.w.m).toFixed(2) + '초 빠름' : '') +
+      (al ? box('교체 알림', '<span style="color:#ffd54a">' + esc(tShort(al.t)) + '</span>', '베스트 +' + al.d.toFixed(2) + '초') : '') + '</div>' +
+      (pit ? '' : '<div class="tw">근거: 같은 선수의 이 기간 세션 · 조합마다 베스트 평균 비교(3세션 미만은 "자료 부족"), 마모를 맞추려고 각 타이어 1~3번째 세션만</div>') + '</div>';
+  }
+  /* the 🛞 tire tab (PC · iPad and Pit) */
+  function renderTireTab(name, rows, pit) {
+    var TL = tAll(rows); tUseC = {}; rows.forEach(function (r) { var x = TL[r[0]]; if (x && x.t) tUseC[x.t] = (tUseC[x.t] || 0) + 1; });
+    var R = tRecommend(rows, TL), C = lapCols(), F = cfg.tireF || 'use';
+    if (tForm) return tFormH(pit);
+    var list = tires().filter(function (t) { return F === 'all' || (F === 'ret' ? t.ret : !t.ret); });
+    if (!cfg.tireSel || !tireById(cfg.tireSel)) cfg.tireSel = (list[0] || {}).id || '';
+    var mk = {}; list.forEach(function (t) { var k = nmKey(t.mk) || '-'; (mk[k] = mk[k] || []).push(t); });
+    var L = '<div class="vl-tlist"><div class="tlh"><div class="vl-sg">' + [['use', '사용 중'], ['all', '전체'], ['ret', '폐기']].map(function (q) { return '<button data-tf="' + q[0] + '" class="' + (F === q[0] ? 'on' : '') + '">' + q[1] + '</button>'; }).join('') + '</div><input data-tq="1" class="ti" placeholder="🔎 찾기" style="flex:1;min-width:0"></div>' +
+      (list.length ? Object.keys(mk).sort().map(function (k) {
+        return '<div class="tgrp">' + esc((mk[k][0].mk || '메이커 없음').toUpperCase()) + ' · ' + mk[k].length + '</div>' + mk[k].sort(function (a, b) { return nmKey(a.nm) < nmKey(b.nm) ? -1 : nmKey(a.nm) > nmKey(b.nm) ? 1 : (a.no || 0) - (b.no || 0); }).map(function (t) {
+          var ss = tSessOf(t.id, rows, TL), st = pstats(ss);
+          return '<div class="vl-tcard' + (t.id === cfg.tireSel ? ' on' : '') + (t.ret ? ' ret' : '') + '" data-tsel="' + esc(t.id) + '" data-tk="' + esc(nmKey(tFull(t))) + '" style="--c:' + (t.col || '#c0c6d4') + '"><div class="t1"><b>' + esc([t.nm, t.cp].filter(Boolean).join(' ')) + ' #' + (t.no || 1) + '</b><span>' + (t.ret ? '폐기' : ss.length ? esc(ss[0][4].slice(5, 10).replace('-', '/')) + '~' : '새 것') + '</span></div><div class="t3"><span>' + ss.length + '세션</span><span>' + st.laps + '랩</span>' + (st.best > 0 ? '<span>베스트 ' + fmtS(st.best) + '</span>' : '') + '</div><div class="bb"><i style="width:' + Math.min(100, ss.length * 8) + '%"></i></div></div>';
+        }).join('');
+      }).join('') : '<div class="vl-pnone">' + (F === 'ret' ? '폐기한 타이어가 없어요' : '＋ 새 타이어로 등록하세요') + '</div>') + '</div>';
+    var t = tireById(cfg.tireSel), D = '';
+    if (t) {
+      var ss = tSessOf(t.id, rows, TL), st = pstats(ss), f1 = ss[0], fl = ss[ss.length - 1], bi = 0; ss.forEach(function (r, i) { if (r[0] === st.bestId) bi = i + 1; });
+      var dA = f1 && fl && ss.length > 1 ? secs(fl[8]) - secs(f1[8]) : NaN;
+      D += '<div class="vl-lxc"><h5>' + tChip(t, tFull(t)) + '<small><button class="tl" data-tedit="1">✏ 고치기</button> · <button class="tl" data-tdup="1">⧉ 복제</button> · <button class="tl" data-tret="1">' + (t.ret ? '↺ 되살리기' : '🗑 폐기') + '</button></small></h5>' +
+        '<div class="px-kp"><div><small>쓴 세션</small><b>' + ss.length + '</b><em>' + (f1 ? esc(f1[4].slice(5, 10).replace('-', '/')) + (fl !== f1 ? ' ~ ' + esc(fl[4].slice(5, 10).replace('-', '/')) : '') : '&nbsp;') + '</em></div><div><small>총 랩 · 주행</small><b>' + st.laps + '</b><em>' + hms(st.time) + '</em></div><div><small>베스트' + (bi ? ' (' + bi + '번째)' : '') + '</small><b style="color:' + C.B + '">' + fmtS(st.best) + '</b><em>&nbsp;</em></div><div><small>평균 1→' + ss.length + '번째</small><b' + (dA > 0 ? ' style="color:#ff6b6b"' : dA < 0 ? ' style="color:#3ddc84"' : '') + '>' + (dA === dA ? (dA > 0 ? '+' : '') + dA.toFixed(2) + '초' : '-') + '</b><em>' + (dA > 0 ? '느려짐' : dA < 0 ? '빨라짐' : '&nbsp;') + '</em></div></div>' +
+        '<div class="tinfo">' + esc([t.wh && '휠 ' + t.wh, t.ins && '인서트 ' + t.ins, t.ax || '앞뒤 같은 세트', t.grip && '기본 💧 ' + t.grip + (t.gripMin ? ' ' + t.gripMin + '분 전' : ''), t.warm !== undefined && t.warm !== '' && '기본 🔥 ' + (+t.warm ? t.warm + '분' : '없음') + (t.warmT ? ' ' + t.warmT + '℃' : ''), t.note && '메모: ' + t.note].filter(Boolean).join(' · ')) + '</div></div>';
+      /* graph: x = n-th session of the tire, one value at a time, other tires to compare */
+      var TM = { best: ['베스트', C.B], t3: ['Top 3', '#ffd54a'], avg: ['평균', '#ff7a1a'], pj: ['예상', '#7fd4ff'] }, tm = TM[cfg.tgM] ? cfg.tgM : 'best', PJ = +cfg.projMin || 5;
+      var val = function (r) { if (tm === 'pj') { var q = projOf(r[0]); return q && q.t > 0 ? q.n * PJ * 60 / q.t : NaN; } return tm === 't3' ? secs(pc.t3[r[0]]) : secs(r[tm === 'best' ? 7 : 8]); };
+      var cmp = (cfg.tireCmp || []).filter(function (id) { return id !== t.id && tireById(id); }).slice(0, 4), ser = [t.id].concat(cmp).map(function (id) { return { t: tireById(id), ss: tSessOf(id, rows, TL) }; });
+      var N = Math.max.apply(null, ser.map(function (s) { return s.ss.length; }).concat([2])), ys = []; ser.forEach(function (s) { s.ss.forEach(function (r) { var v = val(r); if (v > 0) ys.push(v); }); });
+      var W = pit ? 340 : 760, H = 190, L0 = tm === 't3' || tm === 'pj' ? 66 : 54, R0 = 16, T0 = 18, B0 = 28, g = '';
+      if (ys.length) {
+        var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pd = Math.max((y1 - y0) * 0.12, tm === 'pj' ? 0.1 : 0.05); y0 -= pd; y1 += pd;
+        var X = function (i) { return L0 + (N > 1 ? i / (N - 1) : 0.5) * (W - L0 - R0); }, Y = function (v) { var f = (v - y0) / (y1 - y0); return T0 + (tm === 'pj' ? 1 - f : f) * (H - T0 - B0); };
+        var fm = function (v) { return tm === 'pj' ? v.toFixed(1) + '랩' : tm === 't3' ? fmtS(v) : v.toFixed(2); };
+        for (var k = 0; k <= 3; k++) { var yv = y0 + (y1 - y0) * k / 3; g += '<line x1="' + L0 + '" x2="' + (W - R0) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#232b40"/><text x="' + (L0 - 6) + '" y="' + (Y(yv) + 4) + '" fill="#b8c0d0" font-size="12" text-anchor="end">' + fm(yv) + '</text>'; }
+        for (var i2 = 0; i2 < N; i2++) if (N <= 12 || i2 % Math.ceil(N / 12) === 0) g += '<text x="' + X(i2) + '" y="' + (H - 8) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + (i2 + 1) + '</text>';
+        ser.slice().reverse().forEach(function (s, si) {
+          var main = s.t.id === t.id, c = s.t.col || '#c0c6d4', pts = []; s.ss.forEach(function (r, i) { var v = val(r); if (v > 0) pts.push([X(i), Y(v), TL[r[0]] && TL[r[0]].g, r[0]]); });
+          if (pts.length > 1) g += '<path d="' + pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + '" fill="none" stroke="' + c + '" stroke-width="' + (main ? 3.5 : 2.2) + '"' + (main ? '' : ' stroke-dasharray="6 5"') + '/>';
+          if (main) pts.forEach(function (p) { g += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5.5" fill="' + (p[2] ? c : '#0b0f1a') + '" stroke="' + c + '" stroke-width="2.5"/>'; });
+        });
+        g = '<svg viewBox="0 0 ' + W + ' ' + H + '">' + g + '</svg>';
+      } else g = '<div class="vl-pnone">' + TM[tm][0] + ' 기록이 없어요</div>';
+      var chipsT = '<div class="px-pgm">' + Object.keys(TM).map(function (k) { return k === 'pj' ? '<span class="vl-pjc' + (tm === 'pj' ? ' on' : '') + '"><button data-tgmm="pj">예상</button><button data-pjd="-1">−</button><b>' + PJ + '분</b><button data-pjd="1">+</button></span>' : '<button data-tgmm="' + k + '" class="' + (k === tm ? 'on' : '') + '" style="--c:' + TM[k][1] + '">' + TM[k][0] + '</button>'; }).join('') + '</div>';
+      var others = tires().filter(function (q) { return q.id !== t.id && tUseC[q.id]; }).slice(0, 8);
+      D += '<div class="vl-lxc"><h5>📈 몇 번째 세션 → ' + TM[tm][0] + '<small>● 그립제 바름 ○ 안 바름</small></h5>' + chipsT + (others.length ? '<div class="tcmp">비교 ' + others.map(function (q) { return '<button data-tcmp="' + esc(q.id) + '">' + tChip(q, tShort(q), cmp.indexOf(q.id) < 0) + '</button>'; }).join('') + '</div>' : '') + g + '</div>';
+      /* sessions driven on this tire */
+      var prevAt = '', rowsAll = rows.slice().sort(function (a, b) { return a[4] < b[4] ? -1 : 1; });
+      var betw = function (r0, r1) { if (!r0) return ''; var o = {}; rowsAll.forEach(function (q) { if (q[4] > r0[4] && q[4] < r1[4] && tOwner(q[1]) === tOwner(r1[1])) { var x = TL[q[0]]; var k = x && x.t ? x.t : '-'; o[k] = (o[k] || 0) + 1; } }); return Object.keys(o).map(function (k) { var q = tireById(k); return q ? tChip(q, '#' + (q.no || 1) + ' ' + o[k] + '세션', true) : '<span class="mut">없음 ' + o[k] + '</span>'; }).join(' '); };
+      var rowsH = ss.map(function (r, i) {
+        var x = TL[r[0]], pj = projOf(r[0]), pjs = pj ? pj.n + '/' + Math.floor(pj.t / 60) + ':' + ('0' + (pj.t % 60).toFixed(pit ? 1 : 3)).slice(pit ? -4 : -6) : '-', b = betw(ss[i - 1], r), f = secs(r[7]);
+        var bs = f > 0 && Math.abs(f - st.best) < 0.0005 ? ' style="color:' + C.B + ';font-weight:800"' : '';
+        if (pit) return '<tr class="l1"><td>' + (i + 1) + '</td><td>' + esc(r[4].slice(5, 10).replace('-', '/')) + '<br>' + esc(r[4].slice(11, 16)) + '</td><td class="r"' + bs + '>' + fmtS(f) + '</td><td class="r">' + pjs + '</td></tr><tr class="l2"><td></td><td colspan="3">' + prepChips(x, false) + (b ? ' ' + b : '') + '</td></tr>';
+        return (b ? '<tr class="l0"><td></td><td colspan="7">⇣ 사이에 쓴 타이어 ' + b + '</td></tr>' : '') + '<tr><td>' + (i + 1) + '</td><td>' + esc(r[4].slice(5, 16).replace('-', '/')) + '</td><td>' + prepChips(x, false) + '</td><td class="r">' + (+r[5] || 0) + '</td><td class="r"' + bs + '>' + fmtS(f) + '</td><td class="r">' + fmtS(secs(r[8])) + '</td><td class="r">' + (secs(pc.t3[r[0]]) > 0 ? fmtS(secs(pc.t3[r[0]])) : '-') + '</td><td class="r">' + pjs + '</td></tr>' + (x && x.memo ? '<tr class="l2"><td></td><td colspan="7"><span class="mut">📝 ' + esc(x.memo) + '</span></td></tr>' : '');
+      }).join('');
+      D += '<div class="vl-lxc"><h5>이 타이어로 주행한 세션<small>' + ss.length + '세션 · 예상 ' + PJ + '분</small></h5>' + (ss.length ? '<div class="px-sw"><table class="vl-lt vl-ttb">' + (pit ? '<tr><th>#</th><th>날짜</th><th class="r">베스트</th><th class="r">예상</th></tr>' : '<tr><th>#</th><th>날짜 · 시각</th><th>세션 준비</th><th class="r">랩</th><th class="r">베스트</th><th class="r">평균</th><th class="r">Top 3</th><th class="r">예상 랩/시간</th></tr>') + rowsH + '</table></div>' : '<div class="vl-pnone">아직 이 타이어로 주행한 세션이 없어요. 📊 세션에서 타이어를 고르세요.</div>') + '</div>';
+    }
+    var top = '<div class="vl-ttop">' + (pit ? '' : '<button class="tbtn" data-tlib="1">📚 메이커 목록 · 합치기</button>') + '<button class="tbtn o" data-tnew="1">＋ 새 타이어</button></div>';
+    var lib = cfg.tireLib && !pit ? tLibH() : '';
+    if (pit) return tRecCard(R, true) + top + lib + L + D;
+    return tRecCard(R, false) + top + lib + '<div class="vl-trow"><div class="vl-tl">' + L + '</div><div class="vl-td">' + (D || '<div class="vl-pnone">타이어를 고르거나 ＋ 새 타이어로 등록하세요</div>') + '</div></div>';
+  }
+  /* 📚 makers · names · compounds · wheels, with merge (letters alike) */
+  function tLibH() {
+    var by = {}; tires().forEach(function (t) { var k = nmKey(t.mk) || '-'; var o = by[k] = by[k] || { mk: t.mk || '-', nm: {}, cp: {}, wh: {}, n: 0 }; o.n++; if (t.nm) o.nm[nmKey(t.nm)] = t.nm; if (t.cp) o.cp[nmKey(t.cp)] = t.cp; if (t.wh) o.wh[nmKey(t.wh)] = t.wh; });
+    var ks = Object.keys(by).sort(), vals = function (o) { return Object.keys(o).map(function (k) { return o[k]; }).join(' · ') || '-'; };
+    var near = function (a, b) { a = a.replace(/[^a-z0-9가-힣]/g, ''); b = b.replace(/[^a-z0-9가-힣]/g, ''); if (!a || !b || a === b) return a === b && !!a; var m = a.length, n = b.length; if (Math.abs(m - n) > 2) return false; var d = []; for (var i = 0; i <= m; i++) { d[i] = [i]; } for (var j = 0; j <= n; j++) d[0][j] = j; for (i = 1; i <= m; i++) for (j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[m][n] <= 2; };
+    return '<div class="vl-lxc vl-tlib"><h5>📚 메이커 목록<small>⇄ = 합치기 (타이어 · 기록 그대로) · <button class="tl" data-tlib="0">닫기</button></small></h5><table class="vl-lt"><tr><th>메이커</th><th>타이어 이름</th><th>컴파운드</th><th>휠</th><th class="r">타이어</th><th>합치기</th></tr>' + ks.map(function (k) {
+      var o = by[k], sug = ks.filter(function (k2) { return k2 !== k && near(k, k2) && by[k2].n >= o.n; });
+      return '<tr><td><b>' + esc(o.mk) + '</b>' + (sug.length ? ' <span style="color:#ffd54a;font-size:12px">← "' + esc(by[sug[0]].mk) + '"와 비슷</span>' : '') + '</td><td>' + esc(vals(o.nm)) + '</td><td>' + esc(vals(o.cp)) + '</td><td>' + esc(vals(o.wh)) + '</td><td class="r">' + o.n + '</td><td><select data-tmerge="' + esc(k) + '" class="ti"><option value="">—</option>' + ks.filter(function (k2) { return k2 !== k; }).map(function (k2) { return '<option value="' + esc(k2) + '"' + (sug[0] === k2 ? ' selected' : '') + '>→ ' + esc(by[k2].mk) + '</option>'; }).join('') + '</select> <button class="tbtn" data-tmgo="' + esc(k) + '">⇄ 합치기</button></td></tr>';
+    }).join('') + '</table></div>';
+  }
+  /* new / edit form: makers, names, compounds and wheels come from what was entered before (letters' case ignored) */
+  function tVals(f, mk) { var o = {}; tires().forEach(function (t) { if (mk !== undefined && nmKey(t.mk) !== nmKey(mk)) return; var v = t[f]; if (v) { var k = nmKey(v); o[k] = o[k] || { v: v, n: 0 }; o[k].n++; } }); return Object.keys(o).map(function (k) { return o[k]; }).sort(function (a, b) { return b.n - a.n; }).map(function (x) { return x.v; }); }
+  function tCanon(f, v, mk) { var k = nmKey(v); if (!k) return ''; var hit = tVals(f, mk).filter(function (x) { return nmKey(x) === k; })[0]; return hit || String(v).trim(); }
+  function tNextNo(mk, nm, cp) { var n = 0; tires().forEach(function (t) { if (nmKey(t.mk) === nmKey(mk) && nmKey(t.nm) === nmKey(nm) && nmKey(t.cp) === nmKey(cp)) n = Math.max(n, +t.no || 0); }); return n + 1; }
+  function tFormH(pit) {
+    var f = tForm, chips = function (arr, fld, cur) { return arr.length ? '<div class="tch">' + arr.slice(0, 12).map(function (v) { return '<button data-tfv="' + fld + '" data-v="' + esc(v) + '" class="' + (nmKey(v) === nmKey(cur) ? 'on' : '') + '">' + esc(v) + '</button>'; }).join('') + '</div>' : ''; };
+    var mkL = tVals('mk').filter(function (v) { return !f.mk || nmKey(v).indexOf(nmKey(f.mk)) >= 0; }), hasMk = !!tVals('mk').filter(function (v) { return nmKey(v) === nmKey(f.mk); })[0];
+    var same = tires().filter(function (t) { return t.id !== f.id && nmKey(t.mk) === nmKey(f.mk) && nmKey(t.nm) === nmKey(f.nm) && nmKey(t.cp) === nmKey(f.cp) && f.nm; });
+    var retNo = tires().filter(function (t) { return t.id !== f.id && t.ret && nmKey(t.mk) === nmKey(f.mk) && nmKey(t.nm) === nmKey(f.nm) && +t.no === +f.no; })[0];
+    var inp = function (k, ph, w) { return '<input data-tfi="' + k + '" class="ti" value="' + esc(f[k] === undefined ? '' : f[k]) + '" placeholder="' + ph + '"' + (w ? ' style="width:' + w + '"' : '') + '>'; };
+    var used = {}; tires().forEach(function (t) { if (!t.ret && t.id !== f.id) used[t.col] = 1; });
+    return '<div class="vl-lxc vl-tform"><h5>' + (f.id ? '✏ 타이어 고치기' : '＋ 새 타이어') + '<small><button class="tl" data-tfx="1">취소</button></small></h5><div class="tfg">' +
+      '<span>메이커</span><div>' + inp('mk', '예: JConcepts') + chips(f.mk && hasMk ? [] : mkL, 'mk', f.mk) + (f.mk && !hasMk ? '<div class="tw">새 메이커로 저장</div>' : '') + '</div>' +
+      '<span>타이어 이름</span><div>' + inp('nm', f.mk ? f.mk + ' 타이어 이름' : '메이커를 먼저') + chips(f.mk ? tVals('nm', f.mk) : [], 'nm', f.nm) + '</div>' +
+      '<span>컴파운드</span><div>' + inp('cp', '예: Blue · Soft · M3') + chips(f.mk ? tVals('cp', f.mk) : [], 'cp', f.cp) + '</div>' +
+      '<span>번호</span><div>' + inp('no', '1', '5em') + (same.length ? '<div class="twarn">이미 있어요: ' + esc([f.mk, f.nm, f.cp].filter(Boolean).join(' ')) + ' ' + same.map(function (t) { return '#' + t.no + (t.ret ? '(폐기)' : ''); }).join(' · ') + ' → 이 타이어는 #' + f.no + '</div>' : '') + (retNo ? '<div class="twarn">폐기한 #' + f.no + '이 있어요 — 그래도 저장하면 날짜로 구분돼요</div>' : '') + '</div>' +
+      '<span>휠 · 인서트</span><div style="display:flex;gap:6px;flex-wrap:wrap">' + inp('wh', '휠', '10em') + inp('ins', '인서트', '10em') + '</div><span></span><div>' + chips(f.mk ? tVals('wh', f.mk) : [], 'wh', f.wh) + '</div>' +
+      '<span>앞 / 뒤</span><div class="vl-sg">' + ['앞뒤 같은 세트', '앞', '뒤'].map(function (v) { return '<button data-tfv="ax" data-v="' + v + '" class="' + ((f.ax || '앞뒤 같은 세트') === v ? 'on' : '') + '">' + v + '</button>'; }).join('') + '</div>' +
+      '<span>기본 💧</span><div style="display:flex;gap:6px">' + inp('grip', '그립제 (비우면 안 바름)', '12em') + inp('gripMin', '분 전', '5em') + '</div>' +
+      '<span>기본 🔥</span><div style="display:flex;gap:6px">' + inp('warm', '분 (0 = 없음)', '9em') + inp('warmT', '℃', '5em') + '</div>' +
+      '<span>색</span><div class="tcols">' + TCOL.map(function (c) { return '<button data-tfv="col" data-v="' + c + '" class="' + (f.col === c ? 'on' : '') + (used[c] ? ' used' : '') + '" style="background:' + c + '"></button>'; }).join('') + '</div>' +
+      '<span>메모</span><div>' + inp('note', '예: 글루 11/20') + '</div></div>' +
+      '<div class="tfb"><button class="tbtn o" data-tfs="1">저장</button>' + (f.id ? '' : '<button class="tbtn" data-tfs="2">저장 + 하나 더 (#' + (+f.no + 1) + ')</button>') + '</div></div>';
+  }
+  function tFormNew(base) {
+    var used = {}; tires().forEach(function (t) { if (!t.ret) used[t.col] = 1; });
+    var f = base ? JSON.parse(JSON.stringify(base)) : { mk: '', nm: '', cp: '', wh: '', ins: '', ax: '앞뒤 같은 세트', grip: '', gripMin: '', warm: '', warmT: '', note: '' };
+    delete f.id; delete f.ret; f.col = TCOL.filter(function (c) { return !used[c]; })[0] || TCOL[tires().length % 8]; f.no = tNextNo(f.mk, f.nm, f.cp); return f;
+  }
+  function tFormSave(more) {
+    var f = tForm; if (!f || !(f.mk || f.nm)) return false;
+    tSnap();
+    ['mk'].forEach(function (k) { f[k] = tCanon(k, f[k]); }); ['nm', 'cp', 'wh'].forEach(function (k) { f[k] = tCanon(k, f[k], f.mk); });
+    f.no = +f.no || tNextNo(f.mk, f.nm, f.cp);
+    if (f.id) { var t = tireById(f.id); Object.keys(f).forEach(function (k) { t[k] = f[k]; }); }
+    else { f.id = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); f.from = todayS(); tires().push(f); cfg.tireSel = f.id; }
+    save();
+    tForm = more ? (function () { var n = tFormNew(f); n.no = tNextNo(f.mk, f.nm, f.cp); return n; })() : null;
+    return f.id;
+  }
+  function tNowS() { var d = new Date(), p = function (n) { return ('0' + n).slice(-2); }; return ymd(d) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
+  /* the tire for the next session of an owner: latest assignment (incl. "from the next session") + what carries on */
+  function tNext(owner, rs, TL) {
+    var last = rs.filter(function (r) { return tOwner(r[1]) === owner; }).sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }).pop(), lx = last ? TL[last[0]] : null;
+    var ex = (cfg.tireOf || {})[owner] || {}, pend = null; Object.keys(ex).forEach(function (k) { if (k.slice(0, 2) === 'n:' && (!last || ex[k].at > last[4]) && (!pend || ex[k].at > pend.at)) pend = { k: k, t: ex[k].t, at: ex[k].at }; });
+    var tid = pend ? pend.t : lx && lx.t || '', k = 1; if (tid && lx && lx.t === tid) k = lx.k + 1; else if (tid) k = (tUseC[tid] || 0) + 1;
+    var nx = ((cfg.tirePrep || {})[owner] || {}).next, nxOn = nx && (!last || nx.at > last[4]);
+    var prev = ''; if (lx) { if (pend && lx.t && lx.t !== tid) prev = lx.t; else prev = lx.prev && lx.prev !== lx.t ? lx.prev : ''; }
+    return { last: last, lx: lx, t: tid, k: k, pend: pend, prev: prev, g: nxOn && nx.g !== undefined ? +nx.g : 0, w: nxOn && nx.w !== undefined && nx.w !== '' ? +nx.w : lx ? lx.w : null, wt: lx ? lx.wt : '' };
+  }
+  function tNowLine(owner, rs, TL, pit) {
+    var N = tNext(owner, rs, TL), t = tireById(N.t), pv = tireById(N.prev), act = tires().filter(function (q) { return !q.ret; });
+    var h = '<div class="vl-tnow" data-tow="' + esc(owner) + '" data-tlast="' + esc(N.last ? N.last[4] : '') + '"><span class="tnl">🛞 ' + (N.pend ? '다음 세션 타이어' : '지금 타이어') + '</span>' + (t ? tChip(t, tShort(t) + (rs.length ? ' · ' + N.k + '번째' : '')) : '<span class="mut">없음</span>') +
+      (N.lx || N.g || (N.w !== null && N.w !== undefined) ? prepChips({ g: N.g, gn: '', w: N.w, wt: N.wt }, pit) : '') +
+      '<span class="tnb">' + (pv && !pit ? '<button class="tbtn" data-tnset="' + esc(pv.id) + '">⇄ 바로 전 ' + esc(tShort(pv)) + '</button>' : '') + '<button class="tbtn" data-tnext="1">' + (pit ? '🛞 바꾸기' : '다음 세션부터 바꾸기') + '</button>' + (pit ? '' : '<button class="tbtn" data-trec="1">💡 추천 보기</button>') + '</span></div>';
+    if (tPick === 'next') h += '<div class="vl-tblk tnx" data-tow="' + esc(owner) + '" data-tlast="' + esc(N.last ? N.last[4] : '') + '"><div class="tpk">' + (t ? '<button data-tnset="' + esc(t.id) + '" class="on">' + tChip(t, '그대로 ' + tShort(t)) + '</button>' : '') + (pv ? '<button data-tnset="' + esc(pv.id) + '">' + tChip(pv, '⇄ 바로 전 ' + tShort(pv)) + '</button>' : '') +
+      act.filter(function (q) { return q !== t && q !== pv; }).map(function (q) { return '<button data-tnset="' + esc(q.id) + '">' + tChip(q, tShort(q)) + '<small>' + tUseN(q.id) + '</small></button>'; }).join('') + '<button data-tnew="1" class="o">＋ 새 타이어</button></div>' +
+      '<div class="tb2"><span>💧</span><div class="vl-sg"><button data-tng="0" class="' + (!N.g ? 'on' : '') + '">안 바름</button><button data-tng="1" class="' + (N.g ? 'on' : '') + '">바름</button></div></div>' +
+      '<div class="tb2"><span>🔥</span><div class="vl-sg">' + [0, 10, 20, 30].map(function (m) { return '<button data-tnw="' + m + '" class="' + (N.w === m ? 'on' : '') + '">' + (m ? m + '분' : '없음') + '</button>'; }).join('') + '</div></div><div class="tb3">다음 세션에 적용 · 💧은 그 세션만, 🔥은 이어짐</div></div>';
+    return h;
+  }
+  function tUndoH() { if (!tUndo || Date.now() - tUndoT > 5000) return ''; setTimeout(function () { var u = root.querySelectorAll('.vl-tundo'); for (var i = 0; i < u.length; i++) if (Date.now() - tUndoT >= 4900) u[i].parentNode.removeChild(u[i]); }, 5100); return '<div class="vl-tundo"><span>저장했어요</span><button data-tundo="1">↶ 되돌리기</button></div>'; }
+  function tDoUndo() { if (!tUndo) return; var o = JSON.parse(tUndo); cfg.tires = o.a; cfg.tireOf = o.b; cfg.tirePrep = o.c; tUndo = null; save(); }
+  /* tire actions shared by the practice records (#vl_pres) and the Pit live card (#vl_pitire); true = handled */
+  function tClick(e, rer) {
+    var q = function (s) { return e.target.closest && e.target.closest(s); }, a = function (el, k) { return el.getAttribute(k); }, el, blk = q('.vl-tblk'), nw = q('[data-tow]'), ow = nw ? a(nw, 'data-tow') : '';
+    var tl0 = (q('[data-tlast]') || { getAttribute: function () { return ''; } }).getAttribute('data-tlast') || '', nAt = tNowS() > tl0 ? tNowS() : tl0 + '~';   /* "from the next session": after the last session we have, even if the clock says earlier */
+    if ((el = q('[data-tgt]')) && q('tr.px-t2')) { tPrep(ow, q('tr.px-t2').getAttribute('data-psid'), 'g', el.classList.contains('on') ? 0 : 1); rer(); return true; }   /* 💧 in the session list: toggle right there */
+    if ((el = q('[data-tundo]'))) { tDoUndo(); rer(); return true; }
+    if ((el = q('[data-ptab]'))) { cfg.pxTab = a(el, 'data-ptab'); tPick = ''; save(); rer(); return true; }
+    if ((el = q('[data-trec]'))) { cfg.pxTab = 'tire'; save(); rer(); return true; }
+    if ((el = q('[data-tnext]'))) { tPick = tPick === 'next' ? '' : 'next'; rer(); return true; }
+    if ((el = q('[data-tnset]'))) { var nk = Object.keys(((cfg.tireOf || {})[ow]) || {}).filter(function (k) { return k.slice(0, 2) === 'n:' && cfg.tireOf[ow][k].at > tl0; }); tSnap(); cfg.tireOf = cfg.tireOf || {}; var om = cfg.tireOf[ow] = cfg.tireOf[ow] || {}; nk.forEach(function (k) { delete om[k]; }); om['n:' + Date.now().toString(36)] = { t: a(el, 'data-tnset'), at: nAt }; save(); tPick = ''; rer(); return true; }
+    if ((el = q('[data-tng]')) || (el = q('[data-tnw]'))) { cfg.tirePrep = cfg.tirePrep || {}; var mm = cfg.tirePrep[ow] = cfg.tirePrep[ow] || {}; tSnap(); var nx = mm.next && mm.next.at > tl0 && !mm.next.sid ? mm.next : (mm.next = {}); nx.at = nAt; if (el.hasAttribute('data-tng')) nx.g = +a(el, 'data-tng'); else nx.w = +a(el, 'data-tnw'); save(); rer(); return true; }
+    if ((el = q('[data-tnew]'))) { tForm = tFormNew(); if (blk && a(blk, 'data-tsid')) tForm.as = { ow: ow, sid: a(blk, 'data-tsid'), at: a(blk, 'data-tat') }; else if (ow) tForm.as = { ow: ow, sid: 'n:' + Date.now().toString(36), at: tNowS() }; cfg.pxTab = 'tire'; tPick = ''; save(); rer(); return true; }
+    if (blk && a(blk, 'data-tsid')) {
+      var sid = a(blk, 'data-tsid'), at = a(blk, 'data-tat');
+      if ((el = q('[data-tpick]'))) { tPick = tPick === sid ? '' : sid; rer(); return true; }
+      if ((el = q('[data-tset]'))) { tSet(ow, sid, at, a(el, 'data-tset')); tPick = ''; rer(); return true; }
+      if ((el = q('[data-tg]'))) { tPrep(ow, sid, 'g', +a(el, 'data-tg')); rer(); return true; }
+      if ((el = q('[data-tw]'))) { tPrep(ow, sid, 'w', +a(el, 'data-tw')); rer(); return true; }
+      if (q('input')) return true;
+      return true;
+    }
+    if ((el = q('[data-ttc]'))) { tPick = a(el, 'data-ttc'); return false; }   /* the tire cell of a session row: pick the row + open its picker */
+    if ((el = q('[data-tf]'))) { cfg.tireF = a(el, 'data-tf'); save(); rer(); return true; }
+    if ((el = q('[data-tsel]'))) { cfg.tireSel = a(el, 'data-tsel'); save(); rer(); return true; }
+    if ((el = q('[data-tgmm]'))) { cfg.tgM = a(el, 'data-tgmm'); save(); rer(); return true; }
+    if ((el = q('[data-pjd]'))) { cfg.projMin = Math.max(1, Math.min(60, (+cfg.projMin || 5) + +a(el, 'data-pjd'))); cfg.tgM = 'pj'; save(); rer(); return true; }
+    if ((el = q('[data-tcmp]'))) { var c = cfg.tireCmp = (cfg.tireCmp || []).slice(), id = a(el, 'data-tcmp'), i = c.indexOf(id); if (i < 0) c.push(id); else c.splice(i, 1); save(); rer(); return true; }
+    var T0 = tireById(cfg.tireSel);
+    if ((el = q('[data-tedit]')) && T0) { tForm = JSON.parse(JSON.stringify(T0)); rer(); return true; }
+    if ((el = q('[data-tdup]')) && T0) { tForm = tFormNew(T0); rer(); return true; }
+    if ((el = q('[data-tret]')) && T0) { tSnap(); T0.ret = T0.ret ? 0 : todayS(); save(); rer(); return true; }
+    if ((el = q('[data-tlib]'))) { cfg.tireLib = a(el, 'data-tlib') !== '0'; save(); rer(); return true; }
+    if ((el = q('[data-tmgo]'))) { var from = a(el, 'data-tmgo'), sel = root.querySelector('select[data-tmerge="' + from + '"]'), to = sel && sel.value; if (to) { var tm = tires().filter(function (t) { return nmKey(t.mk) === to; })[0]; tSnap(); tires().forEach(function (t) { if ((nmKey(t.mk) || '-') === from) t.mk = tm ? tm.mk : t.mk; }); save(); rer(); } return true; }
+    if (tForm && (el = q('[data-tfv]'))) { var k2 = a(el, 'data-tfv'); tForm[k2] = a(el, 'data-v'); if (!tForm.id && /^(mk|nm|cp)$/.test(k2)) tForm.no = tNextNo(tForm.mk, tForm.nm, tForm.cp); rer(); return true; }
+    if (tForm && (el = q('[data-tfx]'))) { tForm = null; rer(); return true; }
+    if (tForm && (el = q('[data-tfs]'))) { var as = tForm.as, more = a(el, 'data-tfs') === '2'; delete tForm.as; var nid = tFormSave(more); if (nid && as) tSet(as.ow, as.sid, as.at, nid); if (!nid) { tForm.as = as; var mi = root.querySelector('[data-tfi="mk"]'); if (mi) mi.focus(); } rer(); return true; }
+    return false;
+  }
+  function tChange(e, rer) {
+    var t = e.target, a = function (k) { return t.getAttribute(k); }, blk = t.closest && t.closest('.vl-tblk');
+    if (tForm && t.hasAttribute('data-tfi')) { var k = a('data-tfi'); tForm[k] = t.value; if (!tForm.id && /^(mk|nm|cp)$/.test(k)) tForm.no = tNextNo(tForm.mk, tForm.nm, tForm.cp); if (e.type === 'change') rer(); return; }
+    if (e.type !== 'change' || !blk || !blk.getAttribute('data-tsid')) return;
+    var ow = blk.getAttribute('data-tow'), sid = blk.getAttribute('data-tsid'), m = { 'data-tgn': 'gn', 'data-tgm': 'gm', 'data-twt': 'wt', 'data-tmemo': 'memo', 'data-twm': 'w' };
+    Object.keys(m).forEach(function (k) { if (t.hasAttribute(k)) { var v = t.value.trim(); tPrep(ow, sid, m[k], m[k] === 'w' ? (v === '' ? null : +v || 0) : v); rer(); } });
+  }
+  /* Pit · practice live: the picked driver's tire, changed for the next session from here */
+  var tLiveH = '';
+  function updTireLive() {
+    var bx = $('vl_pitire'); if (!bx) return;
+    var me = myName(), on = root.classList.contains('vl-pit') && me && isPractice(SC()) && (tires().length || cfg.tireOf);
+    if (!on) { if (tLiveH) { bx.innerHTML = ''; tLiveH = ''; } return; }
+    var rs = (prac.rows || []).filter(function (r) { return pKey(r[1]) === pKey(me); }), TL = tAll(rs); tUseC = {}; rs.forEach(function (r) { var x = TL[r[0]]; if (x && x.t) tUseC[x.t] = (tUseC[x.t] || 0) + 1; });
+    var last = rs.slice().sort(function (a, b) { return a[4] < b[4] ? -1 : 1; }).pop(), ow = last ? tOwner(last[1]) : tOwner(me);
+    var h = tNowLine(ow, rs, TL, true) + tUndoH();
+    if (h !== tLiveH) { bx.innerHTML = h; tLiveH = h; }
+  }
   function renderPracLx(name, rows) {
     var box = $('vl_pres');
     if (!name) { prac.sum = ''; if (root.classList.contains('vl-pit') && prac.rows.length) { $('vl_tab_prac').classList.add('vl-popen'); box.innerHTML = '<div class="vl-pnone">이 기간 선수 목록에서 눌러 고르세요.</div>'; return; } box.innerHTML = prac.rows.length ? '<div class="vl-pnone">위의 <b>선수 고르기</b>를 눌러 선수를 고르세요.</div>' : ''; return; }
@@ -5228,6 +5543,10 @@
     var dl = Object.keys(days).sort().reverse(); if (!dl.length) { box.innerHTML = '<div class="vl-pnone">이 기간에 ' + esc(name) + ' 선수의 연습 기록이 없어요.</div>'; return; }
     if (dl.indexOf(pxs.day) < 0) pxs.day = dl[0];
     var dr = days[pxs.day], S = pstats(dr), all = pstats(my), C = lapCols();
+    var TL = tAll(mine0); tUseC = {}; mine0.forEach(function (r) { var x = TL[r[0]]; if (x && x.t) tUseC[x.t] = (tUseC[x.t] || 0) + 1; });
+    var ptab = '<div class="px-seg vl-ptab"><button data-ptab="ses" class="' + (cfg.pxTab !== 'tire' ? 'on' : '') + '">📊 세션</button><button data-ptab="tire" class="' + (cfg.pxTab === 'tire' ? 'on' : '') + '">🛞 타이어 ' + tires().filter(function (t) { return !t.ret; }).length + '</button></div>';
+    if (cfg.pxTab === 'tire') { box.innerHTML = (pit ? '<div class="vl-plx pit">' + carBar + ptab + renderTireTab(name, my, true) + '</div>' : carBar + ptab + renderTireTab(name, my, false)) + tUndoH(); return; }
+    var nowL = tNowLine(tOwner(my[my.length - 1][1]), mine0, TL, pit);
     prac.sum = !pit ? (prac.loaded || '').replace('~', ' ~ ') + ' · ' + name + (CAR ? ' (' + cars[CAR] + ')' : '') + ' · 연습한 날 ' + dl.length + '일 · 세션 ' + my.length + '개 · 총 ' + all.laps + '랩 · 총 ' + hms(all.time) : '';
     if (prac.sum && !prac.aBusy) pstat(prac.sum);
     var older = dl.filter(function (d) { return d < pxs.day; }), prevS = older.length ? pstats(days[older[0]]) : null;
@@ -5315,31 +5634,38 @@
         var f = secs(r[7]), t3 = secs(pc.t3[r[0]]), pj = projOf(r[0]), cs = pc.cons[r[0]];
         var top = function (v, b) { return v > 0 && Math.abs(v - b) < 0.0005 ? ' style="color:' + C.B + ';font-weight:800"' : ''; };
         return '<tr data-psid="' + esc(r[0]) + '" class="' + (r[0] === pxs.sid ? 'on' : '') + '"><td>' + esc(r[4].slice(11, 16)) + (pit && r[0] === pxs.sid ? ' ▾' : '') + '</td>' + (showCar ? '<td>' + esc(splitName(r[1]).c) + '</td>' : '') + '<td>' + (+r[5] || 0) + '</td>' + (pit ? '' : '<td>' + esc(r[6] || '-') + '</td>') + '<td' + top(f, S.best) + '>' + (f > 0 ? fmtS(f) : '-') + '</td><td class="px-x">' + (secs(r[8]) > 0 ? fmtS(secs(r[8])) : '-') + '</td>' +
-          '<td' + top(t3, S.t3) + '>' + (t3 > 0 ? fmtS(t3) : pc.t3[r[0]] === undefined ? '…' : '-') + '</td><td class="px-x">' + (pj ? (pj.est ? '≈' : '') + pj.n + '/' + Math.floor(pj.t / 60) + ':' + ('0' + (pj.t % 60).toFixed(3)).slice(-6) : pj === undefined ? '…' : '-') + '</td><td class="px-x">' + (cs ? esc(cs) + '%' : cs === undefined ? '…' : '-') + '</td></tr>' + (pit && r[0] === pxs.sid ? '<tr class="px-det"><td colspan="' + (showCar ? 5 : 4) + '">' + pitDet(r[0]) + '</td></tr>' : '');
+          '<td' + top(t3, S.t3) + '>' + (t3 > 0 ? fmtS(t3) : pc.t3[r[0]] === undefined ? '…' : '-') + '</td><td class="px-x">' + (pj ? (pj.est ? '≈' : '') + pj.n + '/' + Math.floor(pj.t / 60) + ':' + ('0' + (pj.t % 60).toFixed(3)).slice(-6) : pj === undefined ? '…' : '-') + '</td><td class="px-x">' + (cs ? esc(cs) + '%' : cs === undefined ? '…' : '-') + '</td></tr>' + '<tr class="px-t2' + (r[0] === pxs.sid ? ' on' : '') + '" data-psid="' + esc(r[0]) + '" data-tow="' + esc(tOwner(r[1])) + '"' + (pit ? '' : ' data-ttc="' + esc(r[0]) + '"') + '><td colspan="' + (pit ? (showCar ? 5 : 4) : (showCar ? 10 : 9)) + '">🛞 ' + tCell(TL[r[0]], true) + ' ' + prepChips(TL[r[0]], true) + (TL[r[0]] && TL[r[0]].memo ? ' <span class="mut">📝 ' + esc(TL[r[0]].memo) + '</span>' : '') + '</td></tr>' + (pit && r[0] === pxs.sid ? '<tr class="px-det"><td colspan="' + (showCar ? 5 : 4) + '">' + tireBlock(r, TL[r[0]]) + pitDet(r[0]) + '</td></tr>' : '');
       }).join('') + '</tbody></table></div></div>';
     /* laps of the picked session: newest on top, like Live Race */
     var sr = dr.filter(function (r) { return r[0] === pxs.sid; })[0], lp = pc.laps[pxs.sid], lapsH;
     if (lp === undefined) lapsH = '<div style="color:#999;padding:10px 2px">랩타임 불러오는 중…</div>';
     else if (!lp || !lp.length) lapsH = '<div style="color:#999;padding:10px 2px">이 세션의 랩타임이 없어요</div>';
     else { var lst = lp.map(function (v, i) { return { n: i + 1, v: v }; }); lapsH = '<div class="px-g">' + lapSvg(lst, 320, 200) + lapKey('') + '</div>' + lapSum(lst) + pracLapTbl(lst); }
-    var right = '<div class="vl-lxc"><h5>' + (sr ? esc(sr[4].slice(11, 16)) + ' 세션' : '세션') + '<small>' + (lp ? lp.length + '랩 · ' : '') + '첫 랩 위 · <a href="/practice/?p=view_session&id=' + esc(pxs.sid) + '" target="_blank" rel="noopener" style="color:#8ab4ff">LiveRC ↗</a></small></h5>' + lapsH + '</div>';
+    var right = '<div class="vl-lxc"><h5>' + (sr ? esc(sr[4].slice(11, 16)) + ' 세션' : '세션') + '<small>' + (lp ? lp.length + '랩 · ' : '') + '첫 랩 위 · <a href="/practice/?p=view_session&id=' + esc(pxs.sid) + '" target="_blank" rel="noopener" style="color:#8ab4ff">LiveRC ↗</a></small></h5>' + (sr ? tireBlock(sr, TL[sr[0]]) : '') + lapsH + '</div>';
     var dayL = '<div class="vl-lxc px-days"><h5>날짜<small>세션 · 랩 · 베스트</small></h5>' + dl.map(function (d) {
       var x = pstats(days[d]);
       return '<div class="px-day' + (d === pxs.day ? ' on' : '') + '" data-pday="' + d + '"><span><b>' + pdate(d) + '</b><small>세션 ' + days[d].length + '개</small></span><span class="r">' + x.laps + '랩<b' + (x.best > 0 && Math.abs(x.best - all.best) < 0.0005 ? ' style="color:' + C.B + '"' : '') + '>' + fmtS(x.best) + '</b></span></div>';
     }).join('') + '</div>';
-    if (pit) box.innerHTML = '<div class="vl-plx pit">' + carBar + dayL + '<div class="px-mid">' + kp + sess + trend + '</div></div>';
-    else box.innerHTML = carBar + '<div class="vl-plx">' + dayL + '<div class="px-mid">' + kp + trend + sess + '</div><div class="px-right">' + right + '</div></div>';
+    if (pit) box.innerHTML = '<div class="vl-plx pit">' + carBar + ptab + dayL + '<div class="px-mid">' + nowL + kp + sess + trend + '</div></div>' + tUndoH();
+    else box.innerHTML = carBar + ptab + '<div class="vl-plx">' + dayL + '<div class="px-mid">' + nowL + kp + trend + sess + '</div><div class="px-right">' + right + '</div></div>' + tUndoH();
   }
   $('vl_pres').addEventListener('click', function (e) {
     if (!lxP() || !lastPrac) return;
+    var tp0 = tPick; if (tClick(e, function () { renderPracLx(lastPrac[0][0], lastPrac[1]); })) return;
     var d = e.target.closest && e.target.closest('[data-pday]'), r = e.target.closest && e.target.closest('[data-psid]');
     if (d) { pxs.day = d.getAttribute('data-pday'); pxs.sid = ''; renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (e.target.closest && e.target.closest('[data-pgv]')) { cfg.pgV = e.target.closest('[data-pgv]').getAttribute('data-pgv'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (e.target.closest && e.target.closest('[data-pgm]')) { cfg.pgM = e.target.closest('[data-pgm]').getAttribute('data-pgm'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
-    else if (r) { var sid = r.getAttribute('data-psid'); pxs.sid = root.classList.contains('vl-pit') && pxs.sid === sid ? '' : sid; renderPracLx(lastPrac[0][0], lastPrac[1]); }
+    else if (r) { if (tPick === tp0) tPick = ''; var sid = r.getAttribute('data-psid'); pxs.sid = root.classList.contains('vl-pit') && pxs.sid === sid ? '' : sid; renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (e.target.closest && e.target.closest('[data-pcar]')) { var ck = e.target.closest('[data-pcar]').getAttribute('data-pcar'); pxs.day = ''; pxs.sid = ''; setCar(ck, (e.target.closest('[data-pcar]').getAttribute('data-pcd') || '')); }
     else if (e.target.closest && e.target.closest('[data-pv]')) { cfg.pitPv = e.target.closest('[data-pv]').getAttribute('data-pv'); save(); renderPracLx(lastPrac[0][0], lastPrac[1]); }
   });
+  ['change', 'input'].forEach(function (ev) { $('vl_pres').addEventListener(ev, function (e) {
+    if (!lastPrac) return;
+    if (ev === 'input' && e.target.hasAttribute('data-tq')) { var qv = nmKey(e.target.value); root.querySelectorAll('#vl_pres .vl-tcard').forEach(function (c) { c.style.display = !qv || (c.getAttribute('data-tk') || '').indexOf(qv) >= 0 ? '' : 'none'; }); return; }
+    tChange(e, function () { renderPracLx(lastPrac[0][0], lastPrac[1]); });
+  }); });
+  $('vl_pitire').addEventListener('click', function (e) { var hadF = !!tForm; tClick(e, function () { tLiveH = ''; updTireLive(); if (lastPrac) renderPracLx(lastPrac[0][0], lastPrac[1]); }); if (!hadF && tForm) setTab('prac'); });
   /* ---------- watcher ---------- */
   var state = {}, hist = {};
   function keyOf(d) { return (d.driverID || '') + '|' + nameOf(d); }
@@ -5466,7 +5792,8 @@
   }
   function t3Fmt(v) { var x = secs(v); return x >= 60 ? fmtS(x) : (v || '-'); }   /* 78.876 → 1:18.876 */
   function fmtClock(v) { var n = v < 0; v = Math.abs(v); var m = Math.floor(v / 60), sx = Math.floor(v % 60); return (n ? '-' : '') + m + ':' + (sx < 10 ? '0' : '') + sx; }
-  function updFuel(all) {
+  function updFuel(all) { updFuel0(all); try { updTireLive(); } catch (e) {} }
+  function updFuel0(all) {
     var b = $('vl_fbtn'); b.classList.toggle('on', !!cfg.fuelOn);
     $('vl_fuel').style.display = cfg.raceOn === false ? 'none' : '';
     var fOn = cfg.fuelOn && cfg.raceOn !== false;

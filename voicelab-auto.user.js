@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.29
+// @version      3.2.30
 // @description  LiveRC 라이브 스코어링 음성 랩타임 (자동 업데이트 — 열 때마다 깃허브의 최신 보이스랩을 받아 실행)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
