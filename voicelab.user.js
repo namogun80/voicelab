@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.21
+// @version      3.2.22
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 105;   /* = VER below */
-  /* var VER = 105; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 106;   /* = VER below */
+  /* var VER = 106; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.21';
+  var VERSION = '3.2.22';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -550,6 +550,7 @@ window.__vlAuto = true;
     '#vl_clpop .cp-s{color:#b8c0d0;font-size:13px}#vl_clpop .cp-st{display:flex;align-items:center;gap:10px;margin:8px 0}#vl_clpop .cp-st button{width:40px;height:40px;border-radius:10px;border:1px solid #2b3550;background:#1a2135;color:#fff;font-size:20px;cursor:pointer}' +
     '#vl_clpop .cp-st b{font-size:26px;min-width:64px;text-align:center}#vl_clpop .cp-v{color:#ff7ae6;font-weight:800;font-size:16px}#vl_clpop .cp-b{display:flex;gap:8px;margin-top:8px}#vl_clpop .cp-b button{border:1px solid #2b3550;background:#1a2135;color:#ddd;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;font-family:inherit}' +
     '.px-cars{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 10px}.px-cars>span{color:#b8c0d0;font-size:13px;margin-right:2px}.px-car{background:#1a2135;border:1px solid #2b3550;color:#dfe4ee;border-radius:999px;padding:5px 12px;font-size:14px;cursor:pointer;font-family:inherit}.px-car small{opacity:.75;margin-left:3px}.px-car.on{background:#ff7a1a;border-color:#ff7a1a;color:#111;font-weight:800}' +
+    '.px-gr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.px-gr2>.vl-lxc{min-width:0}.px-gr2 h5 small{display:block;margin:2px 0 0}' +
     '.px-g{margin-bottom:8px}.px-g svg{width:100%;height:auto;max-height:260px}' +
     /* Pit 연습 기록: one column, days as chips, laps under the picked session */
     '#vl_root.vl-pit #vl_tab_prac .pr-row{display:flex;flex-wrap:wrap;gap:6px}#vl_root.vl-pit #vl_pchip{display:inline-block;border-color:#ff7a1a;color:#fff;font-weight:800;border-radius:999px}#vl_root.vl-pit #vl_pselbox{display:none !important}#vl_root.vl-pit #vl_tab_prac.vl-popen #vl_pselbox{display:block !important;max-height:55vh;overflow:auto;border:1px solid #ff7a1a;border-radius:12px;padding:8px;margin:6px 0}' +
@@ -5146,24 +5147,34 @@ window.__vlAuto = true;
       '<div><small>Top 3 연속</small><b>' + (S.t3 > 0 ? fmtS(S.t3) : '-') + '</b><em>' + (S.t3Id ? '세션 ' + idxOf(S.t3Id) : '&nbsp;') + '</em></div>' +
       '<div><small>평균 랩</small><b>' + (S.avg > 0 ? fmtS(S.avg) : '-') + '</b>' + avgEm + '</div>' +
       '<div><small>총 랩 · 주행</small><b>' + S.laps + '</b><em>' + hms(S.time) + '</em></div></div>';
-    /* days, oldest → newest: best + average */
-    var asc = dl.slice().reverse(), ser = asc.map(function (d) { return pstats(days[d]); }), W2 = root.classList.contains('vl-lxmd') ? 520 : 760, H = 180, L = 52, R = 14, T = 14, B = 26;
-    var ys = []; ser.forEach(function (x) { if (x.best > 0) ys.push(x.best); if (x.avg > 0) ys.push(x.avg); });
-    var tr = '';
-    if (ys.length) {
+    /* best + average lines: days (oldest → newest) and, on wide screens, the sessions of the picked day next to it */
+    var bavSvg = function (labs, ser, W2, mark, ids) {
+      var H = half ? 170 : 180, L = 52, R = 14, T = 14, B = 26, ys = [], tr = '';
+      ser.forEach(function (x) { if (x.best > 0) ys.push(x.best); if (x.avg > 0) ys.push(x.avg); });
+      if (!ys.length) return '';
       var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), pd = Math.max((y1 - y0) * 0.12, 0.05); y0 -= pd; y1 += pd;
-      var X = function (i) { return asc.length > 1 ? L + i / (asc.length - 1) * (W2 - L - R) : (L + W2 - R) / 2; }, Y = function (v) { return T + (v - y0) / (y1 - y0) * (H - T - B); };
+      var X = function (i) { return labs.length > 1 ? L + i / (labs.length - 1) * (W2 - L - R) : (L + W2 - R) / 2; }, Y = function (v) { return T + (v - y0) / (y1 - y0) * (H - T - B); };
       for (var k = 0; k <= 3; k++) { var yv = y0 + (y1 - y0) * k / 3; tr += '<line x1="' + L + '" x2="' + (W2 - R) + '" y1="' + Y(yv) + '" y2="' + Y(yv) + '" stroke="#232b40"/><text x="' + (L - 6) + '" y="' + (Y(yv) + 4) + '" fill="#b8c0d0" font-size="12" text-anchor="end">' + yv.toFixed(2) + '</text>'; }
-      var step = Math.max(1, Math.ceil(asc.length / 8));
-      asc.forEach(function (d, i) { if (i % step === 0 || i === asc.length - 1) tr += '<text x="' + X(i) + '" y="' + (H - 6) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + d.slice(5).replace('-', '/') + '</text>'; });
+      var step = Math.max(1, Math.ceil(labs.length / Math.max(3, Math.floor(W2 / 95))));
+      labs.forEach(function (d, i) { if (i % step === 0 || i === labs.length - 1) tr += '<text x="' + X(i) + '" y="' + (H - 6) + '" fill="#b8c0d0" font-size="12" text-anchor="middle">' + d + '</text>'; });
       [['best', C.B], ['avg', '#ff7a1a']].forEach(function (q) {
-        var pts = []; ser.forEach(function (x, i) { if (x[q[0]] > 0) pts.push([X(i), Y(x[q[0]])]); });
+        var pts = []; ser.forEach(function (x, i) { if (x[q[0]] > 0) pts.push([X(i), Y(x[q[0]]), i]); });
         if (pts.length > 1) tr += '<path d="' + pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ') + '" fill="none" stroke="' + q[1] + '" stroke-width="3"/>';
-        pts.forEach(function (p) { tr += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.5" fill="' + q[1] + '"/>'; });
+        pts.forEach(function (p) { tr += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (p[2] === mark ? 5.5 : 3.5) + '" fill="' + q[1] + '"' + (ids ? ' data-psid="' + ids[p[2]] + '" style="cursor:pointer"' : '') + '/>'; });
       });
-      var di = asc.indexOf(pxs.day); if (di >= 0) tr = '<line x1="' + X(di) + '" x2="' + X(di) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#ff7a1a" stroke-dasharray="3 4" opacity=".6"/>' + tr;
+      if (mark >= 0) tr = '<line x1="' + X(mark) + '" x2="' + X(mark) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#ff7a1a" stroke-dasharray="3 4" opacity=".6"/>' + tr;
+      return '<svg viewBox="0 0 ' + W2 + ' ' + H + '">' + tr + '</svg>';
+    };
+    var keyH = '<small><span style="color:' + C.B + '">━ 베스트</span> · <span style="color:#ff7a1a">━ 평균</span> · 위로 갈수록 빠름</small>';
+    var asc = dl.slice().reverse(), half = !pit, W2 = half ? (root.classList.contains('vl-lxmd') ? 215 : 300) : (root.classList.contains('vl-lxmd') ? 520 : 760);
+    var trDay = bavSvg(asc.map(function (d) { return d.slice(5).replace('-', '/'); }), asc.map(function (d) { return pstats(days[d]); }), W2, asc.indexOf(pxs.day));
+    if (half) keyH = '<small><span style="color:' + C.B + '">━ 베스트</span> · <span style="color:#ff7a1a">━ 평균</span> · 위 = 빠름</small>';
+    var trend = '<div class="vl-lxc"><h5>📈 날짜별' + (half ? '' : ' 베스트 · 평균') + keyH + '</h5>' + (trDay || '<div style="color:#999;padding:10px">기록이 없어요</div>') + '</div>';
+    if (half) {   /* PC · iPad: the day's sessions, same lines, the picked session marked (click a point = that session) */
+      var sesT = function (r) { return (r[4].match(/\d{1,2}:\d{2}/) || [''])[0]; };
+      var trSes = bavSvg(dr.map(sesT), dr.map(function (r) { return pstats([r]); }), W2, (function () { var sid = dr.some(function (r) { return r[0] === pxs.sid; }) ? pxs.sid : (S.bestId || dr[dr.length - 1][0]); for (var q = 0; q < dr.length; q++) if (dr[q][0] === sid) return q; return -1; })(), dr.map(function (r) { return r[0]; }));
+      trend = '<div class="px-gr2">' + trend + '<div class="vl-lxc"><h5>📈 ' + pdate(pxs.day).slice(0, 5) + ' 세션별' + keyH + '</h5>' + (dr.length > 1 && trSes ? trSes : '<div style="color:#999;padding:10px">이날 세션이 ' + dr.length + '개라 선이 없어요</div>') + '</div></div>';
     }
-    var trend = '<div class="vl-lxc"><h5>📈 날짜별 베스트 · 평균<small><span style="color:' + C.B + '">━ 베스트</span> · <span style="color:#ff7a1a">━ 평균</span> · 위로 갈수록 빠름</small></h5>' + (tr ? '<svg viewBox="0 0 ' + W2 + ' ' + H + '">' + tr + '</svg>' : '<div style="color:#999;padding:10px">기록이 없어요</div>') + '</div>';
     /* sessions of the day */
     if (!pit && !dr.some(function (r) { return r[0] === pxs.sid; })) pxs.sid = S.bestId || dr[dr.length - 1][0];
     if (pit && pxs.sid && !dr.some(function (r) { return r[0] === pxs.sid; })) pxs.sid = '';
@@ -5196,7 +5207,7 @@ window.__vlAuto = true;
   }
   $('vl_pres').addEventListener('click', function (e) {
     if (!lxP() || !lastPrac) return;
-    var d = e.target.closest && e.target.closest('[data-pday]'), r = e.target.closest && e.target.closest('tr[data-psid]');
+    var d = e.target.closest && e.target.closest('[data-pday]'), r = e.target.closest && e.target.closest('[data-psid]');
     if (d) { pxs.day = d.getAttribute('data-pday'); pxs.sid = ''; renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (r) { var sid = r.getAttribute('data-psid'); pxs.sid = root.classList.contains('vl-pit') && pxs.sid === sid ? '' : sid; renderPracLx(lastPrac[0][0], lastPrac[1]); }
     else if (e.target.closest && e.target.closest('[data-pcar]')) { var ck = e.target.closest('[data-pcar]').getAttribute('data-pcar'); pxs.day = ''; pxs.sid = ''; setCar(ck, (e.target.closest('[data-pcar]').getAttribute('data-pcd') || '')); }
