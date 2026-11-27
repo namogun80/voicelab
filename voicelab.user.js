@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.38
+// @version      3.2.39
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 122;   /* = VER below */
-  /* var VER = 122; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 123;   /* = VER below */
+  /* var VER = 123; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.38';
+  var VERSION = '3.2.39';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -4799,7 +4799,7 @@ window.__vlAuto = true;
         var o = evGet(e.id, cache), ms = o && me ? evMineAll(o, me) : [], m = ms[0], td = e === todayE;
         return '<div class="rs-e' + (e.id === ev.sel ? ' on' : '') + '" data-ev="' + e.id + '"><b>' + esc(e.name) + (td ? ' <span class="rs-lv">● 진행 중</span>' : '') + '</b><span>' + (td ? (e.date.slice(0, 10) === todayS() ? '오늘 ' : '현지 ') : '') + esc(e.date.replace(/-/g, '.').slice(td ? 5 : 0, 10)) + ' · ' + (e.d || e.n) + '명</span>' + (m ? (ms.length > 1 ? '<em>' + ms.length + '종목</em>' : '') + ms.map(function (x) { return '<em class="cl">' + esc(x.cls) + (x.car ? ' <span class="vl-car">(' + esc(x.car) + ')</span>' : '') + ' · ' + evLine(x) + '</em>'; }).join('') : '') + '</div>';
       }).join('') + (me && wait ? '<div class="rs-wait">⏳ 참가 확인 중 · ' + wait + '개 남음</div>' : '') + (me && offN ? '<div class="rs-wait">📴 저장 안 된 대회 ' + offN + '개 — 인터넷 연결 뒤 확인</div>' : '') + (!lst.length && !(me && (wait || offN)) ? '<div class="vl-pnone">' + (me ? '이 기간에 참가한 대회가 없어요' : '이 기간에 대회가 없어요') + '</div>' : '') + '</div>';
-    var o = ev.sel ? ev.data[ev.sel] : null, right, again = function () { if (cfg.tab === 'res') renderRes(); }, live = !!(todayE && ev.sel === todayE.id);
+    var o = ev.sel ? ev.data[ev.sel] || evGet(ev.sel, cache) : null, right, again = function () { setTimeout(function () { if (cfg.tab === 'res') renderRes(); }, 0); }, live = !!(todayE && ev.sel === todayE.id);
     if (!ev.sel) right = me ? resGraph(per, cache, CAR, joined, wait) : '<div class="vl-pnone"></div>';
     else if (!o) { right = '<div class="vl-pnone">' + (ev.off ? '📴 오프라인 — 이 대회는 저장된 결과가 없어요' : '대회 결과를 읽는 중…') + '</div>'; evLoad(ev.sel, again); }
     else {
