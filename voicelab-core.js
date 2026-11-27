@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 121;   /* = VER below */
-  /* var VER = 121; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 122;   /* = VER below */
+  /* var VER = 122; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.37';
+  var VERSION = '3.2.38';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -555,6 +555,7 @@
     '#vl_root.vl-nav1 #vl_tools{flex-direction:column;order:8}#vl_root.vl-nav1 #vl_tools #vl_zm{display:none !important}#vl_root.vl-nav1.vl-zpop #vl_tools #vl_zm{display:inline-flex !important;position:fixed;left:70px;bottom:90px;z-index:40;width:180px;flex:none;box-shadow:0 8px 24px #000a;border:1px solid #ff7a1a}' +
     '#vl_root.vl-nav1 #vl_navdrv,#vl_root.vl-nav1 #vl_navzm{display:flex;order:7;align-items:center;justify-content:center;width:46px;height:40px;background:#141a2a;border:1px solid #2b3550;border-radius:10px;font-size:18px;cursor:pointer;color:#fff;margin:2px 0}#vl_root.vl-nav1 #vl_navdrv{border-color:#ff7a1a;margin-top:10px}#vl_root.vl-nav1 #vl_navt{align-self:center;width:46px}' +
     '#vl_root.vl-nav0 #vl_panel{grid-template-columns:0 minmax(0,1fr);position:relative}#vl_root.vl-nav0 #vl_head{visibility:hidden;padding:0;border:0;overflow:hidden}#vl_root.vl-nav0 #vl_body{padding-left:52px}' +
+    '@media (hover:hover) and (pointer:fine){#vl_root.vl-nav0 #vl_navf{display:none!important}#vl_root.vl-nav0 #vl_nave{width:5px!important;background:linear-gradient(rgba(255,122,26,.55),rgba(255,122,26,.2))}}#vl_navtip{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f273d;border:1px solid #ff7a1a;color:#fff;padding:10px 18px;border-radius:10px;font-size:15px;z-index:2147483600;pointer-events:none;white-space:nowrap}' +
     '#vl_root.vl-nav0 #vl_navf{display:flex;position:absolute;left:10px;top:12px;z-index:35;width:34px;height:34px;align-items:center;justify-content:center;background:#1f273d;border:1px solid #2b3550;border-radius:9px;color:#fff;font-size:18px;cursor:pointer}#vl_root.vl-nav0 #vl_nave{display:block;position:absolute;left:0;top:0;bottom:0;width:6px;z-index:34}' +
     '#vl_root.vl-nav0.vl-navpk #vl_head{visibility:visible;position:absolute;left:0;top:0;bottom:0;width:212px;box-sizing:border-box;z-index:36;padding:14px 12px;border-right:1px solid #ff7a1a;box-shadow:8px 0 24px #000a;overflow-y:auto}' +
     '#vl_root .vl-keyt{border-collapse:collapse;margin:8px 0}#vl_root .vl-keyt td{padding:5px 10px 5px 0;font-size:15px;color:#dfe4ee;border-bottom:1px solid #232b40}#vl_root .vl-keyt kbd{display:inline-block;min-width:40px;text-align:center;background:#1f273d;border:1px solid #3a4560;border-bottom-width:3px;border-radius:7px;padding:2px 8px;font:800 14px inherit;font-family:inherit;color:#fff}#vl_root .vl-navrow{display:flex;gap:10px;align-items:center;margin:6px 0;font-size:15px}' +
@@ -873,7 +874,7 @@
     '<div class="gap" id="vl_upd"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:15px">🔄 업데이트</b><span style="color:#bbb" id="vl_updv"></span><button class="ub" id="vl_updb" style="margin-left:auto">업데이트 확인</button></div><div id="vl_updi"></div>' +
     '<div style="margin-top:6px;color:#999;font-size:12px">하루 한 번 자동으로 확인하고, 새 버전이 있으면 ⚙ 설정 탭에 빨간 점 · Tampermonkey 자동 업데이트도 그대로</div></div>' +
     '<div class="gap" id="vl_keys"><b style="font-size:15px">⌨ 단축키</b> <span style="color:#b8c0d0;font-size:13px">PC · 아이패드 키보드 · 입력 칸에 쓰는 중에는 안 됨</span><table class="vl-keyt">' + [['1', 'Live Race'], ['2', '대회 결과'], ['3', '연습 기록'], ['F', '창 모드 ↔ 전체 화면'], ['M', '왼쪽 메뉴 접기 → 숨기기 → 펼치기'], ['+ / −', '확대 · 축소 10%'], ['S', '선수 찾기'], ['Esc', '열린 창 닫기 · 없으면 고른 선수 해제']].map(function (k) { return '<tr><td><kbd>' + k[0] + '</kbd></td><td>' + k[1] + '</td></tr>'; }).join('') + '</table>' +
-    '<div class="vl-navrow">왼쪽 메뉴 <span class="vl-sg"><button data-navset="full">펼침</button><button data-navset="rail">아이콘만</button><button data-navset="hide">숨김</button></span></div><div style="color:#b8c0d0;font-size:13px;line-height:1.6">메뉴 맨 아래 « » 단추로도 바꿔요 · 숨김은 전체 화면일 때만(창 모드에서는 아이콘만) · 숨김일 때 왼쪽 위 ☰ 또는 화면 왼쪽 끝에 마우스 → 메뉴가 떠서 열리고 탭을 누르면 닫혀요 · 이 기기에만 기억</div></div>' +
+    '<div class="vl-navrow">왼쪽 메뉴 <span class="vl-sg"><button data-navset="full">펼침</button><button data-navset="rail">아이콘만</button><button data-navset="hide">숨김</button></span></div><div style="color:#b8c0d0;font-size:13px;line-height:1.6">메뉴 맨 아래 « » 단추로도 바꿔요 · 숨김은 전체 화면일 때만(창 모드에서는 아이콘만) · 숨김일 때 PC는 M 키 · 화면 왼쪽 끝 주황 선에 마우스, 아이패드는 왼쪽 위 ☰ → 메뉴가 떠서 열리고 탭을 누르면 닫혀요 · 이 기기에만 기억</div></div>' +
     '<div class="grid"><label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_wake">화면 꺼짐 방지 (휴대폰 · 아이패드 · PC)</label>' +
     '<label class="ck" style="grid-column:1/3"><input type="checkbox" id="vl_afit"><span>넓은 화면에서 표를 화면 폭에 맞춰 크게 <small style="color:#999">(PC·아이패드, 최대 1.5배)</small></span></label></div>' +
     '<div class="sub"><span>☁ 구글 드라이브 동기화</span><span id="vl_sdot"></span></div>' +
@@ -931,7 +932,9 @@
     [].forEach.call(root.querySelectorAll('[data-navset]'), function (b) { b.classList.toggle('on', b.getAttribute('data-navset') === (cfg.nav || 'full')); });
     [].forEach.call(root.querySelectorAll('#vl_head .tab'), function (b) { var l = b.querySelector('.vl-lxn'), k = { board: '1', res: '2', prac: '3' }[b.getAttribute('data-tab')]; if (l) b.title = l.textContent + (k ? ' · ' + k : ''); });
   }
-  function navSet(n) { cfg.nav = n; save(); navApply(); try { fit(); } catch (e) {} }
+  function navSet(n) { var was = navMode(); cfg.nav = n; save(); navApply(); try { fit(); } catch (e) {} if (was !== 'hide' && navMode() === 'hide') navTip(); }
+  /* PC (mouse) has no ☰ — say once how to bring the menu back */
+  function navTip() { try { if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (e) { return; } var d = $('vl_navtip'); if (!d) { d = document.createElement('div'); d.id = 'vl_navtip'; root.appendChild(d); } d.textContent = '메뉴 숨김 · M 키 또는 왼쪽 끝에 마우스를 대면 열려요'; d.style.display = ''; clearTimeout(navTip.t); navTip.t = setTimeout(function () { d.style.display = 'none'; }, 3000); }
   function navCycle() { var n = navMode(), full = cfg.full === true || (cfg.full !== false && isLx()); navSet(n === 'full' ? 'rail' : n === 'rail' && full ? 'hide' : 'full'); }
   $('vl_navt').onclick = function () { navSet(navMode() === 'full' ? 'rail' : 'full'); };
   $('vl_navf').onclick = function () { root.classList.toggle('vl-navpk'); };
