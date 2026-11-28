@@ -1,6 +1,6 @@
 (function () {
-  var VER0 = 126;   /* = VER below */
-  /* var VER = 126; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 127;   /* = VER below */
+  /* var VER = 127; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -33,7 +33,7 @@
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.42';
+  var VERSION = '3.2.43';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -446,7 +446,7 @@
     '#vl_root.vl-lx #vl_lxg .vl-lxc{flex:1 1 0}#vl_root.vl-lx #vl_lxg{gap:12px}' +
     '#vl_root.vl-lx #vl_big .bcol{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}#vl_root.vl-lx #vl_big .bcol>.rv.ah{grid-column:1;grid-row:1}#vl_root.vl-lx #vl_big .bcol>.rv.bh{grid-column:2;grid-row:1}#vl_root.vl-lx #vl_big .bcol>.mine{grid-column:1/-1;grid-row:2}' +
     '#vl_root.vl-lx #vl_big .rv{padding:6px 10px}#vl_root.vl-lx #vl_big .rv .rv-h{flex-wrap:wrap;gap:2px 6px}#vl_root.vl-lx #vl_big .rv .rv-t{font-size:18px}#vl_root.vl-lx #vl_big .rv .rv-g{font-size:20px}#vl_root.vl-lx #vl_big .rv-x{font-size:16px;padding-left:0;margin-left:0;align-items:flex-start}#vl_root.vl-lx #vl_big .rv-x small{font-size:12px}' +
-    '#vl_root.vl-lx #vl_big .bc-row{grid-template-columns:1fr 1fr}#vl_root.vl-lx #vl_big .bc-row>div:nth-child(n+3){display:none}' +
+    '#vl_root.vl-lx #vl_big .bc-row{grid-template-columns:1fr 1fr}#vl_root.vl-lx #vl_big .bc-row>div:nth-child(n+3){display:none}#vl_root.vl-lx #vl_big .bc-row.pr{grid-template-columns:1fr 1fr 1fr}#vl_root.vl-lx #vl_big .bc-row.pr>div:nth-child(3){display:block}#vl_big .bc-row.pr{grid-template-columns:1fr 1fr 1fr!important}' +
     '#vl_root.vl-lx.vl-lxmd #vl_big .bc-last{font-size:52px}#vl_root.vl-lx.vl-lxmd .vl-lxc table.vl-lt td{font-size:14px;padding:4px 5px}';
 
   css.textContent +=
@@ -2619,7 +2619,7 @@
         '<div class="vl-bc mine">' +
         '<div class="bc-top"><span class="bc-p"><small>P</small>' + esc(r.p || '-') + '</span><span class="bc-nm">' + (r.held ? '<span class="bc-held">지난 런 · 다시 찍히면 새로</span>' : '') + (r.tc ? '<i class="tmd" style="background:' + esc(r.tc) + ';width:.6em;height:.6em"></i>' : '') + (r.fin ? '🏁 ' : '') + nmH(r.nm) + '</span>' + (q && q.rank === 1 ? '<span class="bc-tq">TQ 예상</span>' : '') + '<span class="bc-l">' + (+r.l || 0) + '랩</span></div>' + qTxt +
         '<div class="bc-main"><div class="bc-k">LAST LAP</div><div class="bc-last" style="color:' + lc + '">' + esc(r.last) + '</div><div class="bc-d" style="color:' + lc + '">' + dTxt + '</div></div>' +
-        '<div class="bc-row">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('평균', esc(r.avg || '-')) + cell('Top 3', esc(t3Fmt(r.t3))) : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
+        '<div class="bc-row' + (!nbOn ? ' pr' : '') + '">' + (!nbOn ? cell(bst('베스트'), bst(esc(r.fast))) + cell('Top 3', esc(t3Fmt(r.t3))) + cell('<span style="color:#7fd4ff">' + (+cfg.projMin || 5) + '분 예상</span>', '<span style="color:#7fd4ff">' + esc(pjCard(r)) + '</span>') : (function () { var v = liveOf(r.key); return cell('진행 중', v.t, 'lt', ' data-lt="' + esc(r.key) + '"' + (v.c ? ' style="color:' + v.c + '"' : '')); })() +
           cell(bst('베스트'), bst(esc(r.fast))) +
           cell('앞차', esc(gapA), r.closeTo ? 'cl' : '', r.closeTo ? ' style="--cc:' + closeCol + '"' : '') +
           cell('뒤차', esc(gapB), back && back.closeTo ? 'cl' : '', back && back.closeTo ? ' style="--cc:' + closeCol + '"' : '')) +
@@ -4192,6 +4192,13 @@
         var pc = p.x ? '<span class="px-no">제외</span>' : p.none ? '-' : p.fin ? '<b>🏁 ' + fmtLT(p) + '</b>' : fmtLT(p) + (p.from ? ' <small>' + p.from + '~' + x.n + '랩</small>' : '');
         return '<tr' + (p.fin ? ' class="px-fin"' : '') + '><td>' + t3N(t3, i, x.n) + '</td><td class="lt-d" style="color:' + c + '"><b style="font-weight:' + (x.v > 0 && !sh && d < 0.0005 ? 800 : 700) + '">' + fmtS(t) + (x.v < 0 ? '*' : '') + '</b> (' + gap + ')' + '</td><td class="lt-p">' + pc + '</td></tr>';
       }).join('') + '</tbody></table>';
+  }
+  /* practice card: the N-minute projection of this run, same numbers as the lap table (1 decimal to fit) */
+  function pjCard(r) {
+    var lst = (lapHist[r.key] || []).filter(function (e) { return e.t > 0; }).map(function (e) { return { n: e.l, v: e.t }; }); if (!lst.length) return '-';
+    lst.best = r.bn > 0 ? r.bn : NaN;
+    var o = pracProj(lst, (+cfg.projMin || 5) * 60), p = o[o.length - 1]; if (!p || !(p.L > 0)) return '-';
+    var m = Math.floor(p.T / 60), x = p.T - m * 60; return p.L + '/' + m + ':' + (x < 10 ? '0' : '') + x.toFixed(1);
   }
   function fmtLT(p) { var m = Math.floor(p.T / 60), r = p.T - m * 60; return p.L + '/' + m + ':' + (r < 10 ? '0' : '') + r.toFixed(3); }
   /* laps: lap · time (gap to the best, same colour: best purple, within the set seconds green, more orange, invalid grey) · projected result (races) · position (heats / mains, up green, down red) */
