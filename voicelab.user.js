@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         보이스랩 - LiveRC 음성 랩타임
 // @namespace    voicelab
-// @version      3.2.41
+// @version      3.2.42
 // @description  LiveRC 라이브 스코어링에서 선택한 선수의 랩타임을 음성으로 안내 (모든 LiveRC 트랙)
 // @match        https://*.liverc.com/*
 // @match        http://*.liverc.com/*
@@ -20,8 +20,8 @@
 // ==/UserScript==
 window.__vlAuto = true;
 (function () {
-  var VER0 = 125;   /* = VER below */
-  /* var VER = 125; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
+  var VER0 = 126;   /* = VER below */
+  /* var VER = 126; — VoiceLab Windows app 2.27–2.29 reads the core version from this line: keep it equal to VER0 */
   if (window.__voiceLap && !((+window.__voiceLap.ver || 0) < VER0)) { window.__voiceLap.toggle(); return; }   /* same or newer copy running: a bookmark click toggles it */
   /* Tampermonkey on Chrome MV3 may run us in an isolated world: read LiveRC data through the real page window */
   var W = (typeof unsafeWindow !== 'undefined' && unsafeWindow) || window;
@@ -54,7 +54,7 @@ window.__vlAuto = true;
   function main() {
   if (!document.body) return;
   var VER = VER0;   /* bump when the panel changes */
-  var VERSION = '3.2.41';
+  var VERSION = '3.2.42';
   /* the ten alert tones (names here, sounds in TONES below) */
   var TONE_NAMES = ['부드러운 띵', '낮은 퐁', '짧은 톡', '나무 똑', '맑은 핑', '띵동', '마림바', '물방울', '낮은 종', '출발 총성'];
   function toneOpts() { return TONE_NAMES.map(function (n, i) { return '<option value="' + i + '">' + n + '</option>'; }).join(''); }
@@ -5920,7 +5920,7 @@ window.__vlAuto = true;
     var ptab = '<div class="px-seg vl-ptab"><button data-ptab="ses" class="' + (cfg.pxTab !== 'tire' ? 'on' : '') + '">📊 세션</button><button data-ptab="tire" class="' + (cfg.pxTab === 'tire' ? 'on' : '') + '">🛞 타이어 ' + tires().filter(function (t) { return !t.ret; }).length + '</button></div>';
     if (cfg.pxTab === 'tire') { box.innerHTML = (pit ? '<div class="vl-plx pit">' + carBar + ptab + renderTireTab(name, my.concat(racesC), true) + '</div>' : carBar + ptab + renderTireTab(name, my.concat(racesC), false)) + tUndoH(); oneFit(box); return; }
     var nowL = tNowLine(tOwner(my[my.length - 1][1]), allT, TL, pit);
-    prac.sum = (prac.loaded || '').replace('~', ' ~ ') + ' · ' + name + (CAR ? ' (' + cars[CAR] + ')' : '') + ' · 연습한 날 ' + dl.length + '일 · 세션 ' + my.length + '개 · 총 ' + all.laps + '랩 · 총 ' + hms(all.time);
+    prac.sum = name + (CAR ? ' (' + cars[CAR] + ')' : '') + ' · 연습한 날 ' + dl.length + '일 · 세션 ' + my.length + '개 · 총 ' + all.laps + '랩 · 총 ' + hms(all.time);
     if (prac.sum && !prac.aBusy) pstat(prac.sum);
     var older = dl.filter(function (d) { return d < pxs.day; }), prevS = older.length ? pstats(days[older[0]]) : null;
     var befBest = pstats([].concat.apply([], older.map(function (d) { return days[d]; }))).best;
